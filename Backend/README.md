@@ -37,6 +37,7 @@ The backend of Testimonial CMS is built with Django and PostgreSQL, providing a 
 [![Render link](https://img.shields.io/badge/Render-000000.svg?style=for-the-badge&logo=Render&logoColor=white 'Render link')](https://render.com/)
 [![Swagger Link](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=Swagger&logoColor=black 'Swagger Link')](https://swagger.io/)
 [![Markdown Link](https://img.shields.io/badge/Markdown-03a7dd?style=for-the-badge&logo=markdown&logoColor=white 'Markdown Link')](https://img.shields.io/badge/Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white)
+[![Cloudinary Link](https://img.shields.io/badge/cloudinary-%233448C5?style=for-the-badge&logo=cloudinary&logoColor=ffffff 'Cloudinary Link')](https://cloudinary.com/)
 [![Zod Link](https://img.shields.io/badge/zod-3E67B1?style=for-the-badge&logo=zod&logoColor=892CA0&color=313131)](https://zod.dev/ 'Zod Link')
 [![JSON_WEB_TOKENS Link](https://img.shields.io/badge/JSON_WEB_TOKENS-212121?style=for-the-badge&logo=jsonwebtokens&logoColor=ffffff 'JSON_WEB_TOKENS Link')](https://jwt.io/)
 [![Postgres](https://img.shields.io/badge/Postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
