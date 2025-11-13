@@ -1,7 +1,7 @@
 # 📚 Readme for App ✨
 
-- `📚 Repo`/[`📕 Frontend`](./frontend/README.MD)/
-- `📚 Repo`/[`📘 Backend`](./backend/README.MD)/
+- `📚 Repo`/[`📕 Frontend`](./Frontend/README.MD)/
+- `📚 Repo`/[`📘 Backend`](./Backend/README.MD)/
 
 ## 📖 Table Of Contents
 
