@@ -5,7 +5,7 @@
 
 ## 📖 Table Of Contents
 
-- [📕 Frontend for  Restify App ✨](#-frontend-for-app-)
+- [📕 Frontend for App ✨](#-frontend-for-app-)
   - [📖 Table Of Contents](#-table-of-contents)
   - [👀 Motivation 🔝](#-motivation-)
   - [⚙️ Technology Stack 🔝](#️-technology-stack-)
