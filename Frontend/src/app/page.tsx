@@ -1,4 +1,4 @@
-import { PageConstruction } from "@/components/PageConstruction/Pageconstruction";
+import { PageConstruction } from "@/components/PageConstruction/PageConstruction";
 
 
 export default function Home() {
