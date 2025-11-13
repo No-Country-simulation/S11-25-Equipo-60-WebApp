@@ -1,11 +1,11 @@
-# 📘 Backend for App
+# 📘 Backend for App ✨
 
 - [`📚 Root`](../README.md)/[`📕 Frontend`](../Frontend/README.md)/
 - [`📚 Root`](../README.md)/`📘 Backend`/
 
 ## 📖 Table of Contents
 
-- [📘 Backend for App](#-backend-for-app)
+- [📘 Backend for App ✨](#-backend-for-app-)
   - [📖 Table of Contents](#-table-of-contents)
   - [👀 Motivation 🔝](#-motivation-)
   - [🧰 Technology Stack 🔝](#-technology-stack-)
