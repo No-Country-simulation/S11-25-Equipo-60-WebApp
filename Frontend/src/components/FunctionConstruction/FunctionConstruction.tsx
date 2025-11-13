@@ -5,7 +5,7 @@ import { Card } from "@/components"
 import texts from "@/lib/locales/es.json"
 //import Link from "next/link"
 
-interface UnderConstructionProps {
+interface FunctionConstructionProps {
   readonly title?: string
   readonly description?: string
   readonly showBackButton?: boolean
@@ -15,7 +15,7 @@ export function FuntionConstruction({
   title = texts.function?.title ?? "Función en Construcción",
   description = texts.function?.description ?? "Esta funcionalidad está siendo desarrollada. Estará disponible pronto.",
   showBackButton = true,
-}: UnderConstructionProps) {
+}: FunctionConstructionProps) {
   return (
     <div className="min-h-screen bg-linear-to-br from-orange-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center p-4">
       <Card className="max-w-2xl w-full p-8 md:p-12 text-center space-y-6 shadow-xl">
