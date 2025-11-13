@@ -1,8 +1,5 @@
-import { PageConstruction } from "@/components";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <PageConstruction />
-  );
-
+  redirect("/under-construction");
 }
