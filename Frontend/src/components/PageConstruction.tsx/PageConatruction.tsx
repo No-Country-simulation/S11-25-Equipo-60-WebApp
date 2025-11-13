@@ -1,8 +1,7 @@
 "use client"
 
 import { Construction, ArrowLeft, Clock, Wrench } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Button, Card } from "@/components"
 import texts from "@/lib/locales/es.json"
 
 interface UnderConstructionProps {

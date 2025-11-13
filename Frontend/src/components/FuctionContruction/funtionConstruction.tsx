@@ -1,7 +1,7 @@
 "use client"
 
 import { Construction, Clock, Wrench } from "lucide-react"
-import { Card } from "@/components/ui/card"
+import { Card } from "@/components"
 import texts from "@/lib/locales/es.json"
 //import Link from "next/link"
 
