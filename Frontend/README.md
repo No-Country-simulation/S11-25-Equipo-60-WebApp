@@ -1,11 +1,11 @@
-# 📕 Frontend for ![Logo](../backend/src/assets/img/logo.png) Restify App ✨
+# 📕 Frontend for App ✨
 
 - [`📚 Repo`](../README.md)/`📕 Frontend`/
 - [`📚 Repo`](../README.md)/[`📘 Backend`](../Backend/README.md)/
 
 ## 📖 Table Of Contents
 
-- [📕 Frontend for  Restify App ✨](#-frontend-for--restify-app-)
+- [📕 Frontend for  Restify App ✨](#-frontend-for-app-)
   - [📖 Table Of Contents](#-table-of-contents)
   - [👀 Motivation 🔝](#-motivation-)
   - [⚙️ Technology Stack 🔝](#️-technology-stack-)
