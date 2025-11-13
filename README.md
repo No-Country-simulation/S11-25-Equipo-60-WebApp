@@ -122,6 +122,6 @@ Testimonial CMS is a platform designed for institutions and companies aiming to 
 | Description |  Deploy | link |
 |:-: |:-: | :-: |
 | Repository | [![Github Link](https://img.shields.io/badge/github-%23121011.svg?&style=for-the-badge&logo=github&logoColor=white 'Github Link')](https://github.com/No-Country/c17-29-n-node) | [Repo App](https://github.com/No-Country-simulation/S11-25-Equipo-60-WebApp 'Repo App') |
-| Forntend | [![Vercel Link](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white 'Vercel Link')](https://vercel.com/) |[Back-End](https://github.com/No-Country-simulation/S11-25-Equipo-60-WebApp) |
-| Backend | [![Vercel Link](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white 'Vercel Link')](https://vercel.com/) |[Back-End](https://github.com/No-Country-simulation/S11-25-Equipo-60-WebApp) |
+| Forntend | [![Vercel Link](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white 'Vercel Link')](https://vercel.com/) |[Back-End](https://testimonial-cms.vercel.app) |
+| Backend | [![Vercel Link](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white 'Vercel Link')](https://vercel.com/) |[Back-End](https://apitestimonial.vercel.app/app/docs/) |
 | Data Base | [![Postgres Link](https://img.shields.io/badge/Postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)| [PostgreSQL](https://github.com/No-Country-simulation/S11-25-Equipo-60-WebApp) |

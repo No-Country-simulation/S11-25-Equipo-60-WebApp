@@ -61,7 +61,7 @@ The frontend of Testimonial CMS is built with Next.js, React, and TypeScript, de
 
 | Service |  Deploy | Link |
 |:-: |:-: | :-: |
-| Front End | [![Vercel Link](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white 'Vercel Link')](https://vercel.com/) | [Front-End](https://github.com/No-Country-simulation/S11-25-Equipo-60-WebApp) |
+| Front End | [![Vercel Link](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white 'Vercel Link')](https://vercel.com/) | [Front-End](https://testimonial-cms.vercel.app) |
 
 ## 🛠️ Run Locally [🔝](#-frontend-for-app-)
 
