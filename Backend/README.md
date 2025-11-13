@@ -1,6 +1,6 @@
 # 📘 Backend for App
 
-- [`📚 Root`](../README.md)/[`📕 Frontend`](../Frontend/README.MD)/
+- [`📚 Root`](../README.md)/[`📕 Frontend`](../Frontend/README.md)/
 - [`📚 Root`](../README.md)/`📘 Backend`/
 
 ## 📖 Table of Contents
