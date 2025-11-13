@@ -58,9 +58,9 @@ class LoginView(generics.GenericAPIView):
     destroy=extend_schema(tags=['User']),
 )
 
-class CuentaViewSet(viewsets.ModelViewSet):
+class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = CuentaSerializer
+    serializer_class = UsuarioSerializer
     
 
     def get_queryset(self):
@@ -103,10 +103,22 @@ class CuentaViewSet(viewsets.ModelViewSet):
             username=serializer.validated_data['username'],
             email=serializer.validated_data['email'],
             password=serializer.validated_data['password'],
+            tipo_usuario='visitante'  # Esto corresponde a 'visitante' en tus choices
         )
-        
+        # Asignar automáticamente al grupo "visitante"
+        try:
+            grupo_visitante = Group.objects.get(name='visitante')
+            user.groups.add(grupo_visitante)
+        except Group.DoesNotExist:
+            # Si el grupo no existe, lo creamos (fallback)
+            grupo_visitante = Group.objects.create(name='visitante')
+            user.groups.add(grupo_visitante)
 
         return Response(
+            {
+                "message": "Usuario creado exitosamente y asignado al grupo 'visitante'",
+                "user_id": user.id
+            },
             status=status.HTTP_201_CREATED
         )
     
@@ -122,3 +134,22 @@ class CuentaViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs) 
+    
+@extend_schema(tags=['User'])
+class CompaniaCreateView(generics.CreateAPIView):
+    serializer_class = CompaniaSerializer
+    permission_classes = [AllowAny]
+    
+    def create(self, request, *args, **kwargs):
+        try:
+            response = super().create(request, *args, **kwargs)
+            response.data = {
+                "message": "Compañía creada exitosamente y asignada al grupo 'editor'",
+                "user_id": response.data['id']
+            }
+            return response
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )

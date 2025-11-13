@@ -15,6 +15,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+from decouple import config, Csv
 from datetime import timedelta
 import os 
 
@@ -22,12 +23,13 @@ import os
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-zn$n7l-cdcp8)oxn1bt&2id$vqmo1(q+(%)yx&mugy34h@gg57'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 
-ALLOWED_HOSTS = ['apitestimonial.vercel.app']
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 
 # Application definition
@@ -113,7 +115,7 @@ JAZZMIN_SETTINGS = {
 
     # Additional links to include in the user menu on the top right ("app" url type is not allowed)
     "usermenu_links": [
-        {"name": "Docs", "url": "http://localhost:8000/app/docs/", "new_window": False},
+        {"name": "Docs", "url": "https://apitestimonial/app/docs/", "new_window": False},
    
     ],
 
@@ -217,26 +219,13 @@ WSGI_APPLICATION = 'testimonios.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'bbskjgq5vcmlkwxapwuk',
-        'USER': 'ua3mashklv0trpqgxxms',
-        'PASSWORD': 'koA4Ued3bZz5aot6RZK8tBnxeqVzBj',
-        'HOST': 'bbskjgq5vcmlkwxapwuk-postgresql.services.clever-cloud.com',
-        'PORT': '50013',
-
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
-
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#        'NAME': 'testimonial',
-#        'USER': 'jesus',
-#        'PASSWORD': 'Jesus1',
-#        'HOST': 'localhost',
-#        'PORT': '5432',
-#
-#    }
-#}
 
 AUTH_USER_MODEL = 'app.User'
 # Password validation
@@ -286,7 +275,7 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-#Aqui indico y permito que URL pueda accedar a la api
+#Aqui indico que todo el mundo pueda consumir la api porque se pidio que sea libre
 CORS_ALLOW_ALL_ORIGINS = True
 
 
@@ -363,7 +352,7 @@ SPECTACULAR_SETTINGS = {
     'CONTACT': {
         'name': 'Testimonial',
         'email': 'example@gmail.com',
-        'url': 'https://example.vercel.app',
+        'url': 'https://frontendtestimonial.vercel.app',
     },
     #Orden de los tags en Swagger
     'TAGS': [

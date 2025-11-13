@@ -14,6 +14,8 @@ Este proyecto se trata de una API REST que es utilizada como Backend para la pla
 
 - Ejecuta el siguiente comando para instalar el proyecto:
 
+## Si estas en Windows
+
 ```
 py -m venv venv 
 ```
@@ -26,18 +28,36 @@ py -m venv venv
 pip install -r requirements.txt
 ```
 
-## Si quieres crear un super usuario ejecute el siguiente comando y sigue los pasos...
+## Si estas en una Distribucion Linux basada en Debian (Ubuntu, Linux Mint etc...)
 
 ```
-python manage.py createsuperuser
+python3 -m venv venv
+```
+
+```
+source venv/bin/activate
+```
+
+```
+pip3 install -r requirements.txt
 ```
 
 ## Levantar el backend de la plataforma
 
 El backend de la plataforma está construido en Django, para ejecutar el servidor de desarrollo backend debes ejecutar el siguiente comando:
 
+## Si estas en Windows
+
 ```
+
 python manage.py runserver
+```
+
+## Si estas en Linux
+
+```
+
+python3 manage.py runserver
 ```
 
 Te diriges a la url localhost:8000 en el navegador

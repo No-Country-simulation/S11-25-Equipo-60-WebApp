@@ -45,4 +45,9 @@ urlpatterns = [
     #DRF JWT
     path('app/login/', LoginView.as_view(), name='token_obtain_pair'),
     path('app/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    #REDIRECCIONAMIENTO, ES DECIR QUE TODAS LAS URLS REDIRECCIONEN AL APP/DOCS MENOS ADMIN
+    re_path(r'^(?!admin/).*$', RedirectView.as_view(url='/app/docs/', permanent=False)),
+
+
 ]

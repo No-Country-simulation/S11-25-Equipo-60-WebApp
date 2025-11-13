@@ -8,11 +8,12 @@ from django.conf.urls.static import static
 
 router=routers.DefaultRouter()
 #Modelos
-router.register(r'user', views.CuentaViewSet)   #endpoint 
+router.register(r'user', views.UsuarioViewSet)   #endpoint 
 
 urlpatterns=[
     path('', include(router.urls)),
     #La ruta de auth/o es api/auth/o/login/google-oauth2/
+    path('companias/', CompaniaCreateView.as_view(), name='crear-compania'),
 ]
 
 
