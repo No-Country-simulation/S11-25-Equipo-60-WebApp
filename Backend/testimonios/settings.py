@@ -25,9 +25,9 @@ import os
 SECRET_KEY = 'django-insecure-zn$n7l-cdcp8)oxn1bt&2id$vqmo1(q+(%)yx&mugy34h@gg57'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['testimonial.vercel.app']
 
 
 # Application definition
@@ -216,10 +216,27 @@ WSGI_APPLICATION = 'testimonios.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'bbskjgq5vcmlkwxapwuk',
+        'USER': 'ua3mashklv0trpqgxxms',
+        'PASSWORD': 'koA4Ued3bZz5aot6RZK8tBnxeqVzBj',
+        'HOST': 'bbskjgq5vcmlkwxapwuk-postgresql.services.clever-cloud.com',
+        'PORT': '50013',
+
     }
 }
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#        'NAME': 'testimonial',
+#        'USER': 'jesus',
+#        'PASSWORD': 'Jesus1',
+#        'HOST': 'localhost',
+#        'PORT': '5432',
+#
+#    }
+#}
 
 AUTH_USER_MODEL = 'app.User'
 # Password validation

@@ -30,7 +30,7 @@ class CuentaSerializer(serializers.ModelSerializer):
         model = User
     # estos son los campos que quiero que se conviertan a json
         #fields = ['id', 'username', 'email', 'password']
-        fields = ['id', 'username', 'email']
+        fields = ['id', 'username', 'email', 'password']
 
     
     #Validacion para no colocar campos adicionales en peticion POST/PATCH en herramientas como Postman
