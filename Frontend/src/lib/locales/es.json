@@ -27,5 +27,27 @@
   "contact": {
     "prompt": "¿Tienes sugerencias? Contáctanos en",
     "email": "support@testimonial-cms.com"
+  },
+  "table": {
+    "title": "Visor de Tabla",
+    "add": "Agregar",
+    "headers": {
+      "name": "Tarjeta",
+      "fee": "Tasa (%)",
+      "days": "Plazo recepción (días)",
+      "actions": "Acciones"
+    },
+    "placeholders": {
+      "name": "Nombre de la tarjeta",
+      "fee": "Tasa",
+      "days": "Días"
+    },
+    "buttons": {
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "add": "Agregar",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    }
   }
 }
