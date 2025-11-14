@@ -103,7 +103,6 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             username=serializer.validated_data['username'],
             email=serializer.validated_data['email'],
             password=serializer.validated_data['password'],
-            tipo_usuario='visitante'  # Esto corresponde a 'visitante' en tus choices
         )
         # Asignar automáticamente al grupo "visitante"
         try:
@@ -135,21 +134,84 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs) 
     
-@extend_schema(tags=['User'])
-class CompaniaCreateView(generics.CreateAPIView):
+@extend_schema_view(
+    list=extend_schema(tags=['Compañías']),
+    retrieve=extend_schema(tags=['Compañías']),
+    create=extend_schema(tags=['Compañías']),
+    update=extend_schema(exclude=True),
+    partial_update=extend_schema(tags=['Compañías']),
+    destroy=extend_schema(tags=['Compañías']),
+)
+class NegocioViewSet(viewsets.ModelViewSet):
     serializer_class = CompaniaSerializer
-    permission_classes = [AllowAny]
+    
+    def get_queryset(self):
+        # Filtrar usuarios que pertenecen al grupo "editor"
+        if self.action == 'list':
+            user = self.request.user
+            
+            # Obtener todos los usuarios que tienen el grupo "editor"
+            usuarios_editores = User.objects.filter(groups__name='editor')
+            
+            # 1. Si el usuario está autenticado Y es staff (Admin)
+            if user.is_authenticated and user.is_staff:
+                # El administrador visualiza TODAS las compañías (editores)
+                return usuarios_editores
+            
+            # 2. Si el usuario NO es staff
+            else:
+                # Visualiza solo las compañías que NO son staff
+                return usuarios_editores.filter(is_staff=False)
+                
+        return User.objects.filter(groups__name='editor')
+
+    def get_permissions(self):
+        # Permitir crear compañías sin autenticación
+        if self.action in ['create', 'list']: 
+            return [AllowAny()]  
+        
+        # Para otras acciones requiere autenticación
+        elif self.action in ['retrieve', 'partial_update', 'destroy']:  
+            return [IsAuthenticated()]  
+            
+        return [IsAuthenticated()]
     
     def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Crear usuario (compañía) con contraseña hasheada
+        user = User.objects.create_user(
+            username=serializer.validated_data['username'],
+            email=serializer.validated_data['email'],
+            password=serializer.validated_data['password'],
+        )
+        
+        # Asignar automáticamente al grupo "editor"
         try:
-            response = super().create(request, *args, **kwargs)
-            response.data = {
+            grupo_editor = Group.objects.get(name='editor')
+            user.groups.add(grupo_editor)
+        except Group.DoesNotExist:
+            # Si el grupo no existe, lo creamos (fallback)
+            grupo_editor = Group.objects.create(name='editor')
+            user.groups.add(grupo_editor)
+
+        return Response(
+            {
                 "message": "Compañía creada exitosamente y asignada al grupo 'editor'",
-                "user_id": response.data['id']
-            }
-            return response
-        except Exception as e:
+                "user_id": user.id
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
+    def update(self, request, *args, **kwargs):
+        if not kwargs.get('partial', False):
             return Response(
-                {"error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
+                {"detail": "Método PUT no permitido. Use PATCH en su lugar."},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
             )
+        return super().update(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)

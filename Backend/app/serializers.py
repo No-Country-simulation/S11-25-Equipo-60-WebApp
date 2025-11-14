@@ -27,12 +27,21 @@ class RefreshTokenSerializer(serializers.Serializer):
 
 class UsuarioSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    # Campo para mostrar los nombres de los grupos
+    groups = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='name'
+    )
 
     class Meta:
         model = User
-    # estos son los campos que quiero que se conviertan a json
-        #fields = ['id', 'username', 'email', 'password']
-        fields = ['id', 'username', 'email', 'password']
+        
+        fields = [
+            'id', 'username', 'email', 'password', 'groups',
+            'first_name', 'last_name', 'date_joined'
+        ]
+        read_only_fields = ['groups', 'date_joined']
 
     
     #Validacion para no colocar campos adicionales en peticion POST/PATCH en herramientas como Postman
@@ -55,7 +64,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
-            tipo_usuario='visitante'
         )
         
         # Asignar grupo "visitante"
@@ -66,15 +74,22 @@ class UsuarioSerializer(serializers.ModelSerializer):
     
 class CompaniaSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    # Campo para mostrar los nombres de los grupos
+    groups = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='name'
+    )
     
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'email', 'password', 
+            'id', 'username', 'email', 'password', 'groups',
+            'first_name', 'last_name', 'date_joined'
         ]
+        read_only_fields = ['groups', 'date_joined']
     
     def validate(self, data):
-        
         model_fields = {field.name for field in User._meta.get_fields()}
         extra_fields = set(self.initial_data.keys()) - model_fields
         
@@ -91,7 +106,8 @@ class CompaniaSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password'],
-            tipo_usuario='editor',
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
         )
         
         # Asignar grupo "editor"
