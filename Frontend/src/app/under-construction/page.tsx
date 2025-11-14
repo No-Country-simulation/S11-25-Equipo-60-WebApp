@@ -1,6 +1,6 @@
 import { PageConstruction } from "@/components";
 
-export default function Home() {
+export default function UnderConstruction() {
   return (
     <PageConstruction />
   );

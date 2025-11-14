@@ -8,7 +8,7 @@ import { StatusTable } from "@/components/TableViewer/StatusTable"
 import { TabsTable } from "@/components/TableViewer/TabsTable"
 import { MOCK_USER, MOCK_ROLES, MOCK_PERMISSIONS, MOCK_CATEGORIES, MOCK_STATUS, MOCK_TABS } from "@/mock/DataUserMock"
 
-export default function Home() {
+export default function Prueba() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       <div>
