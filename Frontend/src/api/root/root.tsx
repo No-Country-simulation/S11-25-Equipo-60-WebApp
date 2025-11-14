@@ -1,0 +1,1 @@
+export const urlApi: string = congif.apiUrl || "http://localhost:4000/api";
