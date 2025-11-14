@@ -2,6 +2,8 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from app.models import *
 from django.contrib.auth.models import Group
+# Agrega estos imports al inicio del archivo
+from django.utils import timezone
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -113,3 +115,79 @@ class CompaniaSerializer(serializers.ModelSerializer):
         user.groups.add(grupo_editor)
         
         return user
+    
+class CategoriaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Categoria
+        fields = ['id', 'editor_categoria', 'categoria_texto', 'fecha_registro']
+        read_only_fields = ['editor_categoria', 'fecha_registro']
+
+    def validate(self, data):
+        model_fields = {field.name for field in Categoria._meta.get_fields()}
+        extra_fields = set(self.initial_data.keys()) - model_fields
+        
+        if extra_fields:
+            raise serializers.ValidationError(
+                f"Campos no permitidos: {', '.join(extra_fields)}. "
+                f"Campos válidos: {', '.join(model_fields)}"
+            )
+        
+        return data
+
+    def create(self, validated_data):
+        # Asigna automáticamente el usuario actual al crear
+        validated_data['editor_categoria'] = self.context['request'].user
+        validated_data['fecha_registro'] = timezone.now()
+        return super().create(validated_data)
+
+
+class TabsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tabs
+        fields = ['id', 'editor_tabs', 'tabs_texto', 'fecha_registro']
+        read_only_fields = ['editor_tabs', 'fecha_registro']
+
+    def validate(self, data):
+        model_fields = {field.name for field in Tabs._meta.get_fields()}
+        extra_fields = set(self.initial_data.keys()) - model_fields
+        
+        if extra_fields:
+            raise serializers.ValidationError(
+                f"Campos no permitidos: {', '.join(extra_fields)}. "
+                f"Campos válidos: {', '.join(model_fields)}"
+            )
+        
+        return data
+
+    def create(self, validated_data):
+        # Asigna automáticamente el usuario actual al crear
+        validated_data['editor_tabs'] = self.context['request'].user
+        validated_data['fecha_registro'] = timezone.now()
+        return super().create(validated_data)
+
+
+class EstadosSerializer(serializers.ModelSerializer):
+    estado_display = serializers.CharField(source='get_estado_display', read_only=True)
+    
+    class Meta:
+        model = Estados
+        fields = ['id', 'editor_estado', 'estado', 'estado_display', 'fecha_registro']
+        read_only_fields = ['editor_estado', 'fecha_registro']
+
+    def validate(self, data):
+        model_fields = {field.name for field in Estados._meta.get_fields()}
+        extra_fields = set(self.initial_data.keys()) - model_fields
+        
+        if extra_fields:
+            raise serializers.ValidationError(
+                f"Campos no permitidos: {', '.join(extra_fields)}. "
+                f"Campos válidos: {', '.join(model_fields)}"
+            )
+        
+        return data
+
+    def create(self, validated_data):
+        # Asigna automáticamente el usuario actual al crear
+        validated_data['editor_estado'] = self.context['request'].user
+        validated_data['fecha_registro'] = timezone.now()
+        return super().create(validated_data)

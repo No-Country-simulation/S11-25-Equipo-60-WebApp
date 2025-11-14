@@ -10,6 +10,10 @@ router=routers.DefaultRouter()
 #Modelos
 router.register(r'user', views.UsuarioViewSet, basename='users')   # endpoint para usuarios visitantes
 router.register(r'companias', views.NegocioViewSet, basename='companias')  # endpoint para Compañias
+router.register(r'categorias', CategoriaViewSet, basename='categorias')
+router.register(r'tabs', TabsViewSet, basename='tabs')
+router.register(r'estados', EstadosViewSet, basename='estados')
+
 
 urlpatterns=[
     path('', include(router.urls)),

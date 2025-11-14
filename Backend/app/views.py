@@ -215,3 +215,144 @@ class NegocioViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
+    
+
+@extend_schema_view(
+    list=extend_schema(tags=['Categorias']),
+    retrieve=extend_schema(tags=['Categorias']),
+    create=extend_schema(tags=['Categorias']),
+    update=extend_schema(exclude=True),
+    partial_update=extend_schema(tags=['Categorias']),
+    destroy=extend_schema(tags=['Categorias']),
+)
+class CategoriaViewSet(viewsets.ModelViewSet):
+    serializer_class = CategoriaSerializer
+    
+    def get_queryset(self):
+        user = self.request.user
+        
+        # Si es admin, puede ver todas las categorías
+        if user.is_authenticated and user.is_staff:
+            return Categoria.objects.all()
+        
+        # Si es editor, solo puede ver sus propias categorías
+        if user.is_authenticated and user.groups.filter(name='editor').exists():
+            return Categoria.objects.filter(editor_categoria=user)
+        
+        # Usuarios no autenticados o sin permisos no ven nada
+        return Categoria.objects.none()
+
+    def get_permissions(self):
+        # Solo usuarios autenticados pueden realizar cualquier acción
+        return [IsAuthenticated()]
+
+    def create(self, request, *args, **kwargs):
+        # Verificar que el usuario pertenezca al grupo "editor"
+        if not request.user.groups.filter(name='editor').exists():
+            return Response(
+                {"detail": "No tienes permisos para crear categorías. Debes ser del grupo 'editor'."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        if not kwargs.get('partial', False):
+            return Response(
+                {"detail": "Método PUT no permitido. Use PATCH en su lugar."},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+        return super().update(request, *args, **kwargs)
+
+
+@extend_schema_view(
+    list=extend_schema(tags=['Tabs']),
+    retrieve=extend_schema(tags=['Tabs']),
+    create=extend_schema(tags=['Tabs']),
+    update=extend_schema(exclude=True),
+    partial_update=extend_schema(tags=['Tabs']),
+    destroy=extend_schema(tags=['Tabs']),
+)
+class TabsViewSet(viewsets.ModelViewSet):
+    serializer_class = TabsSerializer
+    
+    def get_queryset(self):
+        user = self.request.user
+        
+        # Si es admin, puede ver todos los tabs
+        if user.is_authenticated and user.is_staff:
+            return Tabs.objects.all()
+        
+        # Si es editor, solo puede ver sus propios tabs
+        if user.is_authenticated and user.groups.filter(name='editor').exists():
+            return Tabs.objects.filter(editor_tabs=user)
+        
+        # Usuarios no autenticados o sin permisos no ven nada
+        return Tabs.objects.none()
+
+    def get_permissions(self):
+        # Solo usuarios autenticados pueden realizar cualquier acción
+        return [IsAuthenticated()]
+
+    def create(self, request, *args, **kwargs):
+        # Verificar que el usuario pertenezca al grupo "editor"
+        if not request.user.groups.filter(name='editor').exists():
+            return Response(
+                {"detail": "No tienes permisos para crear tabs. Debes ser del grupo 'editor'."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        if not kwargs.get('partial', False):
+            return Response(
+                {"detail": "Método PUT no permitido. Use PATCH en su lugar."},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+        return super().update(request, *args, **kwargs)
+
+
+@extend_schema_view(
+    list=extend_schema(tags=['Estados']),
+    retrieve=extend_schema(tags=['Estados']),
+    create=extend_schema(tags=['Estados']),
+    update=extend_schema(exclude=True),
+    partial_update=extend_schema(tags=['Estados']),
+    destroy=extend_schema(tags=['Estados']),
+)
+class EstadosViewSet(viewsets.ModelViewSet):
+    serializer_class = EstadosSerializer
+    
+    def get_queryset(self):
+        user = self.request.user
+        
+        # Si es admin, puede ver todos los estados
+        if user.is_authenticated and user.is_staff:
+            return Estados.objects.all()
+        
+        # Si es editor, solo puede ver sus propios estados
+        if user.is_authenticated and user.groups.filter(name='editor').exists():
+            return Estados.objects.filter(editor_estado=user)
+        
+        # Usuarios no autenticados o sin permisos no ven nada
+        return Estados.objects.none()
+
+    def get_permissions(self):
+        # Solo usuarios autenticados pueden realizar cualquier acción
+        return [IsAuthenticated()]
+
+    def create(self, request, *args, **kwargs):
+        # Verificar que el usuario pertenezca al grupo "editor"
+        if not request.user.groups.filter(name='editor').exists():
+            return Response(
+                {"detail": "No tienes permisos para crear estados. Debes ser del grupo 'editor'."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        if not kwargs.get('partial', False):
+            return Response(
+                {"detail": "Método PUT no permitido. Use PATCH en su lugar."},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+        return super().update(request, *args, **kwargs)
