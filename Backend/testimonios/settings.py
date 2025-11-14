@@ -352,13 +352,14 @@ SPECTACULAR_SETTINGS = {
     'CONTACT': {
         'name': 'Testimonial',
         'email': 'example@gmail.com',
-        'url': 'https://frontendtestimonial.vercel.app',
+        'url': 'https://testimonial-cms.vercel.app/under-construction',
     },
     #Orden de los tags en Swagger
     'TAGS': [
         {'name': 'Login', 'description': 'Operaciones de autenticación'},
         {'name': 'Token', 'description': 'Operaciones relacionadas con los tokens JWT'},
-        {'name': 'User', 'description': 'Operaciones relacionadas con los Usuarios'},
+        {'name': 'User', 'description': 'Operaciones relacionadas con los Usuarios(visitantes)'},
+        {'name': 'Compañias', 'description': 'Operaciones relacionadas con las Compañias(editores)'},
     ],
     'SWAGGER_UI_SETTINGS': {
         'persistAuthorization': True,

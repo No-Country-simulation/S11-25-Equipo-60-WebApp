@@ -9,7 +9,7 @@ from django.conf.urls.static import static
 router=routers.DefaultRouter()
 #Modelos
 router.register(r'user', views.UsuarioViewSet, basename='users')   # endpoint para usuarios visitantes
-router.register(r'companias', views.NegocioViewSet, basename='companias')  # endpoint para compañías
+router.register(r'companias', views.NegocioViewSet, basename='companias')  # endpoint para Compañias
 
 urlpatterns=[
     path('', include(router.urls)),

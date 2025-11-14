@@ -135,12 +135,12 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         return self.update(request, *args, **kwargs) 
     
 @extend_schema_view(
-    list=extend_schema(tags=['Compañías']),
-    retrieve=extend_schema(tags=['Compañías']),
-    create=extend_schema(tags=['Compañías']),
+    list=extend_schema(tags=['Compañias']),
+    retrieve=extend_schema(tags=['Compañias']),
+    create=extend_schema(tags=['Compañias']),
     update=extend_schema(exclude=True),
-    partial_update=extend_schema(tags=['Compañías']),
-    destroy=extend_schema(tags=['Compañías']),
+    partial_update=extend_schema(tags=['Compañias']),
+    destroy=extend_schema(tags=['Compañias']),
 )
 class NegocioViewSet(viewsets.ModelViewSet):
     serializer_class = CompaniaSerializer
@@ -155,18 +155,18 @@ class NegocioViewSet(viewsets.ModelViewSet):
             
             # 1. Si el usuario está autenticado Y es staff (Admin)
             if user.is_authenticated and user.is_staff:
-                # El administrador visualiza TODAS las compañías (editores)
+                # El administrador visualiza TODAS las Compañias (editores)
                 return usuarios_editores
             
             # 2. Si el usuario NO es staff
             else:
-                # Visualiza solo las compañías que NO son staff
+                # Visualiza solo las Compañias que NO son staff
                 return usuarios_editores.filter(is_staff=False)
                 
         return User.objects.filter(groups__name='editor')
 
     def get_permissions(self):
-        # Permitir crear compañías sin autenticación
+        # Permitir crear Compañias sin autenticación
         if self.action in ['create', 'list']: 
             return [AllowAny()]  
         

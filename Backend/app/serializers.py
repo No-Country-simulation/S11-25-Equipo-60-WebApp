@@ -36,10 +36,9 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        
+
         fields = [
-            'id', 'username', 'email', 'password', 'groups',
-            'first_name', 'last_name', 'date_joined'
+            'id', 'username', 'email', 'password', 'groups', 'date_joined'
         ]
         read_only_fields = ['groups', 'date_joined']
 
@@ -84,8 +83,7 @@ class CompaniaSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'email', 'password', 'groups',
-            'first_name', 'last_name', 'date_joined'
+            'id', 'username', 'email', 'password', 'groups','date_joined'
         ]
         read_only_fields = ['groups', 'date_joined']
     
