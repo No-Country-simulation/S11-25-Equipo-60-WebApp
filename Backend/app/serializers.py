@@ -116,10 +116,47 @@ class CompaniaSerializer(serializers.ModelSerializer):
         
         return user
     
+class OrganizacionSerializer(serializers.ModelSerializer):
+    usuario_organizacion = serializers.CharField(source='usuario_organizacion.email', read_only=True)
+
+    class Meta:
+        model = Organizacion
+        fields = ['id', 'usuario_organizacion', 'organizacion_nombre', 'fecha_registro']
+        read_only_fields = ['fecha_registro', 'usuario_organizacion']
+
+    def validate(self, data):
+        model_fields = {field.name for field in Organizacion._meta.get_fields()}
+        extra_fields = set(self.initial_data.keys()) - model_fields
+        
+        if extra_fields:
+            raise serializers.ValidationError(
+                f"Campos no permitidos: {', '.join(extra_fields)}. "
+                f"Campos válidos: {', '.join(model_fields)}"
+            )
+        
+        # Validar que el nombre de organización sea único
+        organizacion_nombre = data.get('organizacion_nombre')
+        if organizacion_nombre and Organizacion.objects.filter(organizacion_nombre=organizacion_nombre).exists():
+            raise serializers.ValidationError({
+                "organizacion_nombre": "Ya existe una organización con este nombre."
+            })
+        
+        return data
+
+    def create(self, validated_data):
+        # Asigna automáticamente el usuario actual al crear
+        validated_data['usuario_organizacion'] = self.context['request'].user
+        validated_data['fecha_registro'] = timezone.now()
+        return super().create(validated_data)
+
+
 class CategoriaSerializer(serializers.ModelSerializer):
+    # Agregar campo para mostrar el username del editor
+    editor = serializers.CharField(source='editor_categoria.email', read_only=True)
+
     class Meta:
         model = Categoria
-        fields = ['id', 'editor_categoria', 'categoria_texto', 'fecha_registro']
+        fields = ['id', 'editor',  'categoria_texto', 'fecha_registro']
         read_only_fields = ['editor_categoria', 'fecha_registro']
 
     def validate(self, data):
@@ -141,14 +178,36 @@ class CategoriaSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class TabsSerializer(serializers.ModelSerializer):
+class TestimonioSerializer(serializers.ModelSerializer):
+    usuario_registrado = serializers.StringRelatedField(read_only=True)
+    organizacion_nombre = serializers.CharField(source='organizacion.organizacion_nombre', read_only=True)
+    categoria_nombre = serializers.CharField(source='categoria.categoria_texto', read_only=True)
+
+    # Definir el ranking con validación de rango
+    ranking = serializers.DecimalField(
+        max_digits=3, 
+        decimal_places=1,
+        min_value=1,  # Valor mínimo
+        max_value=5,  # Valor máximo
+        error_messages={
+            'min_value': 'El ranking debe ser como mínimo 1.',
+            'max_value': 'El ranking no puede ser mayor a 5.'
+        }
+    )
+    # Hacer el estado como campo oculto con valor por defecto
+    estado = serializers.CharField(default='E', read_only=True)
+
     class Meta:
-        model = Tabs
-        fields = ['id', 'editor_tabs', 'tabs_texto', 'fecha_registro']
-        read_only_fields = ['editor_tabs', 'fecha_registro']
+        model = Testimonios
+        fields = [
+            'id', 'organizacion', 'organizacion_nombre',  'usuario_registrado',  'usuario_anonimo', 
+            'api_key', 'categoria',  'categoria_nombre', 'comentario_texto', 'fecha_comentario', 
+            'ranking', 'estado'
+        ]
+        read_only_fields = ['usuario_registrado', 'fecha_comentario', 'organizacion_nombre', 'categoria_nombre', 'estado']
 
     def validate(self, data):
-        model_fields = {field.name for field in Tabs._meta.get_fields()}
+        model_fields = {field.name for field in Testimonios._meta.get_fields()}
         extra_fields = set(self.initial_data.keys()) - model_fields
         
         if extra_fields:
@@ -157,37 +216,35 @@ class TabsSerializer(serializers.ModelSerializer):
                 f"Campos válidos: {', '.join(model_fields)}"
             )
         
-        return data
-
-    def create(self, validated_data):
-        # Asigna automáticamente el usuario actual al crear
-        validated_data['editor_tabs'] = self.context['request'].user
-        validated_data['fecha_registro'] = timezone.now()
-        return super().create(validated_data)
-
-
-class EstadosSerializer(serializers.ModelSerializer):
-    estado_display = serializers.CharField(source='get_estado_display', read_only=True)
-    
-    class Meta:
-        model = Estados
-        fields = ['id', 'editor_estado', 'estado', 'estado_display', 'fecha_registro']
-        read_only_fields = ['editor_estado', 'fecha_registro']
-
-    def validate(self, data):
-        model_fields = {field.name for field in Estados._meta.get_fields()}
-        extra_fields = set(self.initial_data.keys()) - model_fields
+        # Validación adicional para ranking
+        ranking = data.get('ranking')
+        if ranking is not None:
+            if ranking < 1 or ranking > 5:
+                raise serializers.ValidationError({
+                    "ranking": "El ranking debe estar entre 1 y 5."
+                })
         
-        if extra_fields:
-            raise serializers.ValidationError(
-                f"Campos no permitidos: {', '.join(extra_fields)}. "
-                f"Campos válidos: {', '.join(model_fields)}"
-            )
+        # Validar que no exista un testimonio duplicado
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            organizacion = data.get('organizacion')
+            if organizacion:
+                # Verificar si ya existe un testimonio de este usuario para esta organización
+                if Testimonios.objects.filter(
+                    organizacion=organizacion, 
+                    usuario_registrado=request.user
+                ).exists():
+                    raise serializers.ValidationError({
+                        "organizacion": "Ya has creado un testimonio para esta organización. Solo puedes crear uno por organización."
+                    })
         
         return data
 
     def create(self, validated_data):
-        # Asigna automáticamente el usuario actual al crear
-        validated_data['editor_estado'] = self.context['request'].user
-        validated_data['fecha_registro'] = timezone.now()
+        # Obtener el usuario del contexto (JWT)
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            validated_data['usuario_registrado'] = request.user
+        
+        # La fecha se establece automáticamente por auto_now_add=True
         return super().create(validated_data)

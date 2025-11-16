@@ -9,12 +9,10 @@ from django.conf.urls.static import static
 router=routers.DefaultRouter()
 #Modelos
 router.register(r'user', views.UsuarioViewSet, basename='users')   # endpoint para usuarios visitantes
-router.register(r'companias', views.NegocioViewSet, basename='companias')  # endpoint para Compañias
+router.register(r'companias', views.CompaniaViewSet, basename='companias')  # endpoint para Compañias
 router.register(r'categorias', CategoriaViewSet, basename='categorias')
-router.register(r'tabs', TabsViewSet, basename='tabs')
-router.register(r'estados', EstadosViewSet, basename='estados')
-
-
+router.register(r'organizacion', OrganizacionViewSet, basename='organizacion')
+router.register(r'testimonios', TestimonioViewSet, basename='testimonios')
 urlpatterns=[
     path('', include(router.urls)),
 ]

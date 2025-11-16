@@ -296,6 +296,15 @@ REST_FRAMEWORK = {
        'DEFAULT_AUTHENTICATION_CLASSES': (
            'rest_framework_simplejwt.authentication.JWTAuthentication',
        ),
+    #Funcionalidad de limites de peticiones por la misma IP
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '60/hour',  # Limit unauthenticated users to 100 requests per hour
+        'user': '600/hour',  # Limit authenticated users to 1000 requests per hour
+    },
 
     #PERMISOS
        'DEFAULT_PERMISSION_CLASS': ('rest_framework.permissions.IsAuthenticated',),
@@ -360,6 +369,9 @@ SPECTACULAR_SETTINGS = {
         {'name': 'Token', 'description': 'Operaciones relacionadas con los tokens JWT'},
         {'name': 'User', 'description': 'Operaciones relacionadas con los Usuarios(visitantes)'},
         {'name': 'Compañias', 'description': 'Operaciones relacionadas con las Compañias(editores)'},
+        {'name': 'Organizaciones', 'description': 'Operaciones relacionadas con las Organizaciones'},
+        {'name': 'Categorias', 'description': 'Operaciones relacionadas con las Categorias'},
+        {'name': 'Testimonios', 'description': 'Operaciones relacionadas con los Testimonios'},
     ],
     'SWAGGER_UI_SETTINGS': {
         'persistAuthorization': True,

@@ -26,10 +26,21 @@ class User(AbstractUser):
         ordering = ['-date_joined']
 
 
+class Organizacion(models.Model):
+    usuario_organizacion = models.ForeignKey(User, on_delete=models.CASCADE, related_name='usuario_organizacion')
+    organizacion_nombre = models.CharField(max_length=50, blank=False, unique=True)
+    fecha_registro = models.DateTimeField(auto_now_add=True)  # ✅ Fecha automática
+
+    class Meta:
+        verbose_name = 'Organizacion'
+        verbose_name_plural = 'Organizaciones'
+        ordering = ['-id']  # Ordenar por ID descendente
+
+
 class Categoria(models.Model):
     editor_categoria = models.ForeignKey(User, on_delete=models.CASCADE, related_name='editor_categoria', blank=False)
     categoria_texto = models.CharField(max_length=50, blank=False)
-    fecha_registro = models.DateTimeField() 
+    fecha_registro = models.DateTimeField(auto_now_add=True) 
 
     class Meta:
         # Restriccion para que un usuario no pueda registrar varios productos con el mismo nombre
@@ -45,48 +56,38 @@ class Categoria(models.Model):
                 f"de la Cuenta: {self.editor_categoria.username} con el correo ({self.editor_categoria.email}) "
                )
 
+class Testimonios(models.Model):
 
-
-class Tabs(models.Model):
-    editor_tabs = models.ForeignKey(User, on_delete=models.CASCADE, related_name='editor_tabs', blank=False)
-    tabs_texto = models.CharField(max_length=50, blank=False)
-    fecha_registro = models.DateTimeField() 
-
-    class Meta:
-        # Restriccion para que un usuario no pueda registrar varios productos con el mismo nombre
-        #Si el producto pertenece a el, el producto puede tener varias veces el mismo nombre si pertenece
-        #a usuarios diferentes 
-        unique_together = ('editor_tabs', 'tabs_texto')
-        verbose_name = 'Tab'
-        verbose_name_plural = 'Tabs'
-        ordering = ['-id']  # Ordenar por ID descendente
-
-    def __str__(self):
-        return (f"Tab {self.tabs_texto}, "
-                f"de la Cuenta: {self.editor.username} con el correo ({self.editor.email}) "
-               )
-
-class Estados(models.Model):
+    organizacion = models.ForeignKey(Organizacion, on_delete=models.CASCADE, related_name='organizacion', blank=False)
+    usuario_registrado = models.ForeignKey(User, on_delete=models.CASCADE, related_name='usuario_visitante', blank=False, null=True)
+    usuario_anonimo = models.CharField(max_length=50, blank=True, null=True)
+    api_key = models.CharField(max_length=50, blank=True, null=True)
+    comentario_texto = models.CharField(max_length=100, blank=False, null=False)
+    fecha_comentario = models.DateTimeField(auto_now_add=True) 
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='organizacion', blank=False)
+    ranking = models.DecimalField(default=0, max_digits=3, decimal_places=1)
 
     OPCIONES_ESTADOS = (
         ('A', 'APROBADO'),
+        ('E', 'ESPERA'),
         ('R', 'RECHAZADO'),
         ('B', 'BORRADOR'),
     )
-    editor_estado = models.ForeignKey(User, on_delete=models.CASCADE, related_name='editor_estado', blank=False)
+
     estado = models.CharField(max_length=1, choices=OPCIONES_ESTADOS, default='E', verbose_name='Estado')
-    fecha_registro = models.DateTimeField() 
 
     class Meta:
         # Restriccion para que un usuario no pueda registrar varios productos con el mismo nombre
         #Si el producto pertenece a el, el producto puede tener varias veces el mismo nombre si pertenece
         #a usuarios diferentes 
-        unique_together = ('editor_estado', 'estado')
+        unique_together = ('organizacion', 'usuario_registrado')
         verbose_name = 'Estado'
         verbose_name_plural = 'Estados'
-        ordering = ['-id']  # Ordenar por ID descendente
+        ordering = ['-fecha_comentario']  # Ordenar por fecha descendente
 
+    
     def __str__(self):
-        return (f"Estado {self.estado}, "
-                f"de la Cuenta: {self.editor.username} con el correo ({self.editor.email}) "
-               )
+        usuario = self.usuario_registrado.username if self.usuario_registrado else self.usuario_anonimo
+        return f"Testimonio de {usuario} para {self.organizacion.organizacion_nombre}"
+
+

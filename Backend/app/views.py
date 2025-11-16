@@ -45,6 +45,7 @@ class LoginView(generics.GenericAPIView):
         return Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),
+            'user_id': user.id,  # 👈 Agregar el ID del usuario
         }, status=status.HTTP_200_OK)
     
 
@@ -142,7 +143,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     partial_update=extend_schema(tags=['Compañias']),
     destroy=extend_schema(tags=['Compañias']),
 )
-class NegocioViewSet(viewsets.ModelViewSet):
+class CompaniaViewSet(viewsets.ModelViewSet):
     serializer_class = CompaniaSerializer
     
     def get_queryset(self):
@@ -218,6 +219,86 @@ class NegocioViewSet(viewsets.ModelViewSet):
     
 
 @extend_schema_view(
+    list=extend_schema(tags=['Organizaciones']),
+    retrieve=extend_schema(tags=['Organizaciones']),
+    create=extend_schema(tags=['Organizaciones']),
+    update=extend_schema(exclude=True),
+    partial_update=extend_schema(tags=['Organizaciones']),
+    destroy=extend_schema(tags=['Organizaciones']),
+)
+class OrganizacionViewSet(viewsets.ModelViewSet):
+    serializer_class = OrganizacionSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        
+        # Para list y retrieve, todos pueden ver las organizaciones
+        if self.action in ['list', 'retrieve']:
+            return Organizacion.objects.all()
+        
+        # Usuario normal (visitante) no ve organizaciones (o podría ver algunas según tu lógica)
+        return Organizacion.objects.none()
+    
+    def get_permissions(self):
+        # Permitir list y retrieve sin autenticación (público)
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        
+        # Para create, update, delete requiere autenticación y ser editor/admin
+        return [IsAuthenticated()]
+
+    def create(self, request, *args, **kwargs):
+        # Verificar que el usuario pertenezca al grupo "editor"
+        if not request.user.groups.filter(name='editor').exists():
+            return Response(
+                {"detail": "No tienes permisos para crear organizaciones. Debes ser del grupo 'editor'."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Validar que no exista una organización con el mismo nombre para este usuario
+        organizacion_nombre = request.data.get('organizacion_nombre')
+        if Organizacion.objects.filter(
+            usuario_organizacion=request.user, 
+            organizacion_nombre=organizacion_nombre
+        ).exists():
+            return Response(
+                {"detail": "Ya existe una organización con este nombre para tu cuenta."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        if not kwargs.get('partial', False):
+            return Response(
+                {"detail": "Método PUT no permitido. Use PATCH en su lugar."},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        # Verificar que el usuario sea el dueño de la organización o admin
+        organizacion = self.get_object()
+        if not (request.user.is_staff or organizacion.usuario_organizacion == request.user):
+            return Response(
+                {"detail": "No tienes permisos para modificar esta organización."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().partial_update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        # Verificar que el usuario sea el dueño de la organización o admin
+        organizacion = self.get_object()
+        if not (request.user.is_staff or organizacion.usuario_organizacion == request.user):
+            return Response(
+                {"detail": "No tienes permisos para eliminar esta organización."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().destroy(request, *args, **kwargs)
+
+@extend_schema_view(
     list=extend_schema(tags=['Categorias']),
     retrieve=extend_schema(tags=['Categorias']),
     create=extend_schema(tags=['Categorias']),
@@ -263,90 +344,54 @@ class CategoriaViewSet(viewsets.ModelViewSet):
             )
         return super().update(request, *args, **kwargs)
 
-
 @extend_schema_view(
-    list=extend_schema(tags=['Tabs']),
-    retrieve=extend_schema(tags=['Tabs']),
-    create=extend_schema(tags=['Tabs']),
+    list=extend_schema(tags=['Testimonios']),
+    retrieve=extend_schema(tags=['Testimonios']),
+    create=extend_schema(tags=['Testimonios']),
     update=extend_schema(exclude=True),
-    partial_update=extend_schema(tags=['Tabs']),
-    destroy=extend_schema(tags=['Tabs']),
+    partial_update=extend_schema(tags=['Testimonios']),
+    destroy=extend_schema(tags=['Testimonios']),
 )
-class TabsViewSet(viewsets.ModelViewSet):
-    serializer_class = TabsSerializer
-    
+class TestimonioViewSet(viewsets.ModelViewSet):
+    serializer_class = TestimonioSerializer
+    permission_classes = [IsAuthenticated]  # Requiere autenticación
+
     def get_queryset(self):
         user = self.request.user
         
-        # Si es admin, puede ver todos los tabs
-        if user.is_authenticated and user.is_staff:
-            return Tabs.objects.all()
+        # Admin ve todos los testimonios
+        if user.is_staff:
+            return Testimonios.objects.all()
         
-        # Si es editor, solo puede ver sus propios tabs
-        if user.is_authenticated and user.groups.filter(name='editor').exists():
-            return Tabs.objects.filter(editor_tabs=user)
+        # Editor ve solo testimonios de sus organizaciones/categorías
+        if user.groups.filter(name='editor').exists():
+            return Testimonios.objects.filter(
+                models.Q(organizacion__usuario_organizacion=user) |
+                models.Q(categoria__editor_categoria=user)
+            ).distinct()
         
-        # Usuarios no autenticados o sin permisos no ven nada
-        return Tabs.objects.none()
-
-    def get_permissions(self):
-        # Solo usuarios autenticados pueden realizar cualquier acción
-        return [IsAuthenticated()]
+        # Usuario normal ve solo sus propios testimonios
+        return Testimonios.objects.filter(usuario_registrado=user)
 
     def create(self, request, *args, **kwargs):
-        # Verificar que el usuario pertenezca al grupo "editor"
-        if not request.user.groups.filter(name='editor').exists():
+        # Verificar que el usuario NO sea editor
+        if request.user.groups.filter(name='editor').exists():
             return Response(
-                {"detail": "No tienes permisos para crear tabs. Debes ser del grupo 'editor'."},
+                {
+                    "detail": "Los usuarios del grupo 'editor' no pueden crear testimonios. Solo los visitantes pueden crear testimonios."
+                },
                 status=status.HTTP_403_FORBIDDEN
             )
-        return super().create(request, *args, **kwargs)
-
-    def update(self, request, *args, **kwargs):
-        if not kwargs.get('partial', False):
+        
+        # Verificar que el usuario sea visitante
+        if not request.user.groups.filter(name='visitante').exists():
             return Response(
-                {"detail": "Método PUT no permitido. Use PATCH en su lugar."},
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
-            )
-        return super().update(request, *args, **kwargs)
-
-
-@extend_schema_view(
-    list=extend_schema(tags=['Estados']),
-    retrieve=extend_schema(tags=['Estados']),
-    create=extend_schema(tags=['Estados']),
-    update=extend_schema(exclude=True),
-    partial_update=extend_schema(tags=['Estados']),
-    destroy=extend_schema(tags=['Estados']),
-)
-class EstadosViewSet(viewsets.ModelViewSet):
-    serializer_class = EstadosSerializer
-    
-    def get_queryset(self):
-        user = self.request.user
-        
-        # Si es admin, puede ver todos los estados
-        if user.is_authenticated and user.is_staff:
-            return Estados.objects.all()
-        
-        # Si es editor, solo puede ver sus propios estados
-        if user.is_authenticated and user.groups.filter(name='editor').exists():
-            return Estados.objects.filter(editor_estado=user)
-        
-        # Usuarios no autenticados o sin permisos no ven nada
-        return Estados.objects.none()
-
-    def get_permissions(self):
-        # Solo usuarios autenticados pueden realizar cualquier acción
-        return [IsAuthenticated()]
-
-    def create(self, request, *args, **kwargs):
-        # Verificar que el usuario pertenezca al grupo "editor"
-        if not request.user.groups.filter(name='editor').exists():
-            return Response(
-                {"detail": "No tienes permisos para crear estados. Debes ser del grupo 'editor'."},
+                {
+                    "detail": "Solo los usuarios del grupo 'visitante' pueden crear testimonios."
+                },
                 status=status.HTTP_403_FORBIDDEN
             )
+        
         return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):

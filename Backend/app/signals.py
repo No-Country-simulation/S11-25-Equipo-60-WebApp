@@ -9,7 +9,7 @@ def create_default_groups(sender, **kwargs):
     Crea grupos por defecto después de las migraciones
     """
     # Grupos a crear
-    groups = ['admin', 'editor', 'visitante']
+    groups = ['editor', 'visitante']
     
     for group_name in groups:
         Group.objects.get_or_create(name=group_name)

@@ -130,6 +130,6 @@ body {
 
 /*Ocultar Schema*/
 
-.swagger-ui .models {
-    display: none !important;
-}
+/**.swagger-ui .models {
+/**    display: none !important;
+/**}
