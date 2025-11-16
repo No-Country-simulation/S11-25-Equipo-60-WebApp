@@ -1,5 +1,5 @@
 from django.db import models
-# from django.contrib.auth.models import User # Modelo original
+from django.core.exceptions import ValidationError  # 👈 Agrega esta importación
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
 from django.db.models import Q, F
@@ -38,56 +38,74 @@ class Organizacion(models.Model):
 
 
 class Categoria(models.Model):
-    editor_categoria = models.ForeignKey(User, on_delete=models.CASCADE, related_name='editor_categoria', blank=False)
-    categoria_texto = models.CharField(max_length=50, blank=False)
+    categoria_texto = models.CharField(max_length=50, blank=False, unique=True)  
     fecha_registro = models.DateTimeField(auto_now_add=True) 
 
     class Meta:
         # Restriccion para que un usuario no pueda registrar varios productos con el mismo nombre
         #Si el producto pertenece a el, el producto puede tener varias veces el mismo nombre si pertenece
         #a usuarios diferentes 
-        unique_together = ('editor_categoria', 'categoria_texto')
         verbose_name = 'Categoria'
         verbose_name_plural = 'Categorias'
         ordering = ['-id']  # Ordenar por ID descendente
 
     def __str__(self):
-        return (f"Categoria {self.categoria_texto}, "
-                f"de la Cuenta: {self.editor_categoria.username} con el correo ({self.editor_categoria.email}) "
-               )
+        return (f"Categoria {self.categoria_texto}, ")
 
 class Testimonios(models.Model):
 
     organizacion = models.ForeignKey(Organizacion, on_delete=models.CASCADE, related_name='organizacion', blank=False)
-    usuario_registrado = models.ForeignKey(User, on_delete=models.CASCADE, related_name='usuario_visitante', blank=False, null=True)
-    usuario_anonimo = models.CharField(max_length=50, blank=True, null=True)
+    usuario_registrado = models.ForeignKey(User, on_delete=models.CASCADE, related_name='usuario_visitante', blank=True, null=True)
+    usuario_anonimo_username = models.CharField(max_length=50, blank=True, null=True)
+    usuario_anonimo_email = models.EmailField(blank=True, null=True) 
     api_key = models.CharField(max_length=50, blank=True, null=True)
     comentario_texto = models.CharField(max_length=100, blank=False, null=False)
     fecha_comentario = models.DateTimeField(auto_now_add=True) 
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='organizacion', blank=False)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='categoria_testimonios', blank=False)
     ranking = models.DecimalField(default=0, max_digits=3, decimal_places=1)
 
     OPCIONES_ESTADOS = (
         ('A', 'APROBADO'),
         ('E', 'ESPERA'),
         ('R', 'RECHAZADO'),
-        ('B', 'BORRADOR'),
     )
 
     estado = models.CharField(max_length=1, choices=OPCIONES_ESTADOS, default='E', verbose_name='Estado')
 
     class Meta:
-        # Restriccion para que un usuario no pueda registrar varios productos con el mismo nombre
-        #Si el producto pertenece a el, el producto puede tener varias veces el mismo nombre si pertenece
-        #a usuarios diferentes 
+        # Restricción para usuarios registrados
         unique_together = ('organizacion', 'usuario_registrado')
-        verbose_name = 'Estado'
-        verbose_name_plural = 'Estados'
-        ordering = ['-fecha_comentario']  # Ordenar por fecha descendente
+        
+        # 👈 Nueva restricción para usuarios anónimos
+        constraints = [
+            models.UniqueConstraint(
+                fields=['organizacion', 'usuario_anonimo_username', 'usuario_anonimo_email'],
+                name='unique_anonimo_por_organizacion',
+                condition=models.Q(usuario_registrado__isnull=True)  # Solo aplica para usuarios anónimos
+            )
+        ]
+        verbose_name = 'Testimonio'
+        verbose_name_plural = 'Testimonios'
+        ordering = ['-fecha_comentario']
 
-    
     def __str__(self):
-        usuario = self.usuario_registrado.username if self.usuario_registrado else self.usuario_anonimo
+        usuario = self.usuario_registrado.username if self.usuario_registrado else self.usuario_anonimo_username
         return f"Testimonio de {usuario} para {self.organizacion.organizacion_nombre}"
 
+    def clean(self):
+        # Validación adicional a nivel de modelo
+        if not self.usuario_registrado and (not self.usuario_anonimo_username or not self.usuario_anonimo_email):
+            raise ValidationError(
+                "Para testimonios anónimos, tanto usuario_anonimo_username como usuario_anonimo_email son requeridos."
+            )
+        
 
+    def save(self, *args, **kwargs):
+        # Si hay usuario registrado, limpiar campos anónimos automáticamente
+        if self.usuario_registrado:
+            self.usuario_anonimo_username = None
+            self.usuario_anonimo_email = None
+            self.api_key = None
+        
+        self.clean()
+        super().save(*args, **kwargs)

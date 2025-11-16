@@ -13,6 +13,10 @@ router.register(r'companias', views.CompaniaViewSet, basename='companias')  # en
 router.register(r'categorias', CategoriaViewSet, basename='categorias')
 router.register(r'organizacion', OrganizacionViewSet, basename='organizacion')
 router.register(r'testimonios', TestimonioViewSet, basename='testimonios')
+router.register(r'testimonios-organizacion', TestimonioOrganizacionViewSet, basename='testimonios-organizacion')
+#La ruta de cambiar-estado-testimonio solamente puede ser usado por los editores de la organizacion a la que se le realizo el testimonio
+router.register(r'testimonios-cambiar-estado', CambiarEstadoTestimonioViewSet, basename='cambiar-estado-testimonio')
+
 urlpatterns=[
     path('', include(router.urls)),
 ]

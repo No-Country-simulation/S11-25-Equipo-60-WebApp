@@ -361,7 +361,7 @@ SPECTACULAR_SETTINGS = {
     'CONTACT': {
         'name': 'Testimonial',
         'email': 'example@gmail.com',
-        'url': 'https://testimonial-cms.vercel.app/under-construction',
+        'url': 'https://testimonial-cms.vercel.app/prueba',
     },
     #Orden de los tags en Swagger
     'TAGS': [
@@ -369,8 +369,8 @@ SPECTACULAR_SETTINGS = {
         {'name': 'Token', 'description': 'Operaciones relacionadas con los tokens JWT'},
         {'name': 'User', 'description': 'Operaciones relacionadas con los Usuarios(visitantes)'},
         {'name': 'Compañias', 'description': 'Operaciones relacionadas con las Compañias(editores)'},
-        {'name': 'Organizaciones', 'description': 'Operaciones relacionadas con las Organizaciones'},
         {'name': 'Categorias', 'description': 'Operaciones relacionadas con las Categorias'},
+        {'name': 'Organizaciones', 'description': 'Operaciones relacionadas con las Organizaciones'},
         {'name': 'Testimonios', 'description': 'Operaciones relacionadas con los Testimonios'},
     ],
     'SWAGGER_UI_SETTINGS': {
