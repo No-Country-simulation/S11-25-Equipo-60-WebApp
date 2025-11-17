@@ -3,6 +3,18 @@ from django.core.exceptions import ValidationError  # 👈 Agrega esta importaci
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
 from django.db.models import Q, F
+# models.py
+from django.contrib.auth.models import Group
+
+class Roles(Group):
+    class Meta:
+        proxy = True
+        verbose_name = 'Rol'
+        verbose_name_plural = 'Roles'
+        app_label = 'app'  # Esto lo hará aparecer en el apartado app del Admin de Django
+    
+    def __str__(self):
+        return f"Grupo: {self.name}"
 
 class User(AbstractUser):
 
@@ -25,6 +37,30 @@ class User(AbstractUser):
         verbose_name_plural = 'Usuarios'
         ordering = ['-date_joined']
 
+#Para dividir los usuarios en el admin de Django en dos secciones (visitantes y editores), 
+#necesito crear modelos proxy y configurar el admin apropiadamente
+
+class Visitante(User):
+    class Meta:
+        proxy = True
+        verbose_name = 'Visitante'
+        verbose_name_plural = 'Visitantes'
+        app_label = 'app'
+
+class Editor(User):
+    class Meta:
+        proxy = True
+        verbose_name = 'Editor'
+        verbose_name_plural = 'Editores'
+        app_label = 'app'
+
+class AdminUser(User):
+    class Meta:
+        proxy = True
+        verbose_name = "Administrador"
+        verbose_name_plural = "Administradores"
+        app_label = "app"
+
 
 class Organizacion(models.Model):
     usuario_organizacion = models.ForeignKey(User, on_delete=models.CASCADE, related_name='usuario_organizacion')
@@ -35,6 +71,10 @@ class Organizacion(models.Model):
         verbose_name = 'Organizacion'
         verbose_name_plural = 'Organizaciones'
         ordering = ['-id']  # Ordenar por ID descendente
+
+
+    def __str__(self):
+        return self.organizacion_nombre
 
 
 class Categoria(models.Model):
@@ -50,7 +90,7 @@ class Categoria(models.Model):
         ordering = ['-id']  # Ordenar por ID descendente
 
     def __str__(self):
-        return (f"Categoria {self.categoria_texto}, ")
+        return (f"Categoria {self.categoria_texto}")
 
 class Testimonios(models.Model):
 

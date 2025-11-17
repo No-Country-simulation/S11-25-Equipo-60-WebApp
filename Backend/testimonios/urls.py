@@ -36,6 +36,7 @@ class HiddenSchemaView(SpectacularAPIView):
 
 
 urlpatterns = [
+    path('', include('pwa.urls')), #Siempre de primera o sino no funciona
     path('admin/', admin.site.urls),
     path('app/', include('app.urls')), #ESTO LLAMO LOS ENDPOINTS
     #swagger

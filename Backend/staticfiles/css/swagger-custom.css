@@ -126,10 +126,3 @@ body {
     color: #ffffff !important;
     background-color: #343a40 !important;
 }
-
-
-/*Ocultar Schema*/
-
-.swagger-ui .models {
-    display: none !important;
-}

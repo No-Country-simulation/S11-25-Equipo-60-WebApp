@@ -72,15 +72,14 @@ JAZZMIN_SETTINGS = {
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_brand": "Testimonial",
 
-    
-
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-    "login_logo": None,
+    "login_logo": "images/logo1.png",
+    
+    # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
+    "site_icon": "images/logo1.png",
 
     # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
-    # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-    "login_logo": None,
 
     # Logo to use for login form in dark themes (defaults to login_logo)
     "login_logo_dark": None,
@@ -88,8 +87,6 @@ JAZZMIN_SETTINGS = {
     # CSS classes that are applied to the logo above
     "site_logo_classes": "img-circle",
 
-    # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
-    "site_icon": None,
 
     # Welcome text on the login screen
     "welcome_sign": "Bienvenido. Por favor ingrese sus datos",
@@ -115,7 +112,7 @@ JAZZMIN_SETTINGS = {
 
     # Additional links to include in the user menu on the top right ("app" url type is not allowed)
     "usermenu_links": [
-        {"name": "Docs", "url": "https://apitestimonial/app/docs/", "new_window": False},
+        {"name": "Docs", "url": "https://apitestimonial.vercel.app", "new_window": False},
    
     ],
 
@@ -360,7 +357,7 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'CONTACT': {
         'name': 'Testimonial',
-        'email': 'example@gmail.com',
+        'email': 'support@testimonial-cms.com',
         'url': 'https://testimonial-cms.vercel.app/prueba',
     },
     #Orden de los tags en Swagger
@@ -377,3 +374,25 @@ SPECTACULAR_SETTINGS = {
         'persistAuthorization': True,
     }
 }
+
+PWA_APP_NAME = 'Testimonial'
+PWA_APP_DESCRIPTION = "Testimonial"
+PWA_APP_THEME_COLOR = '#0A0302'
+PWA_APP_BACKGROUND_COLOR = "#1c4216"
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = '/'
+PWA_APP_ORIENTATION = 'any'
+PWA_APP_START_URL = '/'
+PWA_APP_STATUS_BAR_COLOR = 'default'
+PWA_APP_ICONS = [
+    {'src': '/static/images/icons/icon-72x72.png', 'sizes': '72x72'},
+    {'src': '/static/images/icons/icon-96x96.png', 'sizes': '96x96'},
+    {'src': '/static/images/icons/icon-128x128.png', 'sizes': '128x128'},
+    {'src': '/static/images/icons/icon-144x144.png', 'sizes': '144x144'},
+    {'src': '/static/images/icons/icon-152x152.png', 'sizes': '152x152'},
+    {'src': '/static/images/icons/icon-192x192.png', 'sizes': '192x192'},
+    {'src': '/static/images/icons/icon-384x384.png', 'sizes': '384x384'},
+    {'src': '/static/images/icons/icon-512x512.png', 'sizes': '512x512'},
+]
+PWA_APP_DIR = 'ltr'
+PWA_APP_LANG = 'es'
