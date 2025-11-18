@@ -103,6 +103,45 @@ class CompaniaSerializer(serializers.ModelSerializer):
         
         return user
     
+class AdminUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'email', 'password', 'date_joined'
+        ]
+        read_only_fields = ['date_joined', 'is_staff', 'is_active', 'is_superuser']
+    
+    def validate(self, data):
+        model_fields = {field.name for field in User._meta.get_fields()}
+        extra_fields = set(self.initial_data.keys()) - model_fields
+        
+        if extra_fields:
+            raise serializers.ValidationError(
+                f"Campos no permitidos: {', '.join(extra_fields)}. "
+                f"Campos válidos: {', '.join(model_fields)}"
+            )
+        return data
+    
+    def create(self, validated_data):
+        # Crear usuario con todos los permisos de administrador
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password'],
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
+            is_staff=True,        # 👈 Staff activado
+            is_active=True,       # 👈 Usuario activo
+            is_superuser=True     # 👈 Superusuario
+        )
+        
+        # Los administradores NO tienen grupos específicos
+        # user.groups.clear()  # Opcional: limpiar grupos si es necesario
+        
+        return user
+       
 class OrganizacionSerializer(serializers.ModelSerializer):
     usuario_organizacion = serializers.CharField(source='usuario_organizacion.email', read_only=True)
 

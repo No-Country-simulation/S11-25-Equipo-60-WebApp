@@ -364,10 +364,11 @@ SPECTACULAR_SETTINGS = {
     'TAGS': [
         {'name': 'Login', 'description': 'Operaciones de autenticación'},
         {'name': 'Token', 'description': 'Operaciones relacionadas con los tokens JWT'},
-        {'name': 'User', 'description': 'Operaciones relacionadas con los Usuarios(visitantes)'},
-        {'name': 'Compañias', 'description': 'Operaciones relacionadas con las Compañias(editores)'},
+        {'name': 'User', 'description': 'Operaciones relacionadas con los Usuarios(usuarios visitantes)'},
+        {'name': 'Compañias', 'description': 'Operaciones relacionadas con las Compañias(usuarios editores)'},
+        {'name': 'Administradores', 'description': 'Operaciones relacionadas con las Usuarios(usuarios admins)'},
         {'name': 'Categorias', 'description': 'Operaciones relacionadas con las Categorias'},
-        {'name': 'Organizaciones', 'description': 'Operaciones relacionadas con las Organizaciones'},
+        {'name': 'Organizaciones', 'description': 'Operaciones relacionadas con las Organizaciones(Dominios)'},
         {'name': 'Testimonios', 'description': 'Operaciones relacionadas con los Testimonios'},
     ],
     'SWAGGER_UI_SETTINGS': {

@@ -44,7 +44,6 @@ class LoginView(generics.GenericAPIView):
         
         return Response({
             'user_id': user.id,  # 👈 Agregar el ID del usuario
-            'refresh': str(refresh),
             'access': str(refresh.access_token),
         }, status=status.HTTP_200_OK)
     
@@ -260,6 +259,111 @@ class CompaniaViewSet(viewsets.ModelViewSet):
         
         return super().destroy(request, *args, **kwargs)
     
+@extend_schema_view(
+    list=extend_schema(tags=['Administradores'],
+        description="Listar todos los administradores. Solo accesible por administradores."),
+    retrieve=extend_schema(tags=['Administradores'],
+        description="Obtener un administrador específico. Solo accesible por administradores."),
+    create=extend_schema(tags=['Administradores'],
+        description="Crear un nuevo administrador. Solo accesible por administradores."),
+    update=extend_schema(exclude=True),
+    partial_update=extend_schema(tags=['Administradores'],
+        description="Actualizar información de administrador. SOLO un administrador puede editar su propia información."),
+    destroy=extend_schema(tags=['Administradores'],
+        description="Eliminar administrador. SOLO un administrador puede eliminar su propia cuenta."),
+)
+class AdminUserViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para crear y gestionar usuarios administradores.
+    - Crear: Solo administradores pueden crear otros administradores
+    - Listar/Ver: Solo administradores pueden ver otros administradores  
+    - Editar: Solo puede editar su propia información
+    - Eliminar: Solo puede eliminar su propia cuenta
+    """
+    serializer_class = AdminUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Solo mostrar usuarios con is_staff=True
+        return User.objects.filter(is_staff=True)
+
+    def get_permissions(self):
+        permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
+    def create(self, request, *args, **kwargs):
+        # Verificar que el usuario que hace la petición sea administrador
+        if not request.user.is_staff:
+            return Response(
+                {"detail": "No tienes permisos para crear administradores. Solo un admin puede crear otro admin"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().create(request, *args, **kwargs)
+
+    def list(self, request, *args, **kwargs):
+        # Verificar que el usuario que hace la petición sea administrador
+        if not request.user.is_staff:
+            return Response(
+                {"detail": "No tienes permisos para listar administradores. Solo un admin puede ver otros admins"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        # Verificar que el usuario que hace la petición sea administrador
+        if not request.user.is_staff:
+            return Response(
+                {"detail": "No tienes permisos para ver administradores. Solo un admin puede ver otros admins"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().retrieve(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        # Verificar que el usuario que hace la petición sea administrador
+        if not request.user.is_staff:
+            return Response(
+                {"detail": "No tienes permisos para modificar administradores. Solo los administradores pueden editar su propia información."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # 👇 VERIFICACIÓN CLAVE: Solo puede editar SU PROPIA información
+        admin_a_editar = self.get_object()
+        if admin_a_editar != request.user:
+            return Response(
+                {"detail": "No puedes modificar la información de otros administradores. Solo puedes editar tu propia información."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().partial_update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        # Verificar que el usuario que hace la petición sea administrador
+        if not request.user.is_staff:
+            return Response(
+                {"detail": "No tienes permisos para eliminar administradores. Solo los administradores pueden eliminar su propia cuenta."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # 👇 VERIFICACIÓN CLAVE: Solo puede eliminar SU PROPIA cuenta
+        admin_a_eliminar = self.get_object()
+        if admin_a_eliminar != request.user:
+            return Response(
+                {"detail": "No puedes eliminar otros administradores. Solo puedes eliminar tu propia cuenta."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().destroy(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        if not kwargs.get('partial', False):
+            return Response(
+                {"detail": "Método PUT no permitido. Use PATCH en su lugar."},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+        return super().update(request, *args, **kwargs)
 
 @extend_schema_view(
     list=extend_schema(tags=['Organizaciones']),
