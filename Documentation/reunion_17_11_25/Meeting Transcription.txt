@@ -1,0 +1,959 @@
+# Meeting Transcription
+
+  Meeting started: 17/11/2025, 19:30:30
+  Duration: 204 minutes
+  Participants: Alejandro Navarro, david coach dev, Jesus Medina, José Ortega, Luis Nina, Vladimir Villacrés
+
+  [View original transcript](https://app.tactiq.io/api/2/u/m/r/y10i5Nq2dcedA0cybkLY?o=txt)
+
+    ## Short summary
+
+En la reunión se abordó el avance del proyecto, destacando la necesidad de coordinación entre los equipos de frontend y backend para mejorar la integración, manejo de roles de usuario y funcionalidades del login y dashboard. Se estableció la división de tareas entre los integrantes para finalizar la landing page y los dashboards de usuarios con distintos roles, y se acordó ajustar horarios de reuniones para facilitar la participación de todos. Además, se discutieron detalles técnicos sobre la seguridad, gestión de estados, y la importancia de contar con una documentación clara para agilizar el desarrollo y la colaboración.
+
+  
+
+  
+    ## Highlights
+
+    > 17:28 Jesus Medina: https://github.com/No-Country-simulation/S11-25-Equipo-60-WebApp
+> 17:30 Alejandro Navarro: https://github.com/No-Country-simulation/S11-25-Equipo-60-WebApp
+> 17:50 Luis Nina: https://github.com/LuisNina1
+> 01:14:37 david coach dev: Yo te lo muestro. Y dueño no tengo, tengo una maqueta aquí en cero que es los que ya está, ya
+
+  ## Transcript
+
+  00:00 david coach dev: Bienvenido.
+00:24 Luis Nina: Qué tal Buenas noches David
+00:27 david coach dev: Cómo vamos aquí? Esperemos lo demás para ver qué se va a transmitir.
+00:33 Luis Nina: Disculpa que no te escucho pero es problema mío a ver también un minuto Hola Creo que ahora sí te puedo escuchar
+00:57 david coach dev: Hola hola probando Me escuchas bienvenido a este nuevo.
+01:01 Luis Nina: Hola David ahora
+01:03 david coach dev: el primero de la hoy día Vamos a grabar la transmisión de la reunión para tenerla para que cualquiera
+01:06 Luis Nina: sí
+01:09 david coach dev: la puede escuchar. listo Ya listo.
+02:07 david coach dev: Bienvenido bienvenido.
+02:09 Jesus Medina: Bueno, bueno, cómo están?
+02:14 david coach dev: Aquí en el nuevo día una nueva semana y lo nuevo.
+02:20 Jesus Medina: Ah está bien.
+04:42 Alejandro Navarro: Hola a todos, cómo están?
+04:46 david coach dev: Bienvenidos, cómo vamos?
+04:49 Alejandro Navarro: Cómo Perdón no no
+05:01 david coach dev: Hoy Qué pena se fue mago? Se bajó más. Que te dio de baja mago, porque ya no sale en el equipo.
+05:25 Jesus Medina: de baja
+05:26 david coach dev: Mago, la de la chica que iba a hacer que iba a hacer video. O ya le escrito Algo de mí.
+05:38 Alejandro Navarro: A la mejor por eso.
+05:42 david coach dev: No sé, era broma, pero igual no te he comido nada todavía. Se repartieron la Landy ni el Lau y hizo todo lo que hay hasta el momento no hay nada más. y los proyectos que ya están desplegados tanto el Front como el
+05:53 Alejandro Navarro: sí De hecho subí yo la rama de de login ahí para que la checara se me hace un favor de checarlo.
+06:05 david coach dev: A ver no la he visto la verdad He estado trabajando. me salió nuevo proyecto en llave tengo que estudiar en Java a ver, Vámonos primero tenemos que buscar el
+06:19 Alejandro Navarro: nada más que igual falta crear una rama Depp o de una vez la vamos a merchear a
+06:28 david coach dev: de una vez a Flor en directamente a Fredy es lo tuyo y si lo tuyo está funcionando y lo lanza directamente a florer porque igual el día de hoy la rama que te tiene que desplegar era la del Main y la de Barca ni la de Frank no directamente la cuando yo venga le modelo y lo que hay que hacer es cambiar los puntos de despliegue amén.
+06:48 Alejandro Navarro: Pero igual para que no haya problemas o bueno, es que no sé, yo me estaba. viendo que se hace así pero Fue muy nuevo todavía en eso.
+07:03 david coach dev: Uy qué bonito está moviendo? Vámonos con todavía todavía Ya estoy viendo. Déjame abrir visto para correr no en local. Uy qué problema me va a explotar ya mismo anota Bueno ahorita teorizando el código me interesa eso pregunté hablen o digan lo que quiera.
+08:03 Alejandro Navarro: Nada más me faltó, No sé lo del Estado global apenas también lo voy a checar lo del sustan. este para tratar de integrarlo y preguntarle a Jesús o bueno o preguntar Más bien a todos De nada más en la petición del usuario me trae el token, me trae dos, no me acuerdo cuáles eran no va a venir también el nombre del usuario o eso ya se te va automáticamente en el Sí, Haz de cuenta que cuando se registra el usuario. Nada más te manda dos el token y no me acuerdo cuál es el otro.
+08:46 Jesus Medina: Va a registrar por ahora Solamente le pido dos Campos no, el user name?
+08:48 Alejandro Navarro: No, bueno, es que no recuerdo haber. bueno, el chiste es que manda dos no también tiene que mandar el nombre del usuario o eso ya va en el cuando se registre
+09:14 Jesus Medina: Tres Campos digo luces, el email y el password no sé si lo mismo para cualquier usuario, si es con dientes o si es editor. Te pido esos tres Campos no sé que sea necesario agregar más Campos o no.
+09:32 Alejandro Navarro: Ah no no no no no, a ver, no me explique bien. Haz de cuenta que cuando haces el login Hazte cuenta cuando te mandas la contraseña y el email
+09:45 Jesus Medina: Ajá
+09:45 Alejandro Navarro: y te registras exitosamente o haz de cuenta que yo recibo en el Para poder no sé cómo Mostrar los datos del usuario Haz de cuenta que sí me manda el token. Pero no tendría que mandar el nombre o tiene el cuando se registra ya va a aparecer todos sus datos. No sé si me doy a entender.
+10:10 Jesus Medina: o sea, cuando el cuando Y solamente con el toque ya ya devuelve los datos.
+10:20 Alejandro Navarro: Ah ya te borró todos los datos con el
+10:23 Jesus Medina: Sí usted, o sea, supongamos. por ejemplo los métodos get todos los métodos get son públicos todos no necesitan autenticación y toquen ni nada por el estilo de son públicos ahora, por ejemplo para un Testing para crear un testimonio Cuando son usuarios bloqueados, simplemente con el puro toquen ya se sabe cuál es el nombre de usuario y eso. Ahora usuario anónimo, que no quiere que no está registrado la aplicación ahí sí, debe de ingresar su email y su username en que le quiera colocar.
+11:18 Alejandro Navarro: Ah okay, okay.
+11:19 Jesus Medina: Eso es lo que lo que pregunta. Con el puro toque ya, ya se sabe la información.
+14:22 Luis Nina: Qué tal una consulta? Me pasaron está ese grupo recientemente. Ustedes Ya veo que han avanzado, quizás me puedan comentar en qué puedo ayudar?
+14:38 david coach dev: Bienvenido no sabía que te habían pasado. Cuándo entraste a Disculpa bienvenido? Preséntate y dinos qué tecnología usas, por favor.
+14:50 Luis Nina: Qué tal mi nombre es Luis Soy de Perú por ahora estoy usando, estoy enfocando en reac. y un poco del backennade y Express Recién estoy empezando Así que quizás puedan guiarme, qué puedo ayudarles?
+15:07 david coach dev: perfecto, no vas a poder ayudar pero que baje en este momento te Está realizando con python con Dyango O sea que por ese lado no, Podrías ayudar, podría ir a landing que este momento estamos buscando. ría notarías mucha complicación y manejar Ahorita lo que a los que Hemos llegado este este momento solo se dividió en la landi y el componente del login, porque teníamos hace un planning para planificar que íbamos a hacer, pero hasta el momento, la verdad Todavía no se ha hecho. Ahorita, estoy revisando el login en este momento este.
+15:52 david coach dev: Qué tal de manejas con net talwing? Lo conocen o lo conoces?
+16:02 Luis Nina: Este telwin le ha usado, pero next no, no le ha tocado. Pero me podrían decir en qué puedo aprender no para poder ayudar.
+16:41 Alejandro Navarro: Hola Luis pues bienvenido y pues no sé también ahorita lo que quiere Bueno vamos a implementar va a ser sustan, no sé si voy a la has manejado o no.
+17:07 Luis Nina: Quizás podrían compartirme su repositorio para ir viendo cómo van?
+17:28 Jesus Medina: https://github.com/No-Country-simulation/S11-25-Equipo-60-WebApp
+17:30 Alejandro Navarro: https://github.com/No-Country-simulation/S11-25-Equipo-60-WebApp
+17:33 Jesus Medina: Luis usted está agregado al repositorio Cuál es usuario para agregarlo.
+17:40 Luis Nina: No, no me han agregado. Te paso mi usuario.
+17:50 Luis Nina: https://github.com/LuisNina1
+17:53 Alejandro Navarro: Sí, es cierto, me surgió una vida también, a ver si me la pueden responder, por ejemplo, en este dado caso, que por ejemplo, tenemos la carpeta de backen y fronten en el mismo proyecto. y yo para poder correr si no estuviera de depriado el el
+18:14 Jesus Medina: Tendría que irse. agarrar la
+18:20 Alejandro Navarro: Este Ajá pero bueno, Mi pregunta, es esta para no para Cuál es la mejor opción desplegar el backen en otra carpeta porque Bueno tengo que bueno, Estaba viendo que tienes que poner también el punto em no las llaves privadas. Entonces cuando hago yo mi cómic omito todo lo del Baker o cómo cómo es la cómo sería esa cuestión para poder trabajarlo
+18:45 Jesus Medina: Ahí lo que tendría que hacer es Descargar directamente. Con la rama del Sí si no actualizo yo la rama. con el
+18:58 Alejandro Navarro: no haz de cuenta que bueno ahorita ya al principio Ya lo hice, pero haz de cuenta que
+19:05 Jesus Medina: punto
+19:08 Alejandro Navarro: por ejemplo en el dado caso Nada más quiero saber cuál es la mejor forma de poderlo trabajar para no tocar yo el Haz de cuenta
+19:19 Jesus Medina: Yo pienso que la mejor forma Para, o sea, para usted de que descargarlo.
+19:25 Alejandro Navarro: no, no, no haz de cuenta que por ejemplo, yo tengo que tocar el punto en no y por ejemplo Por ende, yo ya estoy tocando el cuando yo hago mi git Haz de cuenta, que yo no quiero subir los cambios, pero yo tengo que entonces omitir en el Front todo lo del O desplegar el en otra carpeta para poder trabajar la local.
+19:46 Jesus Medina: Yo pienso que colocar una carpeta aparte para trabajar
+19:50 Alejandro Navarro: Ah okay.
+19:52 Jesus Medina: Aunque si usted, o sea lo que usted usted modifica el punto Eso no se sube. a la
+20:03 david coach dev: A ver, a ver, a ver, alma, calma calma lo que le está preguntando Cómo maneja, el frones no hay ningún problema. Tú vas a tener por completo y tú solo te vas sobre la carpeta Front el punto entraron tiene que ir dentro de la carpeta from, no puede ir afuera. los puntos en tienen que ir dentro de la carpeta de cada tecnología si son del barrio tiene que ver entonces bajen y de que son de dentro de respetar por separado lo que puede podrías instalar en una extensión de monorrepo para que tú puedas solo solo ver en la carpeta fronner y no ve la carpeta igual al momento de hacer hacerlo Push como tú no has tocado nada del backen, no se va, no va a haber ningún problema porque el pus solo se hace lo que tú modificas
+20:48 Alejandro Navarro: Sí porque Haz de cuenta que
+20:49 david coach dev: si en cada correría abrir dos terminales una una apuntando la tarjeta a la carpeta Front Y otra apuntando al backen y ahí levantas cada uno en cada terminal van a terminar en Front y otro terminario para tener la comunicación.
+21:06 Alejandro Navarro: Entonces sí Entonces la mejor opción es trabajar independiente, verdad? Porque obviamente yo cuando hago el el pool para la para la para la rama del obviamente ya ya estoy alterado también los cambios de de Rama Y eso es lo que no no sabía bien Pero bueno gracias porque ya está desplegado, pero tenía esa duda de y cómo se maneja entonces.
+21:31 david coach dev: lo que se podría hacer hacer dos ramas que solo tengan en flor ni el Vaca pero normalmente lo que tendría que hacer es no tocar el rama bajen porque tú no haces cambio en la rama baken porque la rama bracken tú no tienes que hacer fortnite primero tiene que hacer favor de la damame y hay actualizaciones del backing, si te va al problema Y si te va el conflicto porque tú solo arrancas del Main no El problema va a seguir jugando y por eso que la rama May no sería haber desplegado nada pero no te completo.
+22:01 david coach dev: Para que no haya ese problema que al momento que queramos mandar el fronten alarma Main o esta carpeta va que no sea igual a la carpeta va bien de mí. Ahí habría que primero actualizarles la rama from con los cambios de main, ver qué no causa el conflicto y si hay conflicto nada en la rama, baja Nadie se iba a haber el último semana para revisar esos pequeños detalles, Porque si va a haber conflicto cuando tú quieras integrar la rama from a la rama del Main si va a haber conflicto porque la carpeta Main del backen es diferente a la respeta también que tenemos nosotros.
+22:37 david coach dev: Tenemos que hacer es vagar los cambios de backing aceptar todos los cambios entrantes para que eliminen nuestra versión y ahí cuando esté actualizada el backing subir de nuevo todo. Y decirle al backing que no puede mandar nada Amén hasta que no te subí el Front o sea, así mismo cuando el vaya a subir Amén va a tener que traer de todos los cambios del Main a su rama para más Front y ahí subí los cambios porque es como el repositorio, no se integró bien. Debemos haber sacado dos ramas antes de comenzar a pasar dos ramas para que uno solo tenga la alarma la carpeta from, vacía la del baking y la de Front tenga la carpeta vaca en vacía para tener ningún problema Al momento de integrarlo.
+23:21 david coach dev: Porque si yo manda una carpeta vacía y hay contenidos no hay ningún problema porque la carpeta vacía la omite el hit cuando hace Puchi cuando hace merch, la carpeta vacía la se la salta es como si no existiera. Pero esto ya será momento de que hagamos ya el de la semana tres ellos andamos todo para hacer el despliegue y ahí vamos a tener que soportar esos pequeños problemitas van a salir, pues no va a ser muchos.
+23:48 david coach dev: Pregunta en login, solo está visualmente no sirve verdad?
+23:52 Alejandro Navarro: No si está integrado ya está conectado con la
+23:56 david coach dev: Ya Entonces tenemos dos problemas problema uno ninguno de los dos botones funciona. Porque me intenté intenté lo llame como lobby como Amin y como editor y los botones no funcionan.
+24:09 Alejandro Navarro: Es que lo que pasa es que yo nada más estaba apuntando hacia usuario
+24:13 david coach dev: Ya que ese problema en los horarios deberían estar los dos y tener error fantasma hasta que no esté no tenga un dashboard. los dos roles deben estar ya creados en la base de datos con el fantasma, o sea, el momento que tengo los fantasmas no tiene un rol específico, no tiene permiso Así que te queda en la landing en teoría Debería ser así, pues esto ya es configuración más del Front más que del Okay ahorita ahorita tiene que ponerme aquí podemos pedirle que cree el usuario administrador y el usuario editor.
+24:51 david coach dev: Entonces tienes que pasar entonces por qué no entra?
+24:56 Jesus Medina: el administrador es
+25:01 Jesus Medina: admin@gmail.com
+admin
+25:01 Jesus Medina: Este igual lo pasé por el grupo pasado.
+25:05 david coach dev: ya que ese no sea administrador que está acá puesto en el en el
+25:06 Jesus Medina: admin es la contraseña
+25:11 Alejandro Navarro: Y yo también este estaba haciendo un un visitante también. Porque lo tuve que volver a hacer para poder hacer. el el
+25:24 david coach dev: Claro, te estoy viendo que igual hay que dar cuenta, no funciona. Bueno volver a inicio, no debería volver directamente al wom para que te diga directamente a no construcción lo manda directamente.
+25:35 Alejandro Navarro: bueno Es que lo que pasa es que como todavía no sabíamos del dashboard nada más lo único que hice fue maquetarlo y hacer inicio sesión con el usuario.
+25:47 david coach dev: El déjame Probar con este usuario porque yo probé con los usuarios que están aquí escritos en ninguno, vale? Este esos correos de cambiarlos porque si no tiene actualización y no sirven, te podrías poner los correos que están en la plantilla? Después que hay que pasarle la los correos a él para que los cree es que ya vamos a tener que comenzar a tener un poquito más de comunicación entre un lado y el otro.
+26:20 david coach dev: Bueno, Supongo que ya se lo dio porque me hace el Ah bueno, es que voy te comparto más fácil, no Bueno me dicen que no están viendo. Ahí está ella pueden ver todo Ahí está el usuario y la contraseña doy login hace esto y me estoy haciendo Supongo que ya se lo vio.
+26:38 Jesus Medina: pero no no, no, no ese es para loguearse como administrador pero ese ese panel es el que está en Dyango
+26:50 Alejandro Navarro: Sí perdón, perdón Jesús
+26:51 Jesus Medina: Bueno yo no sé si pronto manejaría eso.
+26:52 Jesus Medina: https://apitestimonial.vercel.app/admin/
+26:57 Alejandro Navarro: No todavía no
+26:59 Jesus Medina: Ah bueno pero ese el admin, los usuarios administrativos se deberían en la URL que acaba de mandar. O sea, yo creo que no no debería hacer un dashboard.
+27:11 david coach dev: Cuentas de prueba:
+
+Admin:
+
+admin@testimoalcms.com / admin123
+
+Editor
+
+editor@testimonialcms.com / editor123 Cuentas de prueba:
+
+Admin:
+
+admin@testimoalcms.com / admin123
+
+Editor
+
+editor@testimonialcms.com / editor123
+27:15 david coach dev: A ver, a ver Comencemos con algo este ami no es también demuestra aplicaciones
+27:16 Jesus Medina: le devuelvo el ya le ya le ya le muestro usted le devuelve le devuelve el toque
+27:22 david coach dev: a mí del que maneja la aplicación, pero no es menos del editor también del editor y el usuario debería crearse, ahí tienes un Ahí te mandé aquí con el chat, una cuenta, no sé si la puede crear. Y que le pone como como usuario le pones dos fantasma para nefrones hacer una obligación que si el error es vos automáticamente lo devuelva a la landing Pero los guiados dos cuando yo yo me lo creo tú que me devuelves solo el token.
+27:57 Jesus Medina: el refresh, toque, ni le diré el
+27:58 Alejandro Navarro: visitante01@example.com
+12345678
+28:03 Alejandro Navarro: del usuario eso es lo que Haz de cuenta que para poderlo guiarte como visitante yo creí esto de visitante te lo acabo de mandar por aquí David por el chat de
+28:15 david coach dev: Está aquí, sí, funcionan. Ya es Para probarlo. Quiero ver algo que tenemos un pequeño, seguimos con El pequeño problema de los roles que estamos más por este.
+28:28 Jesus Medina: {
+  "user_id": 1,
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6NDkxNzAyNzk2NywiaWF0IjoxNzYzNDI3OTY3LCJqdGkiOiI1NTY5YTgwMGM0ZWY0ZWMxYWI0NzVhOGUyYmVmNDU3ZSIsInVzZXJfaWQiOiIxIn0.ITIYqdHmB_vGjrEmXtjD3_QRnVnmdwR1VgsTpwRMk64",
+  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjo0OTE3MDI3OTY3LCJpYXQiOjE3NjM0Mjc5NjcsImp0aSI6ImMyY2UyNGI3ZTg1MzRjZmZiZmRmZTQ4NWUwM2FkNTliIiwidXNlcl9pZCI6IjEifQ.NSdrEWOCYq1V7AmRz-CxXJJ6hZb83CKVUYnWn7UaCb0"
+}
+
+Respuesta del login
+28:29 david coach dev: Ahí está sigamos.
+28:30 Alejandro Navarro: aquí ahí debería en la consola debería de darte lo que te da la Data En la consola en la consola del Por qué te cuenta que no?
+28:43 david coach dev: Culpa mía, no te escuché lo último. Sí, tengo un ID número 16.
+28:50 Alejandro Navarro: Del acceso y el no veo bien que dice refresh.
+28:55 david coach dev: Es del jefe nada más.
+28:58 Alejandro Navarro: Eso es lo que yo te preguntaba.
+29:04 david coach dev: Por qué me envían los dos el refresh es cuando se me caduca Yo pido que se se caduque tengo que pedir una renovación, aunque normalmente cuando te caduca de nuevo para no tener problemas que vaya a haber. un inconsistencia de datos, pero cuenta de varias ventanas y tirarte tres lo veo a la vez y ahí cuando
+29:26 Jesus Medina: Hablando yo lo coloqué por colocarlo por si acaso, pero no sé Ahorita lo
+29:30 david coach dev: Te usted dice que no hay diseño de respuesta todavía.
+29:31 Jesus Medina: borro. Okay.
+29:35 david coach dev: Pero está bien, me parece bien, aquí estamos bien o sea, tú cómo va, que en
+29:37 Jesus Medina: Por cierto
+29:39 david coach dev: qué necesitas a ver Vámonos por partes Comencemos con los Ya, yo me lo guíe y me devuelve esto. Este Alejandro tú necesitas que te vuelva algo más.
+29:53 Alejandro Navarro: en lo que yo preguntaba Es que en el Bueno pues yo por ejemplo, lo he visto Así que Haz de cuenta que ya te mandan, por ejemplo, el nombre o los datos que tú quieras pintar para que se para que se vean el
+30:02 david coach dev: Claro, el gato del usuario para no hacer doble Point para no hacer un doble
+30:08 Alejandro Navarro: Es que lo que yo no sé, es que Haz de cuenta que por ejemplo en el dashboard,
+30:08 david coach dev: cuando llegue entre la dashboard un poide es que en teoría Aquí hay una es que quitamos estamos viendo y estamos mal al mismo tiempo. Está bien, lo que podemos pedirle que nos vuelva a salir el nombre y el rol. Pero que la mente dos Campos más a la devolución.
+30:26 Jesus Medina: qué Campos quiere Mostrar con el logic con el
+30:29 david coach dev: No sé pastor, le preguntó le gana si le funcionaría que devuelva el nombre y error. hasta que abre el
+30:41 Alejandro Navarro: que se va a reflejar, es que lo que no tenemos bien, claro, todavía es el diseño por eso.
+30:45 david coach dev: Y que no hay diseños Pues todavía.
+30:47 Alejandro Navarro: Ajá sí, sí, por eso no, no sé qué qué se puede cumplir.
+30:49 david coach dev: No nos damos problemas, Devuélveme error y el nombre nada más.
+30:51 Jesus Medina: Por cierto, alguien sabe diseño alguno de algún fronte o alguien o Luisa de diseño?
+31:10 david coach dev: Sí porque lo otro no solo devuelve aquí con el bien, no necesito que me vuelvas nada más, porque al momento de entrar al dashboard puedo pegarle un emponing que me tengan los datos para no ser tan grande la consulta. Eso sería también, no perder tanto tiempo porque ya con esto me aprieto suficiente para loguear, ya tengo el tope con el token dentro del árbol, ya puedo pedir cualquier otra información.
+31:33 david coach dev: Sabes lo que hazme un favorcito? En login a lo que debes Iniciar sesión, que es una pequeña página donde muestres el líder y le pegues un en Point al get en que te traiga los datos Y solo hace una tabla donde muestre los datos nada más así como una tabla una tabla tonta le diga nombre y rol nada más para saber si si se está conectando
+31:54 Jesus Medina: yo
+31:55 david coach dev: con el baque, si puedes con este token traes los datos nada más.
+32:01 Jesus Medina: Pero eso lo hago yo.
+32:01 david coach dev: algo Sí, Alejandro ya hay una debería. Dame un cinco yo todavía tiene una ruta que me devuelve los datos del usuario o no. Un profile algo que tiene, no? Voy a ver que no me lo sé, no me no me sé la ruta, la verdad. No sé las rutas Hay que hacerlo despacio a ver tenemos que usar, eh? Aquí está. En teoría con esto tenemos que mandarle.
+32:39 david coach dev: Aquí está ID o sea, con el addique nos envía Hay que entrar y es quitarlo pegar el ID vamos a probarlo Según esto el número 16. eje Y ya Qué pasó allá los datos. No debería haberme devuelto los datos.
+33:02 Jesus Medina: no
+33:02 david coach dev: No, porque son datos de infieles, el usuario no debe estar abierto para ver los
+33:07 Jesus Medina: Por qué?
+33:07 david coach dev: datos necesarios tiene que estarlo.
+33:10 Jesus Medina: porque yo lo coloqué Ah claro, porque yo los coloqué libre porque por
+33:10 david coach dev: Claro, después de aumentar eso a ver la única ruta libre que deberían estar literalmente. Con una aplicación de paga en ninguna.
+33:23 Jesus Medina: Porque yo estaba pensando, por ejemplo. Soy una una un usuario yo no puedo ver el perfil de otro usuario.
+33:39 david coach dev: Yo sé ahorita, sí.
+33:42 Jesus Medina: Bueno entonces yo eso lo comenta lo conozco privado.
+33:47 david coach dev: Ahorita, estoy viendo todo la cuestión, es que a ver. Si tú eres administrador, Sí podría haber cualquier cualquier perfil Pero si tú eres. un editor un bueno en la mitad de Héctor en este momento tiene el mismo nivel O sea, eres administrador editor es lo mismo, pero a diferencia que el editor no
+34:04 Jesus Medina: Okay.
+34:09 david coach dev: se los guía en el dashboard de Dyango que no en el árbol de multiplicación y
+34:13 Jesus Medina: exacto
+34:14 david coach dev: el administrador sí se lo ve en el largo de la de Django porque él es quien ni siquiera sé si deberíamos usar el gas por el diálogo todavía. Porque hay que tener un poco de conocimiento para meter mano ahí y si la persona que no sabe conocimiento y mano ahí y mueve algo que no debe, se nos cae toda la aplicación. Eso es una cosa a evaluar después.
+34:38 Jesus Medina: Si quiere metas en el yango para que veas cómo está.
+34:43 david coach dev: No te muevas.
+34:46 Jesus Medina: donde dice
+34:48 david coach dev: Que está aquí está aquí está aquí está. Tranquilo, hay que esperar primero está en el navegador equivocado. Dime un segundo Por favor que ahorita estoy.
+35:00 Jesus Medina: Yo sí, yo le coloqué esa imagen como para tener una imagen para cambiar la
+35:00 david coach dev: Ahora dice postre.
+35:05 Jesus Medina: imagen
+35:05 david coach dev: Claro está perfecto. Porque puede ponerle después un icono de un icono de mensaje y le pone cms, que es el nombre que tenemos hasta ahora porque no hay nombre. Estamos iniciando, estamos iniciando, estamos iniciando.
+35:39 Jesus Medina: Ese es el inicio.
+35:41 david coach dev: Hoy estaba tan bonito. Aquí puedo Añadir no.
+35:50 Jesus Medina: Está bien, está bien.
+35:54 david coach dev: Está muy bien, Ahí sí, sí está bueno. Está perfecto para el alma y más que suficiente La verdad que sí. organización nombre Yo sé. usuario organización fecha y organización Role, vamos a ver cómo están los roles. nombre visitante editora que Déjame ver si pongo Añadir a ver qué pasa pensando vivir una vez más ya nos quedamos con ese dato nada más y ese papá administrado Oh qué bonito Dame un c***** para ver Cuál eran los roles que teníamos bueno que tenés.
+36:56 david coach dev: La Mariquita Él me fue una Sí una una prueba aquí Ya hay unas tablas hechas que las puedes utilizar. Ahí están como utilizarlas y para eso Quiero ver los roles árboles este que vamos a iniciar ahorita el de Cristo estamos haciendo un supositorio. Roly a ver permiso permiso leído ninguno, perfecto guardar ya Vamos a hacer una cosita todo usuario que se registre de parte del fronen, va a ir con este usuario, ves? Todo usuario cliente se registra le pone el usuario.
+37:51 Jesus Medina: Yo todo los usuarios que se están registrando los estoy registrando con el campo digo con Luis rol visitante.
+37:59 david coach dev: Ya no, cámbiatelo así.
+38:02 Jesus Medina: Y el visitante queda para quién?
+38:05 david coach dev: Es que primero vamos a ver ahorita no tengo datos Así que no tengo como como eliminarlo con qué lo voy a mandar de nuevo al login. para una validación Cuando entras Porque si eres usuario que es antes que siga si es que es se vaya el login y lo deje elogiado con el tiempo con la carita y todo en la barra de herramientas p en la barra de navegación como cuando tú entras una página está logueado y tú ves aquí arriba tú así como esto que tú ves tu logo así pero en el login porque el usuario vete el usuario que no tiene permiso una vez que ya ya tengamos los dos verbos funcionando se le cambian los permisos con un screen, se puede cambiar los permisos le cambiamos los permisos para que todo lo que tenga que es Pero igual como nosotros vamos a tener cuatro usuarios, Así que no va a ser mucha la base de datos por el momento.
+38:49 Jesus Medina: Pero pero ya va, ya va, Yo pensaba que el usuario getse es el no, el que no está.
+38:58 david coach dev: No, no, no, el usuario uno registrado porque no tiene permisos todavía.
+38:58 Jesus Medina: registrado permiso
+39:03 david coach dev: El usuario que el usuario el visitante que es que puede entrar dama y escribir mensajes desde el datboll, la mata de verdad, puedes mandar mensaje es que no está el que no está bloqueado ese que está afuera esto olvídate de eso ahorita se lo vamos a manejar los dos usuarios, el de editor y el de te podía llamar ni siquiera visitantes sino escritor pero como visita podemos visitante.
+39:28 david coach dev: Porque recuerda que hay dos hay tres roles en esta en esta simulación, el administrador que administra todo el editor que es el moderador. Y el visitante que para mí es el escritor ya. le quitó el que envía el mensaje porque hago unos diez porque cuando tú te registras del lado de afuera tienes que esperar que el mande la página te autorice la entrada Porque es una aplicación de Entonces me dice que en teoría es algo que se está contratando para otro para otra persona O sea tú no puedes darle de una que entre y ya puedo dar todo sin haber tenido una verificación.
+40:08 david coach dev: Ya normalmente cuando tú te registras un servicio y no tienes entras o como usuario demo que solo puedes ver o si quieres le puedes poner a este usuario permito solo de lectura que usted lo pueda leer y no puede hacer nada más. Porque el visitante ya puede leer escribir editar y eliminar sus mensajes. Ya, yo como tú entras con un demo Cuando entras con un demo una aplicación para hacer todo solo puede ser una o dos cositas. Normalmente es así ahorita por el momento porque ya voy en teoría hoy día.
+40:42 david coach dev: Quería ver si iban a conectar todo y no estamos, pero estamos cinco de nuevo, creo. Sí, estamos cinco nuevos, No estamos ni todos.
+40:51 Jesus Medina: cuatro, sabemos cuatro porque
+40:53 david coach dev: Cuatro porque yo estoy compartiendo dos veces ese verdadero problema que hay
+40:55 Jesus Medina: exacto
+40:56 david coach dev: ahorita que el equipo no se está reuniendo. O sea, yo quiero discutir con el Flower y solo lo tengo a Leandro Yo estoy en el error de pm en este momento, o sea, yo en teoría yo no debo codificar porque estoy pm. Tiempo para poder intentar que las dos partes vayan avanzando Te va a
+41:14 Jesus Medina: sí
+41:20 david coach dev: entretenemos solo a ti. Porque no sé qué está haciendo la otra chica. Si está trabajando, no está trabajando, está haciendo algo, no tengo ni la menor idea.
+41:27 Jesus Medina: La otra muchacha me escribió. Que puede ayudar entonces?
+41:34 david coach dev: Jesús en este momento te voy a nombrar líder de baking, eres el líder y tú vas a tener que comenzar a gestionar lo que hace tu compañera. Ya tiene más o menos un listado lo que me gusta como que verdad porque está bueno el ogging. Está perfecto Solo que por ir tres cuatro gotitas listos, el árbol ya está de pasarlo de la maqueta B cero a nuestro a nuestro repositorio Luis tú vas para el lado de fronen tú ponte y hablas con Alejandro para que se repartan las vamos aquí igual que tenemos que poner una planilla, que vamos a hacer mi idea es algo sencillo que de aquí al jueves está en visto los tres dashboard. Tengo un error el de visitante o escritor el de editor y en el administrador.
+42:23 david coach dev: porque los tres porque vamos a tener un administrador de la aplicación y una, o sea, de que contrata servicio y el administrador general que es el ese ese es un problema, tenemos que ver cómo vamos a hacer para que se pueda lograr nuestro administrador y vaya a la
+42:42 Jesus Medina: Bueno pues yo le creo un empoño yo les creo un en Point para que ustedes puedan crear como que se llama eso administradores y con ese apoyo automáticamente se loguea el dashboard de ella.
+42:58 david coach dev: Perfecto, y ahí se abre esta página estamos perfecto, no hay ningún problema. Yo estoy completamente ahorita se fue alegando, no sé si va a seguir la verdad,
+43:06 Jesus Medina: yo creo que
+43:06 david coach dev: yo no quiero.
+43:08 Jesus Medina: Yo creo que este dashboard de la administradora está bien bueno.
+43:13 david coach dev: Entonces ya tenemos el administrador, dejamos este aquí como está perfecto pone testimonial cmc como Tony como ataque en el barco como está aquí en el así testimoniales no no es testimoniales testimonial ets. Y Listo Ya está perfecto, o sea, digamos que el dafo de administrador te va a instalar tú de maquetearlo en yango Me parece que está bien porque ahí puedes mover los testimonios. Estoy organización, tendríamos que solo tú lo a ver Me equivoqué testimoniando voy a mirar al otro.
+43:53 david coach dev: Al organización perfecto no me acuerdo también lo único que tenías que aumentarle una una columna más llamada aquí.
+44:03 Jesus Medina: Okay okay, Mire yo yo le tengo que hacer una una pregunta.
+44:04 david coach dev: nada Cuéntame
+44:09 Jesus Medina: porque o le va a comentar Ajá porque yo pensaba dejarle eso a La a la O sea yo hice lo que lo que entendí.
+44:24 david coach dev: perfecto
+44:25 Jesus Medina: Y lo que no entendí, no lo hice entonces.
+44:28 david coach dev: Ya perfecto, haremos algo, si quieres mañana nos hacemos Nos tomamos un tiempo tú y yo y a cuadramos bien todo.
+44:34 Jesus Medina: Okay ya entonces, por ejemplo lo lo de la Piquín, si yo le tengo que llamar a la muchacha del backen, pues tengo que entender que es para delegar las tareas.
+44:48 david coach dev: Entonces mañana mañana o después estar reunión hacemos otras, pero tú y yo para concretar bien los puntos para no alargar esto de tamaño.
+44:55 Jesus Medina: Okay okay, está bien, está bien, está bien.
+44:59 david coach dev: Sí me parece bien y ahí tenemos una a ver, tenemos tres usuarios, usuario, usuario, auditorio, usuario visitante Me parece bien porque cada uno de ellos este va a tener su árbol. Esta tiene su propio dafore. Imagínate que se me va esto tiene su dashboard y esto de aquí entran aquí en esta edad, el de visitante Y el editor nada más nos olvidamos de Ami porque le ami no va a manejar tú con esto. Yo creo que aquí lo único que faltaría hacer.
+45:30 david coach dev: sería como el no sé el branding de Aunque no sé. Por el momento no dejémoslo ahí nomás después hablamos tú y yo y cuadramos bien esto ya para no hacer más alarguemos lo el Otro chico, no sé si va a entrar el otro compañero a lo mejor el mundo.
+45:53 Jesus Medina: Ajá esa otra cosa que quería comentar que el otro creo que se llama José él es de México Entonces él dice que a estas horas se le complica las reuniones
+46:02 david coach dev: ya
+46:06 Jesus Medina: Entonces qué sería en este caso nos reunimos más tarde para que él se pueda reunir o que se hace.
+46:12 david coach dev: Pero a qué hora pues qué problema que aquí estamos un Aquí está aquí, ya comentamos mal. Porque primero eran a las 9 vamos a las siete y media A qué hora puede él no te digo a qué hora podría? Porque para mí no hay problema para mí son las siete de la noche, Yo estoy bueno permito a las 8 de la noche, o sea, yo estoy temprano pero para ustedes hay uno que ya son las diez de la noche.
+46:32 Jesus Medina: Para mí ahorita son las 9:25.
+46:35 david coach dev: Ya Y si estás en México ahorita ya son las 10 a qué hora?
+46:39 Jesus Medina: no en México es más temprano Creo en México
+46:46 david coach dev: En Argentina son los días en México deben ser las nueve o las siete una de dos? Ya entonces hay que hablar con él para que nos diga una hora en la que te puedan unir para que comenzar a tener una hora fija para que te puedan integrar porque lo otro es que estamos Es que ahorita en el debería estar, porque si no, entra en dos está afuera.
+47:05 Alejandro Navarro: veinticuatro
+47:07 david coach dev: Literalmente hablando Bien seguido y hasta fuera de no continuar lo automáticamente lo van al equipo, tengo entendido, pero como no contrito una cosa y hace otra no tengo la menor idea. La cuestión que nos diga una hora para las que él se pueda conectar para preguntarle a los chicos que participamos que somos los mismos de siempre. Si podemos Por mí, no hay problema para mí son las ocho de la noche nos brindando a las ocho y no a las diez yo estoy normalmente conectado en la mañana, así que termine el problema.
+47:35 david coach dev: la cuestión de fondo ustedes porque yo estoy yo creo que aquí es que tiene menor hora soy yo porque para mí son ocho de la noche los mexicanos son las citas Ellos tienen Uy Pobrecito cuando lo que te meten en la mañana y le toca los niños en la mañana hora Argentina Pero bueno la cuestión de saber que preguntarle a chicos, qué hora puede estar? Porque yo no tengo problemas. Habría que preguntarle a cada uno de ustedes, si no le da problemas de cambio de horario y pone un horario que podamos estar todos porque si no no por mí sino más bien por él, porque si no va a tener Sprint no le va a contar lo contrario.
+48:14 david coach dev: trabajar para no estar
+48:15 Jesus Medina: yo Sí claro, es verdad, sí habría Habría que ver. Porque él dice que que a las seis sale. bueno, es que a las veintiuno sale de la universidad y sale la clase y va a
+48:47 david coach dev: No quiero ser malo porque yo estoy comiendo aquí ahorita, pero igual si hay que buscar un horario aquí todo a ver Esto no es obligación. Esto es compañerismo. Él no puede habría que buscar uno uno un horario que no acomode a todos porque hay que buscar un buen horario para que todos podamos estar integrados y así no hay ningún problema, o sea hay que rechazar la reunión por mí no hay problema, así que comentar en vez a las nueve a las diez no hay problema.
+49:12 david coach dev: Tienes que comenzar a las 11 para mí no hay problema, pero esto ya tendrías que hablar yo con el resto del equipo porque como así para uno es una hora antes para otros fundadora después que habríamos que tener en cuenta eso, pero por mí no hay problema, sé que atrasarla para mí mejor Mientras más tarde sea mejor para mí porque tengo más tiempo para seguir haciendo mi actividades diarias para poder centrarme bien la sentarme a mí con actividades en los country.
+49:37 david coach dev: Porque así como estoy aquí también estoy en otro también tengo mis productos personales Y también estoy en otra simulación Así que igual consta para que me dé más tiempo. Espero que te levante la noche. de la noche para mejor Pero Vuelvo y repito depende del tiempo de cada uno. Aquí se acaba de poner esto acaba ingresamos nuestros compañeros José Dinos Disculpa que te moleste bienvenido Como a qué hora podría estar tranquilo para podernos reunir.
+50:07 david coach dev: porque estamos casi lo mismo de siempre de una vez para
+50:10 José Ortega: Sí sí es lo que les digo yo comentar porque yo pensé que eran de Argentina
+50:14 david coach dev: no, Yo soy de Ecuador uno, otro hay uno de Perú uno de México y no tengo ni idea de Perú sino estoy mal, tengo que comentar la
+50:22 Jesus Medina: Yo soy de Venezuela
+50:24 david coach dev: Él es Venezuela o sea, aquí estamos multiculturales y multi horarios Así que aquí estamos.
+50:29 José Ortega: Sí es que yo no tuve la oportunidad de estar desde Bueno cuando se pusieron de
+50:33 david coach dev: No te preocupes, no hay problema.
+50:33 José Ortega: acuerdo, pero por ejemplo, ahorita son siete y veintiocho por mí estaría bien, no sé. Arcilla a la hora fija entre más tarde como dicen ustedes, pues estaré bien.
+50:46 david coach dev: Yo no tengo problema porque creo que uno de los compañeros de las nueve. No seas cuál era que Cuál era el que tiene una hora antes, pero si no hay problema Dino una hora que se te haga una hora que se te haga bien a ti para poder reunirnos tampoco que esté tan tarde teniendo en cuenta que tenemos compañero que hay una tiene una hora más que nosotros.
+51:07 david coach dev: Para mí a las nueve para el otro compañero a las diez de la noche y tenías uno que era dos horas antes que es de Argentina porque si para mí son las ocho si tenemos alguna argentino para ellos son las diez.
+51:19 Jesus Medina: Para mí son las 9:30.
+51:21 david coach dev: Pues parece son las nueve y media para mí son las ocho y media para alegando, creo que también no sé qué de qué horario de Alejandro y Luis creo que también son las ocho y media para él. O nueve y media No sé la verdad, estoy perdiendo el estrés. Qué hora tienes? Mira Porque si son 8:30, Qué les parece si lo ponemos a las 9 estamos hablando once Argentina
+51:51 Luis Nina: 8;30 aqui
+51:53 david coach dev: ocho y media tiene
+51:56 Jesus Medina: O sea tienes son las 10 para mí. a las 10 Argentina
+52:06 david coach dev: Y Argentina ocho para mí yo no tengo problema la pregunta si usted puede a las ocho porque esta noche y media te acaba de conectar por esto lo decía. Compartámoslo por la mitad ni a las 11 a las 10:30 listo.
+52:14 Luis Nina: Por mi parte no hay problema.
+52:19 david coach dev: partimos la diferencia por la mitad Sí y media Argentina y Ya dejamos ese horario y estamos dos cuatro estamos dos cuatro cinco Somos la mitad lo que evitamos en el repositorio activo, así que ya queda con eso y se le escribe ya en el grupal que la reunión es toda una partida de las diez y media Argentina la de Eli y los Spring la los Sprint Son lunes y jueves y la Daily Yo la voy a hacer el lunes a viernes no hay ningún problema lo que pueden estar estarán y lo que pueden estar no están, vamos a vamos vamos también a cortar las reuniones para tocar en los Sprint puntos básicos y planeaciones y cualquier otra otra reunión la hacemos después de acabar Sprint salimos y entramos al Canal de Daily Y ahí sí tenemos que tirarnos tres horas más nos tiramos tranquilamente lo que se puedan quedar y los que quieran quedarse y lo que necesiten la ayuda y los que no pueden seguirnos más y nos veremos al día siguiente o en el siguiente Sprint como quieran trabajar ustedes Ahorita tenemos cortamos José está Alejandro y
+53:20 José Ortega: Sí está bien, está bien, está bien.
+53:23 david coach dev: estamos Luis Este Moni que Gabriela se bajó, así que ya no aparece en el equipo, no sé si se dio baja o la cambiemos pidió cambio, tengo la menor idea y anotó aquí. apareció Luis que es nuevo que no lo había visto antes y la verdad que si no estás aquí tampoco estás en el repositorio, tienes la información completa, no country, por favor, El hip hop y el linkedin si tienes para poderte agregar a la documentación de depositorios, ya voy a hacer un saneo este fin de semana para todos los que están aquí, por favor, pongan su linkedin y sus en la información para poder poner los datos de nuevos y lo que ya lo que están de Front cambien si Póngase No mentira, pero mándenme un mensajito si no soy para poderlo poner en el creo que como no no le puedo poner full o no, Sí después de poner la división de los repositorios porque en el principal estamos todos Pues si tú te vas a la mamá solo aparecen los que están trabajando si te mueves a la alarma solo solo aparecen los que están trabajando en el from así literalmente hablando pero ya me voy a poner como pm no más y voy a quedarme como pm me quedo solo en la parte.
+54:35 david coach dev: De mi documentación me voy a quedar yo para que ustedes codifique. Que necesitan ayuda yo entro, No creo ustedes ya son ya con los tres que estamos y falta otra chica de fronten, que no me acuerdo el nombre. Vladimir tiene pues tiene una que estamos reunidos en el general por si acasito
+54:49 Jesus Medina: Vladimir
+54:55 david coach dev: no se dé cuenta. Se me olvidó, hay que poner en en general siempre que estamos estamos en délico, se me olvidó.
+55:03 Jesus Medina: Ah verdad
+55:05 david coach dev: voy a poner y estamos en Sprint Sí, se me olvidó de la próxima vez. Yo pongo un mensaje de minuto 20 minutos antes y así hasta entrar la cuestión, es que estamos hablando de ya tenemos el login medio funcional estamos haciendo un arreglo en los que devuelve. Lo que devuelve el backing el backen te está devolviendo dos toques el toque el
+55:28 José Ortega: una cosa
+55:29 david coach dev: toque.
+55:30 José Ortega: este El yo tengo ya hecho un login, no sé si se los puedo mostrar.
+55:38 david coach dev: Ya comparte yo debo de compartir de compartir listo.
+56:02 david coach dev: Quién se me salió? Que salí Ya estoy como niño de escuela tomando listo.
+56:12 José Ortega: Listo, ahí le puse una landing Este ahí este media. Simulada pero lo que les quería Mostrar era esto.
+56:18 david coach dev: ya
+56:23 José Ortega: Tenemos este, si no tiene es para iniciar sesión Y esto es para crear la cuenta.
+56:30 david coach dev: Un pequeño problema a ver este pueblo van a tener que crearse un grupo ya no country, pero pueden quedar grupos llamados y comienza a comunicarte porque tú estás creando un login, que ya está creado lo tiene.
+56:47 José Ortega: Sí, sí, sí, sí, sí, sí, sí, este.
+56:49 david coach dev: Ese de crear cuenta ese no los tiene ahorita lo que estaba pensando que ya como yo tenemos los tres activos que van a estar trabajando hasta que Vladimir entre que también quiere trabajar para que entre ustedes se pongan Un lío de from. Tienen papel y tiguera uno dos tres lo que quieran y digan alguien que te quieran representante. Para yo poder decirle tiene que hacer esto esto esto esto esto esto esto y ustedes entre ustedes se divida.
+57:17 José Ortega: Aquí yo ya no está, ya está funcionando con Ah no está levantado mi celular.
+57:27 david coach dev: con esto me quedo más tranquilo y si y si no hay muchas cosas yo no, yo no, yo no, Yo te lo voy a subir el último cambio que tengo hecho que ya están subidos y yo con eso ya me No también, si quiero sí, quería purificar, pero ya estamos muchos. Y si hay hartos que hacer pero si no no se divide lo básico que el andén y los el esqueleto de árbol vacío lo quería hacer es atender cada uno te encarga de un árbol.
+57:54 david coach dev: ya cuando te ves la La tenemos dos dadas por ahorita el de El de editor. Y el de visitante o cliente o escritor como le quieran decir ustedes. Necesitamos que eso comenzar a hacerlo porque tienen funcionalidades en conjunto. Estas otras cosas, vamos a sanear esos usuarios. Eso lo va a hacer con José José Hazme un favor ya mismo debe termine de probar. Él vacía todos los usuarios en quedaste dos usuarios de prueba Entonces uno y tres dos nada más y la clave va a ser un dos tres de los dos.
+58:38 david coach dev: Para que todo el mundo use el mismo usuario porque si no vamos, no estamos llenando de usuarios de prueba.
+58:43 José Ortega: Ah sí sí sí, sí, ese en la en la esa de las que mandaste.
+58:50 david coach dev: no, que el el Amin se lo ve acá y en el lago directo de Django No es en este aquí, no? En nosotros el ami naming de toda la aplicación sedes acá. Acá solo se van a loguear en la el editor y el cliente literalmente hablando en la historia del escritor, pongámoslo así para que tengan roles claros unos
+59:10 José Ortega: sí
+59:14 david coach dev: escritores y el otro editor uno escribe y envía el otro el otro apruebe publica o o rechaza y devuelve hay que hacer el flujo de ese. El flujo de ese comportamiento en uno del otro, por eso quiero que ya se pongan yarales porque el backen Lamentablemente solo es uno, así que suerte. Porque todavía te falta la integración y para subir los videos y para subir los las imágenes puedes conversar con eso comienza a investigar eso para que los comités a tirar para que esta semana esté ya funcionando no el Point desde el sino el la subida de archivo del aglobinario tanto como audio como video o si no tirar YouTube o si no abrir el YouTube Ya con eso ya quería chévere.
+01:00:08 david coach dev: Yo estoy viendo que la verdad está muy bueno, no la idea de tenerlo aquí esto está perfecto. No me parece mal, está funcionando bien. Hay cositas que habríamos que yo sé que esto no te puede personalizar mucho Pues ya digámoslo ahí te deja increíble quitarle ese globo y ponerle aunque sean un icono de mensaje para que tenga relación porque hasta el momento no
+01:00:28 Jesus Medina: Está bien.
+01:00:30 david coach dev: tenemos logo tampoco.
+01:00:32 José Ortega: Qué no, porque es lo que estaba este comentando. Jesús para para ver si habíamos este intentado comunicarnos con
+01:00:40 david coach dev: No, no contesta Yo también escribí por internet, no me contestó nunca.
+01:00:52 Jesus Medina: y ahora
+01:00:52 david coach dev: Se puede pedir pero te tiras a la al pequeño problema que todo el mundo está anda buscando diseñadores. Y a veces hay equipo que tiene el dote diseñador y no lo van a soltar. Porque en teoría no country nosotros tenemos el señor, tenemos a Rafael como dicen por ahí. Esto Estamos buscando, pero no nos contesta Yo no le escribí por aquí ahora
+01:01:14 Jesus Medina: Y ese tipo me pareció.
+01:01:18 david coach dev: escribí directamente el correo que tenía puesto y no contestó. Mío, él tiene los datos subidos porque no te conectas si está tiene todos los datos subidos en teoría del hombre está está conectado a menos que esté mal un equipo y eso sería otra cosa que teníamos que ver si él está en más de un equipo.
+01:01:40 Jesus Medina: Voy a borrar todo Los visitantes, eso se fue donde está donde dice en el check
+01:01:40 david coach dev: no
+01:01:45 Jesus Medina: y ahí Borra todo. donde dice, no, no, el Cheque el check donde dice al lado Ahí guarda todo.
+01:02:01 david coach dev: Pobre creen dos usuarios, no más.
+01:02:03 Jesus Medina: Y donde dice al lado de ir. allá hay unas flechas al lado de ideal eliminar usuarios
+01:02:17 José Ortega: esta cosa
+01:02:18 david coach dev: Bueno está muy bueno, para qué está bueno?
+01:02:20 José Ortega: Sí, está. Bueno, no, no.
+01:02:21 david coach dev: Está bonito. Ahora el trabajo de estar configurando, no, que me gusta configurarlo a mí, pero ya un trabajo menos solo tenemos que hacer dos de tres. Yo tengo una tabla más o menos Bueno mi tabla más un poquito más complicada. Hay que abrirlo porque falta el Avatar falta el nombre Hay que hacerlo más grande. Ahora vamos a abrir bien bonito. ya, pero el problema ahorita es que está funcionando con una con un baje por el momento y vamos bien Así que sigamos lo que tenemos que hacer es que
+01:02:53 José Ortega: Eso los dejo.
+01:02:55 david coach dev: el el sigue para adelante
+01:02:57 José Ortega: Sí el Sí este Bueno entonces, cómo nos dividimos la
+01:03:03 david coach dev: Por eso van a trabajar los tres.
+01:03:05 José Ortega: la
+01:03:05 david coach dev: Por el momento mientras yo me pongo a planear las integraciones del Isla porque tenemos ahorita lo que habíamos que sacar es los vacíos. Poder tener landing tener el lobby ni Crear cuenta los usuarios que se registran yo lo iba a mandar con Gus Y si tiene usuarios voz queda registrado pero en la landing y los usuarios que tenga rol se van a cada uno a su árbol respectivo.
+01:03:30 david coach dev: Andamos que José va a quedar un en Point para que tú automáticamente te lo ves y lo mandas directamente a la página del árbol de admin, o sea va a estar, va a seguir Pero va a la página de Django no no dentro de nosotros si es visitante que vaya a su rasgo de Y si ese editor vaya sudavo de editor un rol más que yo si le quiero meter es dolor de administrador pero de la no administrador de la app como app si no administrador del que usa nuestro testimonial porque hay que poner los dominios Y eso lamentablemente no debería tener acceso al editor el editor solo debería como dice no country.
+01:04:11 david coach dev: Aceptar y rechazar publicaciones nada más todo lo que sería aumento de Tab aumento de tabla y todo eso debería mandar debería manejar un administrador de cada de cada persona que contrate nuestro servicio puede ser el mismo porque el administrador también puede rechazar aceptar publicaciones eliminar publicación del administrador también no puede hacer. Pero la cuestión es que responsabilidades claras porque un editor no debe tener claro no debe tener acceso a la configuración y el que maneja la configuración de la app no debe tener acceso a no no que no debería no debería tener acceso directo a configuración de cada cliente.
+01:04:49 david coach dev: O sea, el cliente debe gestionar sus tabs tiene que gestionar su sus no los roles no, porque los roles lo ponemos nosotros lo está la categoría su nombre su dominio Eso sí podría gestionarlo. Pero este es un Rango para después Ahorita tenemos que atacar el escritor y el y el de moderador y recordar la integración que tiene entre los dos, porque no solo el que envía teníamos pensado en acción a un en la tabla de en esta tablita bonita que tiene de testimonio solo aumentaron un campo que se llama feedback y cuando el escritor envía es como nulo y él no puede enviar si el no aparece el feedback tiene que siempre anularse no importa contenido borrarse y quedarte con uno Y el editor no puede rechazar y devolver a menos que ingrese un feedback.
+01:05:41 david coach dev: de Porque el otro rechazando la única manera cuando me ponga a rechazarse, abra un modal que explique ponga feedback y que mantenga que escribir un comentario y poder enviar si manda envías con Facebook puede rechazar y volverlo cambiar el estado rechazado, si no, no lo puede y así no evitaríamos el tener que implementar un chat entre el lado a y lado B luego tenemos un ping pong Sería el mismo testimonio. De Qué opinan de esa de ese de ese cuadro.
+01:06:36 Vladimir Villacrés: Buenas noches.
+01:06:39 José Ortega: Qué tal? Este alguien de acá Bueno antes de continuar con alguien de acá está usando Drive como navegador para mí.
+01:06:59 Jesus Medina: Ya, ya me cambié Ya dejé uso.
+01:07:01 José Ortega: Ajá es que Ahí en el grupo mandé que no les va este a registrar su asistencia. no country
+01:07:14 Jesus Medina: Me cambié.
+01:07:14 Luis Nina: Ahora me cambio, gracias.
+01:07:17 david coach dev: haber sido una en directo no no cachar los datos
+01:07:19 José Ortega: Ajá bueno para las mip para las dailis y los Sprint yo digo que usemos Chrome ya para los demás, pues ya ustedes quieran nada más que como Prime bloquea los datos Y eso.
+01:07:38 david coach dev: Eso se llama robarda Bueno no importa, lo importante es que tenemos otro ya son cuatro. Estamos, eh, Alejandro qué me falta?
+01:07:49 José Ortega: ok
+01:07:59 david coach dev: Aquí están los puestos, ya estamos cinco amigos tenían cinco frones. Creo que ya es demasiado
+01:08:06 José Ortega: Bueno al menos el equipo ya está más o menos la otra vez que nada más haremos cuatro, creo cinco cuatro.
+01:08:13 david coach dev: Este sería todo el equipo porque los demás no se han reportados y mago se dio de baja o la cambiaron porque ya no estaba metida aquí ya no está en el equipo. Éramos doce horas somos once falta más que ya se llevaba. Tenemos. Tenemos tobapen mi hermano Carlos que ni siquiera ha aparecido. Un otro fondo llamado Daniela que tampoco la conozco y está todo antes.
+01:08:37 José Ortega: porque no sé, creo que sí, a entrar un dos chicas pero
+01:08:42 david coach dev: no es que las dos chicas Emily Gabriela digamos, hay que darle depositorio también. Bueno pues ya que estamos todos los frones señores Ya está ya están en camino la landi y se fue Luis ya Bueno ya está hecha la la
+01:09:10 José Ortega: Luis se cambió de navegador.
+01:09:12 david coach dev: Ya sí, ya se está cambiando, o sea, bueno La idea. Es que ya Comencemos los trabajos están aquí que alguien Comenten O sea que lo que te están entregando y desde el lado se queden ahí los dos que están encargados y Vladimir y Luis que son los nuevos que que no tienen no sé si tienen tareas y nada se encarguen del No sé qué les parece la idea.
+01:09:38 José Ortega: Si quieren yo me encargo de la landing y alejan este Perdón Alejandro sí Alejandro que siga con el login Y eso.
+01:09:46 david coach dev: registras no viniera
+01:09:48 Alejandro Navarro: el diseño Y en cuestión de diseño, cómo le vamos a hacer?
+01:09:59 José Ortega: Dónde? En cuestión diseño yo digo que usemos. colores no tan así ni nada más algo minimalista bonito con librerías de No sé si un agujero Bueno yo le metí jeruca. la al este a los componentes y
+01:10:16 david coach dev: Yo no, no conozco otra cosa, teníamos.
+01:10:20 José Ortega: Ese también podemos usar.
+01:10:23 david coach dev: Es que la verdad es otra cosa tienes que comenzar a hacer. Estamos en el planning Así que planeamos en teoría.
+01:10:30 Vladimir Villacrés: Perdón, el día viernes quedamos que yo hacía la landing y Alejandro creo que hacía el login.
+01:10:37 david coach dev: Ahí viene el problema como no todo está en el mismo, qué tiene avanzada? Horrible no es complicado yo que digo helado un colegio.
+01:10:51 José Ortega: De Vladimir de la landing que has avanzado.
+01:10:54 Vladimir Villacrés: El de la landing tengo una parte, pero todavía no he podido porque ayer hubo votaciones en Ecuador entonces realmente estuvo complicado. ecuatoriano David
+01:11:10 david coach dev: Sí yo te doy el guayas.
+01:11:12 Vladimir Villacrés: Ah ya ya chévere Entonces ya sabes cómo estuvo.
+01:11:15 david coach dev: Sí, estuvo horrible, Yo estoy al lado de un colegio, tengo dos colegios uno Live uno una cuadra. Esto parecía la tercera guerra mundial.
+01:11:24 Vladimir Villacrés: Sí, se fue todo el día Yo vivo en el Valle y y quito está unos 45 minutos subir bajar estuvo Atenas fue todo el día.
+01:11:32 david coach dev: No, pero igual hagamos algo. Aquí Vladimir y José están haciendo lo mismo, así que de una dos o Quien tenga la dos y la sacan. para ir o hacen papel Higuera y uno sigue encargando y el otro porque ahorita tenemos el login con Alejandro Luis no tiene No tiene todavía no tiene, hay como se dice no tiene una una tarea sin nada, pero el conocimiento también es un poquito bajo podíamos hacer equipos.
+01:12:05 José Ortega: equipos
+01:12:06 david coach dev: Sí porque éramos José tiene experiencia Vladimir creo que también la tiene. Alejandro creo que también la tiene, pero tenemos a Luis que tiene como son cuatro pueden hacer equipo de dos y dos. para que vayan dos entrenándose de la de la landing y el login, la cara de usuario el Usuario, estamos hablando que también tiene que cargarse de los toros del manejo de estado globales de los usuarios y el otro dos se encarguen de los dashboard.
+01:12:39 david coach dev: Tiene que preguntar por Constitución de usuario, el mismo Davo para todo, pero que te muestren los ítems con el usuario. A veces viene el trabajo entre dos y pueden podemos salir hoy día este para el jueves tener la landing ya terminada o casi terminada y comenzar con los esqueletos de los datos son los que se puedan loguear y que se distingan segundo error. y Jesús tiene que tenerme listo tienes que crear el Point para que se autologueen en Dyango Sí, tranquilo. Tú tranquilo, jefe, esto todavía ni siquiera te va a gustar porque antes no, así que tú tú estás bien, tú vas avanzado Tú tranquilo?
+01:13:17 José Ortega: Nosotros vamos.
+01:13:24 david coach dev: Relájate más luego nos reunimos mañana a pulir bien las tablet Y dejarla funcionando correctamente ya de hacer un buen diseño de manejo de datos para que esto pueda crecer infinitamente. Y eso es lo bueno, no ahorita el problema que tenemos cuatro y tres y dos están haciendo lo mismo y tengo uno que lo está haciendo nada O sea que pongan decían Cómo van a hacer o entre ustedes cuatro tienen un jefe de fronne y que coordine su tareas y yo le doy la tarea de líquido ustedes la van a Pierna y vamos adelantando.
+01:13:55 José Ortega: Pues si quieres yo entro con Alejandro y Vladimir que entre con Luis o como vean.
+01:14:01 david coach dev: Bueno, señores, Aquí están los tres involucrados hablen los reyes para esto como la boda ahora que haya para siempre.
+01:14:10 Vladimir Villacrés: a ver qué Es no sé que landing page. Creo que no es mayor. el diseño que vino no es muy complicado, así que Tomará un día más y posiblemente se acaba. Entonces no sé o sea, yo no tengo problema el dashboard no le he visto todavía que está hablando David Cuál es el diseño en esas cosas.
+01:14:37 david coach dev: Yo te lo muestro. Y dueño no tengo, tengo una maqueta aquí en cero que es los que ya está, ya
+01:14:42 Vladimir Villacrés: cosas ya
+01:14:45 david coach dev: le pasé y tiene que pasar los negros. Deme un segundo que estoy cargando el chat. Y creo que ya lo venden, están cargando denle un segundo que no sé que se demora más cargar aquí o cargar acá. este Más o menos los testimonios el usuario con sus datos. Y como estoy en la min tiene también la base de datos que son extra. Tiene para hacer bascar también que es un extra, tiene manejo de ruta la aplicación que son estas tiene manejo de heroles con permiso.
+01:15:43 david coach dev: De manejo, la apariencia de la aplicación su perfil y la configuración de sus opciones más o menos es lo que yo bueno, lo que saqué aquí. El editor tiene más o menos lo mismo, pero más pequeño el árbol cuando con los servicios. los testimonios es crear testimonio directamente el publicar porque en este entorno esto es como un escritor y un Y un revisor el escritorio escribe, le envía al moderador revisor revisor escoba Escoge a pruebas, se lo devuelve y el escritor publica porque esa fue lo que yo entendí la primera vez que leí porque yo no leí todo. Yo le dije un logo y lo hice acá, pero ya leyendo leyendo más a profundidad lo que piden, eh? Flujo diferente el escritor solo escribe y envía el editor revisa.
+01:16:37 Vladimir Villacrés: El menú izquierdo Se se oculta, verdad?
+01:16:40 david coach dev: Sí, aunque ahorita no está muy bonito porque se esconde y no se ve nada no sirve para nada, faltarían arreglar esto porque esto deberían quedar los iconos y aquí el editor debería tener el Avatar el nombre el rol, o sea, todo esto macela, va a tener el nombre. Y ahí también debe tener la configuración aquí mismo en vez del cielo este equipo está aquí abajo lo que tú escribes se abra, se abre una pestaña que tenga la configuración de idioma, tiene otro idioma configuración puede meter el tema y al cerrar sesión.
+01:17:12 david coach dev: Si no le vas a poner en cambio idioma ni cambio de tema lo dejamos así, nomás con solo color y cerrar sesión de abajo y listo se acabó. Dos Ese es lo primero y ahí solo faltan crear la funcionalidades de envío de un lado a otro y el Facebook de un lado a otro primero se habló de un chat entre uno y otro. Ah pero como vino que había muy poco tiempo y esto era implementar mucho, se bajó a que esto lo tenga un campo más de testimonio que se llama el Facebook y el testimonio funciona como una pelota de Ping pong.
+01:17:46 david coach dev: Tapo a un lado recibe el otro y devuelve y el testimonio con el campo del escritor el editor vacío y director al escritor de Wall si no pone FIFA no puede devolver, eso sería todo y con eso nos oramos tener un chat directo. Y se hace más sencillo más sencillo el flujo porque no hay contacto entre el lado a y lado B más que un campo que tenga una breve reseña de lo que está mal hecho.
+01:18:17 david coach dev: Igual que a continuación de ustedes y parece que está bien, está bien, tiene parece que está mal no pueden cambiar y gestionar como ustedes den el ejemplo. No se escuchó.
+01:18:33 Vladimir Villacrés: este no sé, yo me iría más por el landing page porque este le veo como Como le requiere mejor conocimiento que lo puede hacer, No sé la persona nueva.
+01:18:51 david coach dev: Luis no tiene un nivel alto porque repito.
+01:18:58 Vladimir Villacrés: ya Bueno entonces Alejandro ya está ocupado. Quién está libre? Entonces porque creo que estamos cuatro o no sé cuánto estamos.
+01:19:09 david coach dev: A ver si me encuentro también somos cinco si me saca de la ecuación quedan cuatro.
+01:19:14 Vladimir Villacrés: Ah es que no veía lo que pasa es que estoy con el celular Entonces veo aquí seis personas.
+01:19:19 david coach dev: bueno, los frones, los frones todos son alegando Vladimir Luis José y yo estamos del lado del
+01:19:27 Vladimir Villacrés: ya y Luis qué tan buen conocimiento tienes Luis
+01:19:27 david coach dev: yo Fíjate que la otra vez escribió no te estoy escribiendo.
+01:19:45 Vladimir Villacrés: José creo que sabe más.
+01:19:57 david coach dev: Ah ya Bueno hasta que estoy seguro que comentó hace un ratito todavía arriba Darwin no Había tocado next pero iba a aprender para trabajar en x. Peor lo que digo voy a tener que hablar con él para que te te amplíe más lo que necesite que no se asuste porque tampoco lees la nes, no muy complejo y también teoría pero con un poquito esteroide es como que tú supiera usar javas y comienza otra ataque Primero te asusta y después te aburres literalmente hablando Así mismo es primero asusta porque después me aburre.
+01:20:30 Alejandro Navarro: Este sí, pues del lado del login, nada más les digo que me falte me faltaría, no sé si de alguien nomás, lo va a integrar o es también parte del manejo de estado global que habían comentado que se iba a ser consta, no?
+01:20:43 david coach dev: En teoría Hasta ese momento iba con susto. es parte de la persona que intentará encargada del login, tiene que hacerlo el estado de porque cuando se cae la idea de cuando usted descargan en login automáticamente precargue todo lo que son seleccionables categoría está cualquier cosa que no sea datos sensible de la aplicación se auto cargue para cuando abren las aplicaciones o los formularios de otros sean rápidos no esperar que
+01:21:13 Alejandro Navarro: Pero por eso puedo todo todo eso lo va a gestionar el dashboard, No ya cuando se va a redirigir a la página del dashboard con todos los datos de Los visitantes, no?
+01:21:22 david coach dev: Todo eso lo carga landing apenas hablas aprendas cargar a la landi y comienza a cargar los datos. porque
+01:21:29 Alejandro Navarro: Yo me no, no, yo me refería cuando ya se registran en el login.
+01:21:36 david coach dev: Esto es un paso, pues Lamentablemente si yo espero que yo vengo aquí entro estoy aquí. Me llego yo estoy logueado, sé que ya tengo mis cuentas aquí puestas es solo un paso y entro y como de aquí igual ya estoy adentro y Peor si tiene si tienes token y ya te lo guiaste y no te ha borrado el token. Te puedes darte inicio automático que si tienes un usuario abreviado, te vuelvo a loguear solo refresca del toque nada más.
+01:22:01 david coach dev: por eso no te digo que te carga de aquí porque cuando ya cargue aquí hay cosas que deben entrar como los todo lo que sea parte de esto de aquí pero puede cargar esto Gracias
+01:22:13 José Ortega: Sí sí, este una cosita este David Bueno a todo lo que estás comentando y todo eso no sé si vas a hacer algún Algún documento o tareas en cómo se llama?
+01:22:26 Luis Nina: Disculpen, tengo problemas con mi micrófono. Hice algunos logins con react, next no lo use aun, igual si ustedes me guían estoy dispuesto a aprender y ayudar
+01:22:29 José Ortega: Entre él o es que habías dicho. para que
+01:22:35 david coach dev: Que sí tenemos pm Solo que tuvo la primera reunión.
+01:22:41 José Ortega: No, sí sí, pero pues ahorita no se ha presentado entonces.
+01:22:45 david coach dev: la única documentación que tengo en la que está en Main Dame Cambiarme a mí. la única documentación que proyecto es de esto y están los casos de uso con los Ya están los casos de uso, ponían leerlos y pulirlos. Dios lo que no quiere abrir darle un chance. Esta yo tengo muy pesada la máquina. Y en los casos de uso están aquí listos y ya están escritos y todo y tienen ya tienen tareas cada uno cada cada segundo tiene lo que tiene que hacer. O sea ya están puestos y escritos todos.
+01:23:28 david coach dev: El diseño en la base de datos no está terminada porque teníamos un flujo de trabajo que terminó siendo. Messi carga porque la vez pasada no me quita Ahí está terminó siendo así como se ve aquí A poner la manito Este es el flujo que está en el momento dijimos que este activo es opcional y vamos a mantener editor y visitante en la misma página. Y después iba a hacer otro una landis x una que solo tengo formulario para enviarlo y porque tienes que demostrar la integración con una Api externa. No yo dije que no solo sea ver una página como la del demo.
+01:24:12 david coach dev: Que tiene entras aquí, perdón, si yo sé que no que nosotros sea algo, así que tú entras. Al demo pero también y Volver al inicio aquí el demo Ya ve los comentarios. Que nosotros sea esto porque yo pienso yo pienso que dinámica esto ya tiene y usted tiene interés, la búsqueda y todo igual eso es fácil hacerlo. porque esto Solo es en el buen que me traigo el Back con todos los testimonios y todos los Y todos los filtros Todo lo hago de helado de flores para que no se demore un mundo y no me que no me creo una petición cada vez que yo digo. Que yo tengo una letra.
+01:24:53 david coach dev: tú vas a comenzar a buscar por palabra tienes que esperar que vaya al backen y devuelva el backing y son dependiendo de la del tiempo que tenga no sé dos tres testimonios va a ser fácil porque ya tienes 200 300 400 testimonios va a ser un poco pesado más bien como tienen que todos los testimonios tienen que estar sectorizados por por dominio traer todos
+01:25:15 José Ortega: Sí, sí.
+01:25:16 david coach dev: los testimonios y hacer la búsqueda directamente de más de esto hay que hacer un componente de Carrusel En todo el año normal que tuve en alani, en la parte de abajo que dice testimonio y te van viendo los testimonios. Ese componente también el café recién no está hecho. Pero sí, creo que están Sí están en la documentación.
+01:25:34 José Ortega: No, listo, listo listo.
+01:25:36 david coach dev: Aquí está, la pueden leer, la puede modificar podemos hablar mañana, si sabes que hay que cambiar esto hagamos esto tiene Aquí están los usuarios Tienen cinco usuarios, el administrador en la mitad del cliente, el editor de visitante, el usuario anónimo y el público. Pero ustedes anónimo de este el que envía los mensajitos desde hay que enviarlo, hay que enviar los mensajes. Este es el usuario, es que en un formulario web hay en una página aquí el Andy y un formulario de Envía tu testimonio escribe y envía. El editor aprueba se publica rechazo se borra y se acabó. Un usuario visitante pero parece el ese es el otro usuario que hay acá. Literalmente está aquí. Este Ay no perdón, perdón, perdón, perdón, puesto que son cinco usuarios.
+01:26:33 david coach dev: Este aquí el usuario el visitante, pero este visitante no estaba dentro nuestro demuestro panel sino en el panel de Davo de la persona que contrata el cms. Inicialmente es el mismo que nosotros que solo iba a tener solo íbamos a subirlo con una empresa xz foto de Play o te haces otro Flower adentro del fondo y pone landing haciendo otra carpeta llamada externo y despliega esta carpeta en versión hace como otro abajo y le manda esta carpeta vercel y tiene ya si quiere tenerlo con tu dominio.
+01:27:10 david coach dev: Que no quiero tenerlo con otro dominio directamente que sería que desplegarlo en otro. Precisamente lo mismo tener una landing x y z con un Carrusel donde se ven y un demo y la página de búsqueda completa y tener un dashboard igualito el aquí que lo único que tiene lo único que va a tener ese dashboard desde que se lo hace desde el sness no necesita Solo este de crear testimonios este da testimonios y uno y una tabla que me da así como dice esto Totales en el otro lado así totales, o sea, uno Vos ni que me dicen lo que tiene y una para crear testimonio nada más Y eso se lo hace directamente.
+01:27:57 david coach dev: Se lo hace directamente Desde el no necesitaba eso porque le está pegando a tu mismo. Y listo? Con la diferencia que este usuario no usa login, sino o se puede hacer un como digo, digo Jesús una en Point para que cuando se lo vea Aquí también se lo muestra y le regresa el Tokio para que también te lo hagamos lo que hagamos, está y toda la petición de toque.
+01:28:25 david coach dev: eso es lo que eso es lo que digo el otro día José que también me pareció buena la idea, no sé qué opinen que Que opinen y que digan qué va. Soy todo oído.
+01:28:41 Alejandro Navarro: Pues Yo opino que primero si nos vamos a hacer por equipos Pues de una vez y otra cosa escoger bien el diseño porque pues entonces cada quien va a estar haciendo un diseño diferente Pues a la hora de integrar todo va a estar diferente porque faltan varios colores la tipografía. Y esas cositas.
+01:29:08 david coach dev: Yo le puse una página negra con rojo.
+01:29:12 Alejandro Navarro: ahora
+01:29:16 david coach dev: familia
+01:29:16 Alejandro Navarro: Sí de hecho de hecho yo me yo me estaba yo me guié por no sé, creo que tengan
+01:29:20 david coach dev: sí
+01:29:20 Alejandro Navarro: Vladimir también está mostrándonos por Ese diseño, no?
+01:29:24 david coach dev: Pero sí, es que ese era diseño que teníamos puesto hasta el día, pues fue viernes.
+01:29:31 Alejandro Navarro: Sí pues
+01:29:31 Vladimir Villacrés: Sí ese mismo no se ve mal.
+01:29:32 david coach dev: Pero si no le gusta y Quién hace de otros colores, están en el instituto de disposición unirse como Front aparte.
+01:29:42 Vladimir Villacrés: No, yo creo que tiempo y diseñador no hay entonces.
+01:29:45 david coach dev: Sí, la estructura Recuerden que el árbol tiene todo esto es todo y este se
+01:29:48 Alejandro Navarro: Pero entonces en Sí en sí, las tareas del freno ahorita nada más que es hacer la otra estructura del dashboard tener el puro una estructura, verdad? Nada más? Pues no sé.
+01:30:04 david coach dev: auto carga sin un error O sea hay que Darwin no es así este son pan sectorizados según el usuario, o sea, con todos los ítems, Pues tú cargas según el usuario, lo puedes descargar desde un Jason al cual le pones los nombres de todos los ítem que lleva el usuario.
+01:30:21 Alejandro Navarro: Sí pero de eso no, no hay mucho problema porque cuando te lo leas te va te va a redireccionar a un no O sea eso.
+01:30:29 david coach dev: Sí allá, voy por error y por error.
+01:30:29 Alejandro Navarro: Por eso no.
+01:30:31 david coach dev: Por error muerto de lo que está dentro es el mismo Solo que por error muestra una cosa muestra otra, porque diferente está en la misma página para todos.
+01:30:37 Alejandro Navarro: Sí, sí, sí sí.
+01:30:40 david coach dev: La de crear testimonio en la misma página para todos la misma. Solo que tenemos que tener en cuenta, esto la subió la foto, la subió video que puede mandar uno o el otro o los dos.
+01:30:52 Alejandro Navarro: Y Bueno pero primero yo creo que vamos paso por paso primero.
+01:30:55 david coach dev: Claro porque estamos manejando, pero tienen que ir pensando que mientras Ya como tiene la otra persona pueden acercarse una una a crear el ajo y lo otro a ir aumentando los componentes.
+01:31:08 Alejandro Navarro: exactamente y por eso por eso le estaba diciendo que entonces este José y Luis
+01:31:09 david coach dev: por eso
+01:31:13 Luis Nina: Ahora me tengo que retirar, tengo que estar en unas clases, me voy comunicando con ustedes, saludos
+01:31:44 david coach dev: O se ponen de acuerdo ustedes mismo o hacemos una Tómbola último número estamos una página Random para que no saque número y una de los equipos. O cada uno cada uno coge una funcionalidad de la que están viendo aquí y la
+01:31:55 Alejandro Navarro: Porque Luis ahorita
+01:31:59 david coach dev: comida Van a crear y listo también, si no quiere entrar quito quieren si tiene menos conocimiento de next, pero sí sí, conoce ría. Él se puede encargar de hacer esto los componentes. Porque los componentes es puro río puro, o sea, esto Solo río, o sea, esto no tiene nada que ver con él ojo arriba los componentes han hecho en rías. Son puros Ríos pompones O sea si no tiene conocimiento en él puede quedarte a crear componente y ya están los componentes casi maquetados.
+01:32:29 david coach dev: En en becerro sería el resto lo copia y los modifique para que funcionen y podrían ir trabajando en por secciones. O hacer grupo depende de ustedes ustedes son cuatro y como equipo deberían unirse y gestionar eso. Yo estoy viendo porque para el fin de cómo está la semana uno tener ya el árbol Solo que diga. Hola, bienvenido un mensaje que me venía editor bienvenido, visitante y listo.
+01:32:59 david coach dev: Y con una un par de ítem que se selecciona el segundo error, creo que podría ser muy bien para esta semana uno. Y para la semana dos ya tener funcionando casi todos los ítems del dafo para encargarnos de la de los dos cosas fuertes de la subida de video y de imágenes que tienen que pasarse de Front en donde se vayan a guardar y la comunicación entre.
+01:33:22 david coach dev: el escritor y el Y el editor que son las partes fuertes de la aplicación porque los demás son componentes que tienen que ir haciendo poco a poco me estaban creciendo la aplicación. Por eso en este cable pequeño y desearle para esta semana sería el Davo funcionando ya con los roles. Y una vez tengan tengan el login, solo es cuadrar escuadren bien. La barra que cuadren bien que todo esto te vea todo esto tenga sentido que no no pase esto.
+01:33:54 david coach dev: Que no se puede hacer nada, no tripa nada, aunque Sería bueno, porque sería modo Focus estás aquí y solo puedes trabajar aquí y no tiene, no te puedes cambiar de aquí. No podría haber como un modo foco puede que está mal hecho como tú lo quieres empezar dependiendo del lado donde de que mires del vaso de agua depende que está vacío está lleno.
+01:34:15 José Ortega: Okay Mira entonces Bueno veo esto David Perdón Alejandro Bueno ya que tienes Uno de si dicen que vamos a usar este diseño bueno parecido a este. Y ya tienes el login ya nada más. terminalo y lo subes allí y ya después si quieren yo me aviento un
+01:34:49 Alejandro Navarro: De hecho, sí te Bueno no sé si leíste ya subí la rama de hecho nada más. Me
+01:34:52 José Ortega: Sí sí, ya.
+01:34:53 Alejandro Navarro: falta lo del sustan y ya lo que lo que sí le voy a pedir de favor, es que no sé bien. Eso sí, Yo no lo quiero tocar todavía si alguien me llega a enseñar. Ya estaría bien.
+01:35:09 José Ortega: Perdón, el qué?
+01:35:11 Alejandro Navarro: de para hacer la el margin, el
+01:35:17 José Ortega: este
+01:35:19 Alejandro Navarro: Disco pero igual pero igual todavía no, porque todavía me faltan detalles por hacer, No sé ahorita David no sé este dijo que faltaban detallitos y una vez para que lo vea diciendo los anoto y en cuanto también voy a aprender bueno. Lo de asustan para hacer el estado global.
+01:35:36 José Ortega: Entonces, para que si no entonces David yo me aviento un árbol y pues Vladimir
+01:35:37 Alejandro Navarro: Sí de hecho de hecho José ya también tiene la lápiz desplegada, no sé si ya
+01:35:40 José Ortega: que se siga con la landing y pues Luis se fue.
+01:35:47 david coach dev: Es que a ver, yo me di cuenta de esto y no es la primera vez Cuando lo cuando ve que son muchas cosas como que se asustan y se sale. Aquí dice, ahora tengo que retirarme tengo que estar en unas clases, me voy comunico con ustedes Saludos o sea, siga estuvo tuvo esta clase, digo Aquí está en el en el chat de la llamada, se se despidió bueno, sigamos con esto pues.
+01:36:12 david coach dev: Quedamos con para este para el día jueves tener el landing?
+01:36:12 José Ortega: sí Entonces nada más dígame cuál cuál Bueno este Jesús
+01:36:18 david coach dev: terminada Y un funcionando. Le parece que está bien.
+01:36:26 Vladimir Villacrés: cuál es
+01:36:30 José Ortega: Cuál este ya está más completo?
+01:36:35 david coach dev: No no ya para mañana si no hoy día mañana ya van a estar los tres usuarios ya registrados y van a ver tres usuarios, uno que se llame militantes que va a ser que te tiene que dirigirlo a la landing. Y otro que se llame administrador que tiene que dirigirlo al buen que bate Jesús para se autologin y él te va al dashboard de Django y la historia el editor y el escritor que van a estar tener su propio tu propio árbol O sea ya los usuarios tienen que estar para mañana listos.
+01:37:06 José Ortega: No, sí, sí, pero este perdón de la de las de bueno cuál? Lleva más funcionalidades para que me aviente esa
+01:37:17 david coach dev: Más funcionalidades literalmente el para nosotros el editor.
+01:37:22 José Ortega: Editor
+01:37:23 david coach dev: Tiene que tener todo lo que es amigo del ingreso publicación.
+01:37:28 Alejandro Navarro: https://apitestimonial.vercel.app/app/docs
+01:37:32 Alejandro Navarro: sabías, te la mandé por aquí Ah bueno Sí ahí ya.
+01:37:33 José Ortega: Sí, sí. Sí pero me comentaba Bueno ahorita, dijo Jesús que iba a subir este a producción ya entonces para que ver que tiene el local y ver que tiene en él ahorita en producción, porque yo también lo estaba revisando y pues para avanzar en lo que tiene más y dejar lo que Ya este lo demás.
+01:37:54 Vladimir Villacrés: Consulta consulta va landing. Luego se abre login y luego entra al dashboard
+01:38:00 José Ortega: Sí pero el visitante perdón.
+01:38:01 Vladimir Villacrés: así en este.
+01:38:02 david coach dev: sí
+01:38:03 Vladimir Villacrés: Es el orden No ya okay.
+01:38:05 david coach dev: y el orden Pero entre el a lo que entre login y el dashboard si el usuario tiene como roll Rodríguez Pero como que si tuviera logueado.
+01:38:20 Vladimir Villacrés: Puede acceder a la landing el usuario loguear?
+01:38:23 david coach dev: Sí sí te puede loguear pues no puede ingresar los datos Porque usuario, es un usuario ni permiso, o sea, como no tiene permiso no puede entrar un dato Hasta que el editor le de permiso Ese es que ese sería Rango dictamente del administrador el administrador tiene que darle permiso si es editor es que lo único que le da el permiso a los Editores es el administrador nadie más le puede dar permiso de editor él no se puede lograr como Editor
+01:38:50 Jesus Medina: para que utilice el empeing de editor o compañía ya el Point de compañía automáticamente se se loguea con el rol de compañía y el que se loguee con o se cree una cuenta con el o sea, tengo dos empones los que se creen en las cuentas con los Se crean automáticamente como visitantes y los que se creen las cuentas con el Point de compañías se crea automáticamente con el rol de editor no sé si a ver si lo cambio lo dejo así. Eso le ahorra tarea al administrador lo está chequeando los usuarios.
+01:39:38 david coach dev: Es que cómo te lo explico? Uno no se podía y no no se podía, no, no debería poderse logiar ni siquiera como visitante. Si eso nada apagado
+01:39:52 Jesus Medina: O sea si yo me cree yo tengo
+01:39:54 david coach dev: Eso sí porque tenemos que bueno opiniones de dos opiniones Quiero escuchar.
+01:39:58 Vladimir Villacrés: Pero el visitante solo debería haber. Yo creo que el bisistente debería poner solo una opinión, no más y el administrador a ver si lo acepta o no pues Solo los que están logueados creo que pueden deberían hacer cambios y todo eso y entrar con sus perfiles. No es así.
+01:40:27 José Ortega: Solamente puede ver los testimonios. Si quiere este hacer un testimonio tiene que loguearse.
+01:40:37 Jesus Medina: no
+01:40:39 José Ortega: no
+01:40:40 Jesus Medina: Que ahí van a ver usuario usuarios, anónimos porque
+01:40:44 José Ortega: El anónimo Ah sí sí.
+01:40:44 Jesus Medina: Va a haber esto se tiene que colocar con los usuarios anónimos para poder cumplirse el requisito de integración con sitio externo.
+01:40:57 david coach dev: A ver, te explico bien esa parte los usuarios anónimos O sea tú vas al alandia, hay un formulario ese formulario se iba a tener a seguridad pero no es por medio de token, sino por medio de apiquí. una piquique creada del administrador o el editor y es grabada base de datos Y cuando el cualquier persona que envíe un testimonio a lo que llega al bajen, el baje tiene que revisar primero que sea de una de un dominio permitido y segundo que la Api que envíe sea la misma piquis, que tiene guardada en la en la base de datos si los dos requisitos son válidos entra Al digamos repositorio testimonio para revisar si en cualquiera.
+01:41:37 José Ortega: Sí, sí.
+01:41:38 Jesus Medina: eso hasta ahí fue eso sí, no lo desarrollé porque
+01:41:41 david coach dev: con eso todavía falta y si por si acaso no cumple automáticamente me dan 404 y se acabó Ya
+01:41:52 Jesus Medina: Sí porque
+01:41:54 david coach dev: Porque no cumple de los dos no cumple lo los factores, o sea el comentario no puede llegar y se regresa, se le da un error de servidor. Ya sería eso ya literalmente queda Emmanuel desarrollador que haya implementado el formulario en arreglarlo. tú tienes que tener una seguridad una un medio de seguridad mínimo, aunque no puede ponerlo por token porque no puede pedirle que toque en tu testimonio, se registre que sería lo lógico que toda la persona que quiera poner un testimonio tenga que registrarse Pero puede puedes abrir un Point así como Con una pequeña Nada más eso sí no tiene reto alimentación, es en solo es devenir como un buzón de sugerencia literalmente hablando Tú escribes tu sugerencia y le envías.
+01:42:37 david coach dev: Ya lo que pasa con esta sugerencia, ya no está en tus manos y nunca va a tener retroalimentación de ese movimiento. de lo contrario de que
+01:42:57 Jesus Medina: Yo por ejemplo, aquí pienso crear un testimonio. Yo lo había colocado esto O sea por ejemplo era piquín, no va en testimonio.
+01:43:09 david coach dev: Sí pero la pique testimonios Igual igual Recuerda que es la misma para El dominio viniendo de afuera o viniendo pero la diferencia del usuario
+01:43:17 Jesus Medina: Ajá entonces
+01:43:21 david coach dev: El usuario elogiado tiene que enviar de toque.
+01:43:22 Alejandro Navarro: Una disculpa esta fallando mucho mi internet
+01:43:22 Jesus Medina: yo Yo yo los dominios aquí le Bueno si no después más tarde lo modifico. pero los dominios Aquí le coloque organización.
+01:43:42 david coach dev: Sí por eso te digo, podemos revisar las tablas para organizarlas bien y no tener tanto confusión de Descargar lo que tiene que salir ahorita en el planning y yo te ayudo después si quieres mañana nos reunimos Solo dos y arreglamos bien esto y le damos bien cuadradas y te explico una que tengas la
+01:43:58 Vladimir Villacrés: consulta
+01:44:00 david coach dev: idea Clara cuénteme.
+01:44:03 Vladimir Villacrés: El el landing page tiene un botón para admin? No Debería ser solo login para que vaya login directamente.
+01:44:18 Jesus Medina: o con el o con el
+01:44:23 Vladimir Villacrés: estoy hablando con el Front estoy hablando de cuando estoy viendo la landing que que es del ejemplo que
+01:44:28 José Ortega: Ah no es nada más de nada más de
+01:44:33 david coach dev: No Debería ser está más puesta y no me he dado cuenta de eso quería hacerlo
+01:44:34 Vladimir Villacrés: Ay, ay, no entendí eso.
+01:44:39 david coach dev: bien, también está mal Debería ser lobby, Ah pues no le puedo pedir tanto.
+01:44:41 Vladimir Villacrés: claro y admin o sea seguía login demo Api
+01:44:49 david coach dev: Es que la app es que a ver te explico No country pide documentación esta me hizo una documentación del fronting, pero ya está, ya está levantado el cuando tú declina Api tiene que mandarte directamente el Y me mandas afuera, o sea, no aquí mismo sino que le hace que le abra una nueva pestaña.
+01:45:09 Vladimir Villacrés: Pero esto no es seguro o sí.
+01:45:11 david coach dev: Sí, A menos que te quieras poner a codificar toda la documentación que está aquí acá. Esto sí, porque esto tiene que loguearse usted no tiene la parte más arriba Jesús muchas gracias, tienes que poner la creencia en la parte de arriba.
+01:45:32 Jesus Medina: Aquí donde dice autorizar.
+01:45:36 david coach dev: En la parte de arriba de eso Ah bueno ya ya comparto yo. Mira aquí tiene que pegar sucre en sus toquen y todo si no tiene un usuario en otro una contraseña, no se va a poder Por eso te digo que cuando alguien se se registre no puede tener, no puede llevar horrores específicos, debería registrarse directamente como vos un usuario Bot no tiene un toque.
+01:46:06 Jesus Medina: Ah Porque yo por ejemplo yo por ejemplo, creo este este usuario con este Point
+01:46:26 david coach dev: ya
+01:46:28 Jesus Medina: automáticamente cuando el usuario se registra con este Point Ya aparece aquí como con el rol visitante. Otra vez, Dios mío.
+01:46:43 david coach dev: Como él no tiene toque. Ya no importa, pero importante este usuario no tiene token al no tener token, no puede, no puede ingresar al resto de funcionalidades porque le falta.
+01:46:57 Jesus Medina: Cómo Pero cómo así que no toquen porque solamente con Con colocar esto se loguea y ya le genera el token.
+01:47:09 david coach dev: Es que ahí no va un usuario de verdad para llevar un spring a ver. La única manera que él puede poner un usuario una contraseña de un usuario de un usuario elevado que tenga administrador porque quien se la dio. Dos también a este esto que también después ponerle un poquito más de seguridad no solo manejar con toque. Pero igual eso te ve, después lo importante que todo usuario que se registre no tienes que tener otro todo tiene que tener un método de registro, no varios es una sola puerta de ingreso, nada más todos los usuarios televisan como si tú quieres como visitante o como usuario como visitantes, si quieres, si no quiere poner uno solo sin permiso y va con un usuario de lectura un usuario de lectura no tiene permiso ni actualizar ni editar ni borrar.
+01:48:01 david coach dev: Solo puede ver y dependiendo del rol es el alcance lo que puede ver la lista de usuarios, no debería estar al público debería estar cerrada todos con usuarios de toque, si ya se filtrando soy una contraseña ningún sistema de seguro, ya tiene el usuario y la contraseña de unamino de una persona que tenga un rol alto en tu aplicación ya. Literalmente ya no hay nada más que hacer porque tú no puedes tú no te puede brindar contra eso.
+01:48:28 Alejandro Navarro: Oye oye David una una consulta Por ejemplo si ese si ese usuario ya por ejemplo
+01:48:31 david coach dev: Cuénteme.
+01:48:34 Alejandro Navarro: se registra como visitante no nada más va a entrar a lo que le pertenece a él ya no tendría por qué no tendría Cómo entrar a admin, por ejemplo.
+01:48:44 david coach dev: no, no puede porque ya viene la
+01:48:45 Alejandro Navarro: Por eso por eso, por eso te digo por y para qué serviría un fantasma si se va a registrar igual como visitante nada más va a tener eso.
+01:48:52 Jesus Medina: claro
+01:48:53 david coach dev: Es que antes no había visitante error de visitantes del escritor. Eso tendría que tener el tener que tener visitante de poder escribir editar eliminar y borrar testimonio.
+01:49:07 Jesus Medina: Bueno, eso eso lo está haciendo eso lo está haciendo el visitante.
+01:49:09 Alejandro Navarro: Sí, sí, sí, sí, sí sí sí.
+01:49:11 david coach dev: Sí pero eso tiene que ir bajo toque, no de un toque.
+01:49:15 Alejandro Navarro: Por eso ya el usuario Ajá ya cuando te registras y y en el login, ya te ya te
+01:49:15 Jesus Medina: entonces hay que registrar es el
+01:49:22 Alejandro Navarro: llega el token.
+01:49:26 david coach dev: y que esa es la diferencia con el otro, el que no te llega el token cuando Tú es que esa es la diferencia cuando tú tienes a ver esto viene el concepto de la aplicación, es gratis y de paga cuando tú tienes un Services tú no digas que un usuario de paga y no tiene cuenta free. Tú no puedes, tú puedes dejar con un usuario, se registre, pero mientras no pague, no tienes eso.
+01:49:53 david coach dev: Y cómo le cómo le bloqueaste?
+01:49:54 Alejandro Navarro: Pero pero no va a tener acceso a que si su dashboard no le va a permitir hacer ciertas cosas, no?
+01:49:59 david coach dev: Es que cuando tú nos pagas no tienen acceso al dafore en la aplicación.
+01:50:02 Alejandro Navarro: Pero Y entonces, para qué servía el Qué es O sea qué vería?
+01:50:05 david coach dev: Para que hagamos que viene yo me registro tú le agrítate aquí Y el editor el administrador habilita cuando el chiste cuando tú lo cambias de error normalmente lo hice porque no había no hay todavía ni un dado ni una donde fuera la idea que te bloquea como que es y regresará a lani, para ver que el esté funcionando bien, después se iba a borrar y se iban a poner el que he de visitante que había escritor y el que es de editor Valle de editor, pero era para mientras se probaba el login solo para login, nada más.
+01:50:40 david coach dev: Porque es un rol error, lo puede tanto poner como sacar cuantas veces tú quieras para eso están las tablas. Porque la idea que yo tenía que todo el mundo sea hasta que hasta que el editor administrador le suba le suba el rol. Porque tú tienes que poder bajar al editor es que hay un problema que es la historia de administrador y elimina le estás quitando el acceso a la persona a la aplicación.
+01:51:08 david coach dev: Yo quiero cambiar de editor Cómo hago Me entiendes, Yo tengo un editor y lo quiero cambiar Cómo hago para poderlo cambiar Si el editor electrónico que lo puedo hacer. aparte del administrador global de la aplicación Por eso era el doctor que había de administrador de de cada de cada dominio.
+01:51:33 Jesus Medina: Entonces entonces La idea, es que los usuarios
+01:51:38 david coach dev: La idea que todo esté como visitante ya lo como visitante lo que hay que hacer es que no puedan entrar a hacer ningún cambio mientras no tengan un toque O sea no, no debería haber primero ruta, no voy a hacer pública ninguna. excepto una que se abra para que sean porque todas las todas las que son parte que tengan datos de los clientes no puedes ver públicos por por ley de privacidad de por ley de protección de privacidad del del usuario ninguna ruta que tenga datos de usuario parte pública
+01:52:14 Jesus Medina: aquí por ejemplo yo, por ejemplo, la única los únicos datos que muestro es el username y el email y la fecha que se creó Esos son los únicos datos que yo muestro en get tanto tanto de los usuarios visitantes como los usuarios editores
+01:52:34 david coach dev: Está mal, no puede ser público.
+01:52:36 Jesus Medina: Okay ahora una pregunta, por ejemplo
+01:52:38 david coach dev: Porque te explico por qué yo soy tu competencia, Yo te pego y me llevo la lista de todos tus clientes.
+01:52:45 Jesus Medina: Está bien. Ahora una unas preguntas cuando yo esté logueado solamente puedo ver entonces. Cuando le den veo solamente mi propia información.
+01:52:59 david coach dev: Claro que sí el visitante solo ve la suya.
+01:53:01 Jesus Medina: Ajá Y entonces este.
+01:53:05 david coach dev: Es que ahí viene los roles.
+01:53:06 Jesus Medina: igual que igual que el get ID supongamos que si yo Yo soy el usuario uno y soy visitante, No puedo ver la información del quince solamente de mí mismo.
+01:53:17 david coach dev: exactamente
+01:53:19 Jesus Medina: Porque la idea, Por ejemplo en un testimonio la idea que yo tenía era por ejemplo ver De quién quién hizo el testimonio? Y a qué compañía Entonces esa información si es pública. O no?
+01:53:41 david coach dev: la información a ver la información pública pero en la landi de cliente en adelante que comparte los testimonios Ahí van a salir porque recuerda que tengo una integración una landi de alguien. Él va a mostrar esos datos. pero el visitante no puede tener acceso a ningún otro dato pero
+01:53:56 Jesus Medina: Por ejemplo yo estoy
+01:54:03 david coach dev: No importa de quien sea no puede ver quién le puso arame. Yo estoy visitante Creo que quién le puso Quién le puso comentario a mi dominio, no, el sudor puede ver sus comentarios y su testimonio nada más.
+01:54:14 Jesus Medina: estoy
+01:54:15 david coach dev: Nadie puede verlo darte lo demás el editor sí puede ver los testimonios completos, pero el editor tampoco debería poder tener acceso a los datos de los usuarios. A menos que el editor sea un admin, si tiene tsunami, puede hacer todo.
+01:54:32 Jesus Medina: Cómo ella vaya Cómo que un editor no puede ver los datos supongamos de un usuario, o sea, supongamos un usuario, es un testimonio un comentario de mí. Yo tengo que saber quién es ese usuario.
+01:54:44 david coach dev: Claro pero es que a ver si puede ser, pero no lo puede evitar entiende Yo puedo solo verlo, o sea, yo quiero ver quién envió y Quién escribió si lo puedo,
+01:54:50 Jesus Medina: Ah okay.
+01:54:53 david coach dev: pues Si lo quiero modificar esos datos el editor no debería poder modificarlo. Porque no es un administrador, o sea, Ese es ese ese es el juego de los roles Mientras más alto tu rol más privilegio tienes, o sea, el visitante solo puede tener él tiene acceso a su propio dato y a crear y gestionar sus testimonios pare y contar el editor tiene acceso a sus datos gestionar los testimonios de toda la El dominio y poder ver los datos de la otra persona nada más y el administrador es que debería tener acceso a todos a los datos de la persona podrán modificar, pero ese es el administrador en este caso para Por eso hay que ponernos claro y ponernos consciente y tenerlo claro tener la la base Clara y va a haber un usuario administrador para el cada dominio o el editor va a va a hacer un administrador.
+01:55:49 david coach dev: O sea que escoger bien los roles para según eso dar los permisos y los empuñados Por eso le pregunto a usted mismo Cómo quiere manejar eso. Porque si meten el administrador van a tener que hacer otro lo único que tiene que hacerlo tu dashboard y dividir la responsabilidad entreditorio administrador. Cuál es la diferencia que el editor no va a poder manejar, no poder cambiar contraseña a nadie alterar los datos de nadie, ni cambiar la otra categorías, o sea, él no puede hacer nada de eso, eso ya sería bueno la categoría Sí porque es parte de su edición, pero ya Cuál es la aplicación, ya sería para el administrador o el editor es un administrador.
+01:56:32 Jesus Medina: David en categorías yo había colocado que solamente los administradores podían crear categorías porque sino que habíamos quedado
+01:56:44 david coach dev: Es que ese está bien ese error de administración, para eso está el
+01:56:45 Jesus Medina: que
+01:56:49 david coach dev: administrador administradores que te encarga de todo lo relacionado con la creación de categoría y cancelación de esta actualización de dominios, ingresar dominio autorización de clientes también tiene que tener derecho, también podría verme modificar testimonio aprobar en el testimonio rechazar testimonio publicar testimonios. Si es que el editor no la ha podido hacer falta, o sea, pero
+01:57:14 Jesus Medina: Y las y las organizaciones solamente las crean los administradores.
+01:57:20 david coach dev: Sí, la organización la organización crea la organización de creada por el administrador, pero no de la por administrador de la aplicación O sea que entra Django el que entra en yango puede hacer esto. El otro lo que puede hacer es agregar dominios.
+01:57:34 Jesus Medina: Okay O sea ese es el que yo llamo administrador Ese es bueno la administrador
+01:57:41 david coach dev: global
+01:57:43 Jesus Medina: global es el único que puede crear organización, verdad?
+01:57:47 david coach dev: sí
+01:57:47 Jesus Medina: o dominios
+01:57:48 david coach dev: exactamente
+01:57:50 Jesus Medina: Ahora otra pregunta. Por ejemplo, ahí estaba pensando eso una organización. Solamente puede pertenecer a un usuario, verdad? o sea cuando me digo un usuario a un solo Editor O varios Editores pueden permanecer a la misma organización?
+01:58:14 david coach dev: Sí, debería poder. Porque yo soy una una empresa como Microsoft un televisor no me va a alcanzar, pero si soy una de piedra como el mecánico Pepito con una persona me basta y me sobra. O sea, eso se le puede dejar uno uno hasta que crezca y después se le puede cambiar un String a una raíz. Se acabó el problema.
+01:58:34 Jesus Medina: Se la se la va a pasar una lógica para eso Entonces un por ejemplo. el usuario el administrador creó la organización Microsoft Ajá Y él agregó al usuario uno a esta a esta organización.
+01:58:56 david coach dev: ya como Editor
+01:59:04 Jesus Medina: Como editor un editor puede agregar otros Editores a la organización o lo único que puedo agregar usuario a la organización es el administrador.
+01:59:15 david coach dev: En teoría lo único que podría subir de nivel de visitante editor Debería ser el administrador O sea tú no te podrías lograr como editor, no te voy a registrar como editor O sea me entiende al momento cuando tú entras a una organización a una una aplicación que tiene moderación. Tú no puedes tú no te tú no te no te registras con un rol alto normalmente todo el mundo se le quita con el mismo rol y los administradores son como cuando tú estás en disco no te de manera disco tú en discos de manera. Tú Entras como un usuario normal y el administrador de disco que te va subiendo los privilegio de roles Así mismo sería que tú te ingresas con todo el mundo ingresaría como visitador como visitante y el administrador sea del sitio o del sistema, le sube el rango editor porque si no tendría no tienes.
+02:00:02 Jesus Medina: Entonces el administrador el administrador de Django se la va a estar pasando en cambiando los roles de los usuarios
+02:00:12 david coach dev: Es que para eso está el administrador de cada uno, ya me entiendes. Esas son las esas son la división de responsabilidades cada rol tiene su responsabilidad el administrador de la app es para toda la en conjunto, no solo para lo que necesiten un dominio A menos que sea un problema muy grande que El dominio no lo el administrador o el administrador del dominio no lo puede manejar. Ponte que cerebro que una cuenta y él no aparece en el administrador el que tiene acceso directo en la base de datos Y tú puedes entrar a la base de datos desde yango y borrarlo.
+02:00:49 david coach dev: O sea tú puedes hacer eso el administrador de la aplicación no debería poder ingresar a la base de datos, solo tendría acceso a su base de datos, o sea, todo decepcionado es como que te voy a dar una escalera Mientras más arriba más arriba más más privilegios alcanzas. el administrador global era el de todo, pero como tú mismo dices un administrador lo va a una aplicación no se va a tardar todos los días que la en la empresa quiere cambiar el orden de visitante moderador tiene que escribirle administrador que el administrador vaya a la empresa, busque busque al señor que está acá, o sea, para eso cada uno tiene su encargado es como cuando tiene tú tienes tú estás en tu casa y tienes y tienes tus hijos tus hijos, dónde están encargado de usar tu casa para Negras tú pues encargado de arreglar el cuarto de sus hijos de tus hijos, tú no Bueno cuando sos chiquito estoy la arreglas tú pero cuando ya tienen un nivel de experticia más alto, o sea más edad ya se encargan de ella arreglar sus cosas así mismo es aquí Tú comienzas como visitante chiquito y vas subiendo privilegios.
+02:01:56 david coach dev: Pero esto ya depende como lo quiera manejar ustedes si el editor es una editorial completo o el editor solo se dedica a editar. Eso ya depende cómo lo quieran hacer porque yo tampoco quiero poner yo yo no tengo ni la voz final ni soy la la santa, bola, verdad? Puedo estar en todo, puedo estar equivocado 100% pero como yo estoy muy seguro lo que digo puedo estar hablando piedras, pero estoy bien, seguro la piedra, que estoy hablando.
+02:02:20 Jesus Medina: Mire yo Yo opino que para que el administrador no se por ejemplo. Yo el administrador creó una organización y esa organización le asignó un una un editor, verdad? Bueno tanto el editor sale el editor que pertenece a la organización Microsoft Tanto la administrador como el editor que pertenece a la organización Microsoft pueden agregar. Otros Editores a dicha otros usuarios a dicha organización como Editores pienso yo. No sé si si sea factible o no.
+02:03:07 david coach dev: O sea no es de agregar, Porque todos los se registra lo que podrían hacer ellos cambiar el rol, Sí me parece bien, o sea, usamos que me que el editor es un
+02:03:12 Jesus Medina: Eso eso es lo que eso eso es lo que me refiero.
+02:03:18 david coach dev: administrador global de cada dominio listo y eliminamos.
+02:03:21 Jesus Medina: No, pero Ajá eso un administrador no vale de ese dominio organización.
+02:03:27 david coach dev: Claro sí que cuando es que cuando el editor va a su das por estar en los usuarios solo le salen los usuarios de su dominio en cambio el administrador de Django cuando va usuario, le están en los usuarios venar de toda la aplicación. Esa es la diferencia sectorizada de roles y poderes error el editor de Microsoft solo tiene acceso a Microsoft pero el administrador de testimonial tiene acceso
+02:03:48 Jesus Medina: exacto
+02:03:51 david coach dev: a todo testimonial, amo y señor de la Baraja de cartas y Microsoft solo de la de las cartas rojas ya y del corazón, eh? Nada más ni siquiera de diamante.
+02:04:01 Jesus Medina: Ajá Pero entonces hay un detalle Que entonces un editor podría ver la lista de usuarios que son visitantes porque necesita verla para poder saber a quién va a agregar a la organización como con rol de editor.
+02:04:25 david coach dev: Sí en ese caso, Sí si lo pones el editor como un administrador Sí si lo pones a editor como un editor, no. Esa es la diferencia de los roles específicos de cada uno, si el editor es solo editor no puede cambiar de error, no puede modificar datos, no puedo hacer nada, pero si el editor es un administrador tiene derecho a ser todo. Por eso ponía en consideración del equipo, si quieren trabajar como editor como administrador o quieren dividir responsabilidades tener un administrador y un editor, por eso estaba poniendo a ver que cierra uno para que se aclare de una vez y ya con esto terminar la reunión de hoy día porque yo estaba como que un poquito.
+02:05:12 Jesus Medina: Bueno yo opino lo que había dicho no sé qué oír a los demás.
+02:05:17 José Ortega: Yo opino que lo que diga Jesús porque pues en sí las funcionalidades las tiene que hacer el de parte de ahí y pues nosotros Solamente vamos a consumir su
+02:05:28 Alejandro Navarro: Yo la verdad no entendí bien Así que yo nada más le apego a lo que me digan.
+02:05:33 José Ortega: Yo también yo me pegó lo que me dijo Jesús porque pues él es el que va a construir.
+02:05:37 Alejandro Navarro: Sí sí, sí, yo igual como Jesús venga trabajando. Nosotros nos vamos maquetando.
+02:05:44 José Ortega: y
+02:05:44 david coach dev: Perfecto entonces que quedamos de que digamos que ya quedamos con la responsabilidad de dividir para el día jueves la anda incompleta y los de árbol funcionando solo solo ingresando no tiene funcionalidades todavía hechas Claro que te quieren poner funcionalidades dedito arriba siempre El pasito extra aclarar una cosa acá una cosita antes que sí lo del usuario anónimo y la Api externa es un paso más allá la integración de sitio externos de los testimonios nada más llega normalmente es un Carrusel o la página completa de búsqueda nada más pero para dar el paso extra es que estoy creando lo el lo de la lo del formulario y la integración en otros mediante login automático me entiende Como para hacer un diferenciarnos nuestro producto de cualquier otro producto porque si no vamos a hacer Igual que cualquier persona que es como Clonar y ponte pentáculo binario, tú puedes Subir tus fotos o puede hacer tu integración en tu propio das ropa para subir la foto porque nadie tiene tu propia aplicación que tú en tu computadora y puedes subir y bajar imágenes como tú quieras.
+02:06:55 david coach dev: Y tiene la apico después comunicar que te lo veas y ya te comuniques y subes tu cuenta tu propia cuenta Esa era la idea que yo tenía para este SMS que te convierte en un motor de SMS para poder subir información en el Django o por medio de muestra propia app o por medio una Api en sitios externos no solo visualizar también tener comunicación de entrada y de salida.
+02:07:22 david coach dev: o sea, para tener un pasito este más que solo son en Point el mismo después que tiene nuestro frones lo utiliza otro frontnite Solo que Digo, es lo mismo es como si tuviera un Front con varias varias afuera es muy muestro el propio cliente y varios clientes que se comunican a nuestro baque y listo. Literalmente lo mismo Solo que con en otro en otra cuenta es la mía Esta es lo que yo estaba proponiendo Pues por el momento solo no estamos dedicando a nuestro a nuestro sistema todo lo que vamos a hacer va a estar adentro de nuestro sistema si hay tiempo o si no, yo me pongo a replicarlo y yo mismo construyo, el otro la otra empresa que yz y la subo porque solo he copiar lo que ustedes han hecho y cambiarle los colores y el logo nada más y con eso se va y te le hace un dashboard, De visitante nada más no necesitamente esa misma funcionaría que quiere explicar el visitante en otra página no la de nosotros.
+02:08:25 david coach dev: Dominio diferente y ahí vamos lo que queremos Con eso ya y con Jesús Si quieres seguimos para llegar bien, ponía la tabla donde venimos mañana cuando tú tengas tiempo libre y comenzamos a cuadrar una por una para dejar todo Ya vamos despacito desde desde el principio hasta el fin para ir cuadrando una por una sectorizando bien los ítems y los campos para que queden todo ya no y aclararte cualquier duda que tengas para crear todo limpio y limado para que quede Ya funcionando y que tu trabajo sea mucho más fácil de hacer. No hay ningún problema por eso.
+02:08:59 Jesus Medina: si quieres seguir sigamos ahorita para para eso sí, porque
+02:09:04 Alejandro Navarro: este yo nada más tengo Perdón Jesús antes para que David Oye me decías que había detalles en el login para para arreglar me puedes para apuntarlos y
+02:09:16 david coach dev: Sí ya dame chance, que tengo que tengo que volver a abrir el porque ya lo cerré. Dame un segundo que tú ya estoy cargando.
+02:09:27 Alejandro Navarro: Sí gracias.
+02:09:30 david coach dev: detenciones Así que se demora un poquito Tengo que hacer limpieza. Bueno lo importante el primero el botón de volver mandarlo directamente al Home tú eres indiferente darle un directo al Home ya algún
+02:09:48 Alejandro Navarro: Al Home que tenía la página de construcción.
+02:09:54 david coach dev: No tienes que a ver eso es lo que te voy a explicar esta este está construyendo una manera que el esto Solo manda a una página específica. Yo lo tengo ahorita que vaya a un construction para que ustedes pueden hacer esto como yo tengo aquí mi página de prueba. Que yo la puedo probar en línea ya está subida. Yo la puedo probar en línea, pero al momento que la gente te amo en tu dominio entra aquí.
+02:10:18 david coach dev: O sea, para ingresar acá tiene que poner raya prueba para poder ingresar, pero usted tiene una página que quieren probar amor raya landing tiene que poner raya landing para poder ingresar ya cuando tú terminas esto se le cambia ya él construye te pones landing aquí automáticamente. para conocer
+02:10:36 Alejandro Navarro: Sí pero por eso te decía a dónde la mando entonces?
+02:10:39 david coach dev: Directamente a la raíz la mandas. Literalmente le mandas como tengo puesto por acá. Directamente el bono automáticamente la va a dirigir a la página que sea él se encarga de mandarla donde le bueno, nosotros nos enviemos.
+02:10:53 Alejandro Navarro: Vale.
+02:10:58 david coach dev: Esa era una la otra los dos botones de abajo de admin y de editor no funciona.
+02:11:03 Alejandro Navarro: Ajá pero haz de cuenta que ahí igual necesitaría igual nada más es Pues sí,
+02:11:06 david coach dev: Eso ahora habría que cambiar.
+02:11:08 Alejandro Navarro: nada más es mandarlo redireccionar no O sea nada más es mandar el link y ya.
+02:11:12 david coach dev: Sí, pero a Ese botón le falta uno. Es falta de visitante. Administrador editor y visitante el administrador se va a bloquear y se va directamente a dirigir al diablo de ángulo. Pero editor va tu editor y el visitante va a subir Y recuerda que mi en mi cap solo habían dos usuarios nada más.
+02:11:36 Alejandro Navarro: Sí nada más está admin y Editor
+02:11:39 david coach dev: Hay que subirle visitantes.
+02:11:41 Alejandro Navarro: Okay, visitante.
+02:11:43 david coach dev: O puedes ponerle escritor si quiere o testimonio testimoniales visitante para que sepan que un tercer usuario
+02:11:54 Alejandro Navarro: Ah sí Ese ese también no lo puse como componente porque no sabía Ah también
+02:11:55 david coach dev: Y eso sería todo, me gustó el que le hiciste del login. El el este que está muy bueno, te lo va a copiar, te voy diciendo.
+02:12:10 Alejandro Navarro: te iba a preguntar, por ejemplo del from, vamos a usar para los iconos Cuál Yo nada más conozco la de la librería de Esa es la que yo he ocupado, no sé si vayamos a ocupar otro.
+02:12:25 david coach dev: utilizas otra librería, intálala y utilícela punto
+02:12:28 Alejandro Navarro: Ah ya hay una librería de
+02:12:41 José Ortega: Ya nosotros la bajamos y nada más le instalamos.
+02:12:44 Alejandro Navarro: Preguntaba igual por si no habían una librería, no igual me me acoplo a esa
+02:12:44 david coach dev: sí
+02:12:48 Alejandro Navarro: que ustedes están utilizando.
+02:12:51 david coach dev: Yo estoy usando porque esta es la que viene con yayoi.
+02:12:55 Alejandro Navarro: Vale.
+02:12:55 david coach dev: yo soy muy amante esto porque estoy vendiendo los componentes y lo bueno que los componentes son completamente personalizables, si quieres modificarlo viene aquí lo modifícate y listo se acabó no hay, no hay problema actualizar y te quiere autorizar un componente que tú modificaste le pones que no, porque a veces tienes que modificarte porque vamos cuando ingresas a los al menú cuando les pongas aquí lo el El chip que el menú que sale de aquí para acá o es nada que el de acá te piden modificar algunos componentes porque hay que aumentar hay que aumentar opciones.
+02:13:32 david coach dev: Pero ahí, normalmente Aquí está todo aquí, lo puede configurar yo lo que normalmente estoy haciendo es copiar esto. Y crear mi propia y debería de componentes para no tener que porque lo bueno que tiene esto que ya tienen integración con el con el área, o sea, con la accesibilidad estos componentes son totalmente accesibles. y tienen por debajo la facilidad de cambio tamal Esto es lo que a mí no me gusta esto Esta librería me trae toda la librería todo tipo de rías para estar cuatro o cinco tipos yo aquí me pondría a brindar, donde están todos los tipos de rías y esto no importar los tipos que utilizo no no importar todo el tipado arriba porque el tipo de arriba es un son como cinco mil líneas de código titán, o sea
+02:14:14 Alejandro Navarro: Sí, Yo por eso no utilicé, no utilicé esa librería porque como era en poquitos componentes no, no le vi la necesidad.
+02:14:22 david coach dev: No, el colegio son mucho más allá son altísimos, pero también están los de
+02:14:23 Alejandro Navarro: Sí, sí, sí sí sí.
+02:14:29 david coach dev: lo del otro la competencia de charlo de Ay cómo te llamas I love, uno css, que son oponentes. Lo único que lo de uno desde ese tiene problemas con next porque como se calientan de lado servidor algunos componentes no ha hecho para que fueran del lado del cliente a veces hay conflicto con eso, qué gusto esta porque ya. Directamente pulida para nexo O sea ya está integrada con negro, así que ya tiene, además que ya le integró el árabe y vivo, o sea que te está volviendo un estándar porque ya tiene la review ya, ya tiene esta esta librería como estándar en su componentes.
+02:15:04 david coach dev: O sea, por eso la comencé a utilizar y por eso lo estoy comentando a aprender bien porque ya ya está cometiendo un estándar. Esto no difiere a que mañana pongan ellos dos votos en esta librería y pongan una mejor en el en el código no hay nada escrito. Hoy día Estás arriba Mañana estás abajo hoy día angular es mejor mañana arria mejor pasado sale un nuevo y lo mata a los dos.
+02:15:28 david coach dev: Como lo que es, es, no sé, no sé eclipse eclipse Me parece que existe Es lo que yo Ha sido Ría y lo que debió haber sido. Nec es un muy buen lenguaje muy sólido muy fácil de aprender Y la integración con otro componente de otros framework y librería es mucho más fática cuando tú haces un micro es horrible integración de esto con esta tecnología es fea, es como astro astro es muy lindo pero sirve para tener por el momento solo sirve para hacer páginas estática pero ya comenzó a tener sus integraciones con bapping y su integración es con componentes reutilizable y todo el chiste con con interactiva no ya no tanto para para bienes estáticas es belkic también es uno muy bueno que está subiendo como espuma se quedó en nada porque Lamentablemente nadie lo usa.
+02:16:21 david coach dev: Pero que nadie lo usa bueno librería porque no no llega a tener un problema. pues La idea es esa La idea, es que tú hagas tu componente bonito aquí Gamer login, debería estar aquí el componente del Esto Solo llamando desde acá Entonces se convierte literalmente, eso se convierte como en un ruteado. Bueno, Qué bruto no estoy.
+02:16:39 Alejandro Navarro: Sí, lo lo había hecho así.
+02:16:42 david coach dev: En ahí está.
+02:16:43 Alejandro Navarro: Hasta arriba sí está. este
+02:16:50 david coach dev: Esto bueno depende está bien, si lo está ahí bien hecho está bien hecho, no
+02:16:55 Alejandro Navarro: Sí porque el único que puse en el en el otro componente fue el
+02:16:56 david coach dev: digo que no. Si me preguntas a mí yo lo vi yo venía aquí al lobby, lo hubiera puesto aquí dentro de login login. Este lo hubiera puesto aquí una carpeta de más componente. Porque es un componente que solo lo va a usar el login Así mismo con aquí
+02:17:13 Alejandro Navarro: Okay sí
+02:17:14 david coach dev: viene la teoría del alcance. Yo la manejo no. Bueno, no soy experto. Estoy peleando con ella porque todos los días me todos los días peleo con alguien diferente porque una persona me hizo unas cosas otra persona en teoría teoría todo lo que va dentro de login tiene que ir dentro de la carpeta lógica. No debería estar afuera tiene un componente que solo voy a utilizar login dentro del lobbing Crea una carpeta llamada componente y lo pones ahí, si es
+02:17:37 Alejandro Navarro: Ah okay.
+02:17:37 david coach dev: solo lo voy a utilizar una carpeta adentro y lo pones ahí otra persona dicen que no, que los tienen que ir afuera en la carpeta llamada.
+02:17:46 Alejandro Navarro: Yo de hecho creé la carpeta Hook que está ahí abajito, no? Entonces?
+02:17:52 david coach dev: Cambio estoy aquí ya mucha gente dice que esto está bien hecho. Por qué Porque hay otra yo no sé cómo la verdad y la arena descanses es algo complicada de entender porque depende todo depende de perspectiva de cómo la vea el desarrollador si este de aquí solo lo voy a usar el login debería estar aquí, pero aquí le falta la ruta el el de los
+02:18:17 Alejandro Navarro: la carpeta Hook
+02:18:19 david coach dev: No eres el bloqueado.
+02:18:21 Alejandro Navarro: Ah bueno Sí cierto
+02:18:22 david coach dev: Y en ese momento yo no voy a estar aquí adentro, pero aquí en el tiene que hacer el que sale. como hace que
+02:18:28 Alejandro Navarro: Sí todavía falta están en el ámbito global, sí sí.
+02:18:31 david coach dev: Te bloquea, pues no, y al momento que haces, te lo veo ya lo usa dos componentes. Ahí afuera me entiende. Y ahí cuando te va complicando la regla del alcance, porque al momento que Tú comienzas a ser más grande proyecto lo que lleva solo para un componente para un lado ya sé, ya voy, ya lo voy a utilizar.
+02:18:46 Alejandro Navarro: lo necesitan en otros
+02:18:48 david coach dev: Y allá no tienes que estar ahí, ya tienes que estar afuera es cuando empieza a hacer una bola de nieve. Y aquí esto te llama trabajar por fichu, este es el afichu de login, aquí lleva todo login que que ganas con eso que lo que están trabajando aquí afuera no tienen problema porque tú trabajas en tu carpeta y no afecta trabajo. Lo demás Pero mira, aquí tenemos un club que yo lo puse esto está de adorno Ah todo esto que dice Ahorita no tiene equipo.
+02:19:18 david coach dev: Es un archivo para que fijo suba esta carpeta en blanco, Porque si tú no le pones esto y la en blanco y no te sube esta carpeta. No sé si ya la sube, hasta hace seis meses Pero igual todo depende como tú lo quieras hacer se te hagas más cómodo. Te tienes más cómodo arriba y poner aquí esto ya lo borró una vez que le pones un una vez que esto lo vas a hacer en tu rama, no es que tú yo le pongo un archivo aquí bórate este.
+02:19:46 david coach dev: Solo para mantener así para que te puedo ver la carpeta. Espero que ya no lo
+02:19:50 Alejandro Navarro: Vale.
+02:19:50 david coach dev: voy a hacer porque yo no me voy a poner a meterte cosas en tu código solo tú solo te digo para que vayas mejorando Me parece muy bien, si lo vi bien,
+02:19:56 Alejandro Navarro: Vale.
+02:20:00 david coach dev: igualito, me sorprendió. Me gustó el el escape, cómo se llama eso? El logger espiner eso es un spinner los que estaba pensando que podríamos hacer
+02:20:10 Alejandro Navarro: Cómo perdón, el
+02:20:16 david coach dev: o no sé si conoces de los componentes. Y el la carga perezosa? Que te vaya a enredar los componentes.
+02:20:27 Alejandro Navarro: Qué?
+02:20:35 david coach dev: No no es lady Es bueno la carga perezosa, no me acuerdo.
+02:20:40 Alejandro Navarro: es
+02:20:42 david coach dev: se me fue y usar skeleton para que
+02:20:47 Alejandro Navarro: Esqueleto No creo que sí lo había escuchado, no lo he usado Pero te lo investigo y veo qué onda no?
+02:20:52 david coach dev: un componente y está cargando tiene un visual de componente porque están son puros son puras, son puros bolita y cuadritos nada más Pero tiene el espacio
+02:21:01 Alejandro Navarro: Sí, sí, sí sí sí.
+02:21:02 david coach dev: componente Hasta Que aparezca componente si lo quieren usar úsenlo, si no lo quieren usar, no lo usen, pero es una diferencia en que tu aplicación pase de De tener una presencia de carga mucho más rápido porque tiene un precargada porque los esqueletos cargados automáticamente. Hasta que te cargue componentes bajo demanda son componentes bajo demanda, pero quiero utilizar buses no quiero utilizar, no lo use solo se lo pongo como carta sobre la mesa por ahí explico. Yo no tengo yo no soy un a ver, hablaremos algo Este no es mi proyecto Y ustedes son mis empleadas porque yo tenía que estarle pagando para que yo quisiera hacer un trabajo comunitario todos tenemos voz todo tenemos voto Y si una persona está mal la otra la puede corregir con un tono amarillo educado y si se van a c********, lo mandamos otro canal para que te chinguen no hay ningún problema.
+02:21:57 david coach dev: Que la verdad, pues a ver Somos humanos, algún momento se nos van a pelar los cables algún momento nos vamos a nos vamos a querer matar entre nosotros hay que decir la verdad. el componente
+02:22:09 Alejandro Navarro: No, pero pero pero es como dices, no O sea eso es trabajo, pero porque tú lo quieres hacer, pues si no te gusta al final pues.
+02:22:16 david coach dev: sí Te vas como yo yo porque me iba a tener un proyecto para mí me lo cancelaron
+02:22:20 Alejandro Navarro: nada
+02:22:25 david coach dev: ayer, así que ya no me pude ver debajo. Porque me lo iban a pagar y ahí sí, si te pones a pensar entre un proyecto free y uno pagado.
+02:22:31 Alejandro Navarro: Ah no, pues sí, obviamente.
+02:22:33 david coach dev: Todito cubrimos al padre yo no creo que nadie todos esta parte de aquí está bien bonita, pero te voy a te voy a pedir algo. Ándate locales abajo en librería está mal puesto, creo que también está más puesto en librería de estar en en compartido locales inmediatas chivito. te ves Aquí están todos los textos de la aplicación. Entonces aquí mismo poner tu página va a ser un archivo con el nombre de tu página y ponerlo así.
+02:23:04 david coach dev: Porque yo no sé si la van a implementar, ya es otra cosa, quería hablar antes que te acabe esto, vas a tener cambio de tema, van a que van a tener cambio de cambio de idioma, sí o no?
+02:23:18 Alejandro Navarro: Pues yo igual no he hecho acá en el idioma, el cambio de tema sí lo he hecho pero pues igual Yo me adapto igual el chiste es aprender.
+02:23:24 david coach dev: Usted porque no va a codear yo ahorita Soy pm y yo no voy a tocar código, voy a hacer pm Cuba tener y manager y hasta te quiere.
+02:23:35 Alejandro Navarro: Bueno entonces a mí a mí yo opto yo no sé los demás que primero tengamos ya la base de la estructura y ya esos pequeños detalles, si nos da tiempo los implementamos Yo opino eso.
+02:23:45 david coach dev: Si pueden hacer esto Sí aquí en locales, una carpeta con el nombre de su componente y la ponen así. Por qué?
+02:23:53 José Ortega: Sí este Perdón ahí este como tú dices, ponemos las estructuras de los textos y pues para la conversión de idiomas nada más.
+02:24:00 david coach dev: sí
+02:24:03 José Ortega: Bueno no sé, yo he usado y ocho n creo.
+02:24:07 david coach dev: O no es link que es la nueva generación de papi y además que la documentación muy fácil de seguir Pero tiene que hacer una persona y lo demás solo comentar porque te vas a comentar, te va a cometer cada una cena suya, eso se va. Por eso siempre por eso Normalmente se hace una base que es lo que yo digo este plan inicial cuando ya viene con todo, pero aquí no tuvimos.
+02:24:30 Jesus Medina: el
+02:24:32 david coach dev: Si alguien quiere poner el 18n, lo felicito que lo pongo una persona y lo demás solo lo replican forma de hacer los textos nada más. Quién dice quién retira. quien quiera aprender o No tiene que ver nada.
+02:24:51 Jesus Medina: Bus sale de la fría. A las 7:40.
+02:25:00 david coach dev: bueno
+02:25:00 Jesus Medina: Me llama a las 7 yo salgo aquí a las 8.
+02:25:05 david coach dev: O sea señores ya con esto el niño que yo le podría pedir es esto.
+02:25:10 José Ortega: Sí sí, mira.
+02:25:12 david coach dev: Así no usen en cambio idioma.
+02:25:15 José Ortega: la cambio de idioma es
+02:25:15 Alejandro Navarro: Ok entonces
+02:25:20 José Ortega: Entonces para que se haga más fácil que se hagan las estructuras así como está es el Jason y pues ya.
+02:25:32 david coach dev: Bueno a terminar
+02:25:32 Alejandro Navarro: Un gusto saludarlos y me paso a retirar la próxima reunión mañana o hasta el jueves.
+02:25:39 david coach dev: A ver, aclaremos un punto las reuniones quedaron para las 10:30 están Estamos de acuerdo.
+02:25:47 Alejandro Navarro: sí
+02:25:49 Jesus Medina: Sí sí, está bien.
+02:25:51 david coach dev: Listo Daily van a ver de lunes a sesión del lunes y el jueves de ley todos los días, el que quiere estar perfecto, el que no no hay problema es para poder ver qué están haciendo. Yo voy a estar todos los días, yo voy a ingresar media hora si alguien entra y
+02:26:05 Alejandro Navarro: Ah!
+02:26:09 david coach dev: otra veinte minutos hasta que hasta que la misma aplicación me vota.
+02:26:12 Alejandro Navarro: Pero pero te decía a esa misma hora a las diez diez y media.
+02:26:17 david coach dev: Dime sí, dime ocho en punto ocho y media estoy a la misma hora todas a la misma
+02:26:19 Alejandro Navarro: Ah okay, vale.
+02:26:22 david coach dev: hora todo una un horario para que no haya problema no vaya que no, que no entré
+02:26:23 Alejandro Navarro: Ah muy bien
+02:26:27 david coach dev: porque no no toda la misma hora igual hay que ponerlo en el grupo te voy a poner
+02:26:29 José Ortega: baba
+02:26:30 david coach dev: que la hora y media hora horario Argentina
+02:26:30 Alejandro Navarro: Vale.
+02:26:35 david coach dev: bueno, señores, solo quedamos con lo entregables paleado para el día jueves, la landi completa y los da por Texturizados por usuario si tienen funcionalidades chévere, si no esto queda para el siguiente eso Este es el alcanzable deseado, o sea, esto es el mínimo cansado Ya eso es lo mínimo.
+02:26:51 Jesus Medina: Eso es para el pronto.
+02:26:54 david coach dev: Hazlo mañana o ya mismo porque tú ya estabas muy avanzado. Lo único que tenemos que hacer contigo arreglar las tablet ya casi está todo. Tu trabajo ahorita sería cuadrado extraordinario.
+02:27:03 José Ortega: sí Sí nada más este ahí Jesús Nada más dime Bueno qué vas a cambiar en qué partes para que porque yo voy a hacer un dashboard. y
+02:27:15 david coach dev: No, lo que yo lo que vamos a organizar primero es el login porque hay demasiado acceso no se puede necesitar muchas veces tienen que tener todos tus ingresos
+02:27:22 José Ortega: Sí porque todo bueno, todos los usuarios bueno Dependiendo el usuario ya
+02:27:25 david coach dev: ahí la tabla Ya la voy a organizar bien para que todos tengan lo mismo y puedan seguir consistente Y si hay diez o cincuenta mil cincuenta mil registros las tablas se han funcionales, entonces van a devolver pequeños, no van a hacer no van a ser evoluciones gigantes, o sea, van a tener con respuestas cortas. Después habrá que hacer un sistema cachado. Eso no se sabe de caché en Django si no lo hacemos Igual acabo terminar aprendiendo yango y ayudándolo ya, yo lo ayudé con un rey límite, no sé, pero sé que buscar información, pero importante Ahí vamos lo importante que va a tener un solo login ya y un solo registro para que no hayan tanto porque hay un botón de ruta está abierta que están.
+02:28:06 david coach dev: demás Hay que organizar eso Pero ahí lo demás que te doy un consejo, puedes hacer lo que puede hacer lo que hice yo Jason en el y pégale a Jason hasta que esté en la ruta del vagón, si puedo te voy a poner hoy día que hoy día ha organizado eso, pero eso rápido voy a comenzar una por una de las tablas para eliminar lo que no va y poner lo que sí va y hacer las relaciones. Eso es una dos horas máximo terminamos. Si lo hacemos rápido. Si no hay problema si quiere mañana que ha terminado eso.
+02:28:42 david coach dev: A ver, este árbol que va a ser tú deberíamos usarlo, otros dos intenta que tu tu cita se muestren por usuario.
+02:28:52 Jesus Medina: para
+02:28:56 david coach dev: Porque al fin y al cabo es el mismo componente, o sea, como ese mismo la llave es la llave. del admin de la de los árboles es el mismo nivel que cambia es la en la presentación de los ítems, o sea, dependiendo del usuario, te muestran los
+02:29:17 José Ortega: Dependiendo los privilegios que vaya teniendo van a ir agregándole más.
+02:29:20 david coach dev: Sí van aumentando en cambio, el habilitante no lo va a tener sus datos es testimoniales y un par de una página donde se ven todos los todos los testimonios divididos por estado rechazado borrador, pendiente publicado y rechazado estos son los cuatro roles que hay hay que hacer una tabla verlo como yo estaba pensando poner un tap y una tabla para que sea más fácil Ah Pero quiere que ustedes que quieren que sea bonito quieren hacer un Canvas que se vea como Canvas no hay ningún problema. Ya depende tú, yo lo iba a hacer como un y una tabla dentro y se acababa el problema Claro que si quieren hacer más bonito y ponerlo como un camba para que te vea bonita como canva es cuestión de la inventiva.
+02:30:03 david coach dev: Ya aquí no hay diseño Así que aquí el que lo haga primero lo demás lo replican y punto. Aquí vamos aquí estamos sin diseño y sin barcos estamos estamos estamos todos en una tablita y estamos Armando el barco mientras vamos avanzando por el momento. Estamos bien en la semana uno y tenemos desplegado bajen base de datos
+02:30:21 José Ortega: listo
+02:30:24 david coach dev: funcionando aplicación levantada tenemos el suave, o sea, vamos bien, que hay cositas que hay que pulir. Sí hay que pulir esta cosita para ponerlo menos, pero vamos muy bien. Ya tenemos login, ya tenemos componentes, ya tenemos landing O sea ya vamos muy bien, No la falta de lo pesado que son los dados O sea que vamos con eso terminemos con Darwin funcionando por roles para este print y para la segunda
+02:30:45 José Ortega: Dale
+02:30:45 david coach dev: temporada Ya arreglamos la funcionalidades de cada uno y ahí sí te la divido a
+02:30:48 José Ortega: perfecto
+02:30:50 david coach dev: cada uno le entrego un Darwin completo. A partir de la funcionalidad de que son que son la misma en cada uno que esta se repiten nada más. Es el mismo el mismo la misma ruta Solo que dependiendo del usuario nada más Pero bueno, señores, pues este momento sería todo por el fronting para Jesús comenzamos con los debate. O lo hacemos mañana?
+02:31:13 Jesus Medina: Sí, empecemos ahorita porque yo esta semana no creo que pueda seguir codeando lo que tengo que yo trabajo y estudio y esta semana va a ser entonces.
+02:31:23 david coach dev: Lo de las tablas Vámonos a las tablas vámonos.
+02:31:27 Alejandro Navarro: Todos nos vemos bye.
+02:31:27 Jesus Medina: sí
+02:31:29 david coach dev: Bueno Cuídense mucho Un gusto, haberlo Visto gracias por estar aquí si me paso Tienen alguna bueno explotar algo hacer algo más avire nada más, eh?
+02:31:39 José Ortega: Vale, Este yo también me retiro este cualquier cosa o ahí, pues ya mañana no creo entrar hasta el miércoles.
+02:31:47 david coach dev: hoja cuando pueda de la biografía No te olvides así cierto no se olvide comentar todos los días no Contry que tengo un hola para que te cuente en el
+02:31:53 José Ortega: Oh sí sí sí sí. Va, vale.
+02:31:56 david coach dev: Arranque ya se cuida bueno, sigamos a ver Jesús comparte tú o compa tuyo no tengo el ojo parto yo y tú ves si tú vas que yo no tengo la alarma.
+02:32:07 Jesus Medina: Qué quiere va a compartir?
+02:32:11 david coach dev: Sí Comencemos a revisar las tablas Vámonos con las tablas primero. Vamos primero despacito el lobby, está bien. El loki perfecto el reflex está bien.
+02:32:25 Jesus Medina: Yo ahorita ya actualicé producción.
+02:32:28 david coach dev: ya
+02:32:29 Jesus Medina: Bueno ya ya hice el cambio. del Después agregaré seguridad a la contraseña, no lo he agregado.
+02:32:43 david coach dev: No hay problema. Tranquilidad no hay problema ya perfecto email.
+02:32:51 Jesus Medina: Ya ya como modelo el de ya eso ya no aparece la respuesta.
+02:32:55 david coach dev: Perfecto, estamos Perfecto ahí está perfecto. Eso está bien, sigamos con el que sigue. Alto el efecto que si funciona perfecto sigamos ahí alto. Ese tiene que ser tiene que tener toque, si no viene con toque, no debería poderse tenerlo a Puerto Rico si quieres los puede anotando o lo puede ir haciendo como tú quieras. Todo lo de tiene que tener Tokio después después decir que creemos que si queremos que tener una ruta pública la ponemos.
+02:33:29 david coach dev: Pues por el momento todo van noviados todos no hay ninguno que no vayas en
+02:33:42 Jesus Medina: Yo había anotado estas cosas en el método, o sea todos los usuarios. No pueden Bueno yo le escribí mi manera Ajá solamente en los métodos de
+02:33:52 david coach dev: ya
+02:33:56 Jesus Medina: compañías. Y usuarios, solamente puedo ver mis datos el anime sí puede ver todos los usuarios tanto en Uber como de compañías.
+02:34:02 david coach dev: sí Y que eso eso. tiene Déjame más fácil y voy revisando las las Aquí está el link. Ya lo estoy abriendo. Déjame pasarle la ventana de acá para poderlo ver mi otra ventana. Lo que quiero revisar algo Cómo era para entrar en ajo, aquí está. Este botón tiene Está chévere Ya ya entré, vamos primero con la organización, qué inorganización.
+02:34:41 Jesus Medina: Organización son los usuarios de editor Ah no organización son los dominios?
+02:34:51 david coach dev: Ahorita no hay nada perfecto está vacío. categorías Ya yo categoría, ya me voy a poner a pasar toda la categoría a esto de aquí hay que aumentarle. Hay que aumentarle ahorita. Digo que a cada uno vamos primero con la chiquita y no vamos acordando. Voy a ir en orden. Tengo una pared aquí en el árbol ya primero esta categoría ya. Dame un segundo que tengo que irme Ay no, aquí tengo que irme a la página de nosotros para poder sacar la categoría.
+02:35:29 david coach dev: No nos dejemos entrar en un icono para que sea bonito sí, no sé si grabar el icono en el marketing, dame un chance, dame un segundo que Mientras llego para poder. Sí sí, porque estoy abriendo la página de nosotros de yo tengo la de prueba Oye mío. Cómo odio, esto Ajá me comieron los bajes, lo voy a matar. Los piones me copión o sea, yo andaría estupendo. Al expositor a ver la base de datos después vemos, le está desplegada.
+02:36:11 david coach dev: depositor Y la base de datos Está en pobre, verdad? Perfecto.
+02:36:15 Jesus Medina: sí
+02:36:16 david coach dev: Sí estoy viendo la documentación. Okay yo quiero ir al desplegado porque Qué pasó Ay que estoy en Main que bruto. Póngale, póngale cero. Tengo que actualizar en mí también hay que ver cómo arreglamos. Eso es que yo la vez pasada. Yo tenía dos ramas unas que diga Floyd y solo se veía la carpeta donde solo se veía en la carpeta básque ni cuando tú ingresabas te pegaba directamente a la carpeta y no había ese problema que tenemos ahorita que están las dos.
+02:36:53 david coach dev: Tengo que ver como Tito eso, a ver si los puedo replicar aquí Bueno ya ya estoy en la página de nosotros de ir a prueba, que están todos los todos los que se me ocurrió poner la verdad es eso. Prueba listo no comparto porque no te haga más pesada, la llamada Te compartimos los dos creo que a ver vamos a ver Estas son la tabla de categorías permiso categoría icono nombre descripción y color. El icono es un String nada más. Yo te espero tranquilo, no hay problema.
+02:37:28 Jesus Medina: Que aquí color que Stream icono.
+02:37:31 david coach dev: Sí primero va a icono.
+02:37:33 Jesus Medina: enorme en categoría
+02:37:34 david coach dev: Bien, categoría un icono. Ya te muestro. No creo que te voy a morir esto. Es para que lo pueda ver así icono nombre de cristiano y color. Porque color porque cuando tú lo pones se ve así. Ya viene con tu propio color y tu propio icono y se ve se ve es para darle un para que la aplicación tenga constancias, o sea tiene que ser constante para que te pueda ver.
+02:38:06 david coach dev: no solo tiene que ser contrato también tiene que llevar icono el icono es un icono de texto Así que ponerse en un solo un campo de texto nada más un String el nombre es un String la descripción es un String y el color también es un String así que no te preocupes, todos son de Acá me encargo de mover de hacerlo.
+02:38:26 Jesus Medina: icono Qué más?
+02:38:31 david coach dev: el nombre
+02:38:34 Jesus Medina: Ya, ya está categoría que esto es nombre.
+02:38:37 david coach dev: compartir que no veo tu pantalla Ahora se me fue yo la veo no ya icono nombre descripción color.
+02:38:51 Jesus Medina: Icono color y qué más?
+02:38:58 david coach dev: descripción y color dama icono nombre descripción y color todas son de
+02:39:05 Jesus Medina: De descripción vendría siendo la categoría texto.
+02:39:09 david coach dev: Stream sí no es que amo Te pico icono del icono nombre. pobre brother, View descripción color azul pero en hexadecimal que es un
+02:39:24 Jesus Medina: iconos icono Bueno lo que sea color azul y y el nombre de la categoría
+02:39:31 david coach dev: Nombre Pues claro, pues para saber cuál Qué nombre.
+02:39:34 Jesus Medina: Y servicio Y ya y la fecha.
+02:39:38 david coach dev: Sí, la fecha.
+02:39:39 Jesus Medina: esas o sea esos cuatro Campos
+02:39:42 david coach dev: sí que lo crea pero
+02:39:47 Jesus Medina: no, pero es que es que Django crea los videos automáticamente yo no lo
+02:39:54 david coach dev: Para que el que lo crea te Bueno no importa ya yo. Leí icono color categoría texto, qué categoría texto No entendí?
+02:40:04 Jesus Medina: el nombre
+02:40:06 david coach dev: al nombre y la fecha de registro perfecto está bien Eso es Todo ya Por eso pasamos categoría Yo después me encargo de poner una por una lo que están aquí el otro son los estados. tiene
+02:40:19 Jesus Medina: No yo no he creado tabla estaba porque yo yo déjame mostrarle más o menos lo que
+02:40:36 david coach dev: No hay ninguna?
+02:42:03 david coach dev: Hola Hola Hola Hola Hola Hola Hola Me escuchas Tú
+02:42:06 Jesus Medina: Ya voy ya voy ya voy.
+02:42:07 david coach dev: No no estoy probando que te van una llamada de disco prendida y no me están escuchando. Se escucha por qué micrófono se me apagó? hola hola hola hola hola hola hola hola Ah como lo estoy dando la aplicación de acá, me la bloquea la
+02:42:32 Jesus Medina: David
+02:42:34 david coach dev: Dígame. Hola hola
+02:42:39 Jesus Medina: por ejemplo el tema de las de las organizaciones que usted me decía que los Editores no yo no había
+02:43:29 Jesus Medina: Porque yo pienso Aquí estoy en Colombia aquí estoy logueado como un diente normal.
+02:43:36 david coach dev: Ya claro
+02:43:37 Jesus Medina: Estos son los campos de del usuario anónimo así un usuario. Común y corriente quiera mandar campos de anónimo, si está logueado, quién eres luz? Yo apliqué esa. Esa lógica, o sea, supongamos. Lo estoy bloqueado.
+02:44:01 david coach dev: ya
+02:44:02 Jesus Medina: estos datos Estos estos tres. Yo cuando le den ejecutar. Automáticamente quedan nulos así yo los envié porque eso estoy logueado Entonces no puedo enviar datos de usuario anónimos. Si me entiende.
+02:44:33 david coach dev: Sí es que
+02:44:35 Jesus Medina: Bueno, eso por ese lado ahora el estado del testimonio por defecto de G que es en espera. Entonces yo creé un Point por la parte Que es que para cambiar el estado. Del del testimonio Ese es solamente lo puede usar el como que se llama la organización. O sea el editor que está asociado a dicha organización. Entonces si yo este este es el testimonio dos. Entonces yo quiero el testimonio dos colocar el estado aprobado ya que se cambió aprobado Entonces cuando yo vaya a darle en el el testimonio dos cambió el estado de espera aprobado entonces por eso yo no creo otra tabla de Estados por
+02:45:48 david coach dev: Pero si en vez de ponerte la mayúscula llamando nada mayúscula.
+02:45:53 Jesus Medina: Así bueno, se cambia las letras, o sea, el minúsculo la mayúscula o como sea, pero lo que quiero decirle Es que yo no creo otra tabla de estado sino que lo manejo internamente del testimonio. de la tabla de testimonio O sea, los estados están dentro de las tablas de testimonio, no? En una tabla por aparte.
+02:46:14 david coach dev: Cómo es Es un Stream vacío? Nada más?
+02:46:17 Jesus Medina: Sí en la base de datos es una letra ya aprobado, eh? Espera Aunque Bueno yo lo puedo cambiar.
+02:46:29 david coach dev: Te entiendo, es que te explica el problema de eso. Para que me entienda si yo mañana quiero poner un nuevo estado necesito que tú o un programador entre el código y lo cambie de ahí. Teniendo una tabla puede entrar al administrador y en la tabla suelo aumentar un
+02:46:48 Jesus Medina: entonces
+02:46:52 david coach dev: estado me entiende la diferencia. por eso
+02:46:55 Jesus Medina: Pero pero pero pero pero que bueno Pues sí es esa la Esa es la diferencia, pero
+02:47:02 david coach dev: sí
+02:47:02 Jesus Medina: pero qué más estados voy a agregar, o sea el estado los estados.
+02:47:07 david coach dev: Te pido pendiente aprobado rechazado publicado por orador y archivado.
+02:47:12 Jesus Medina: Bueno entonces digo todos esos estados aquí. aprobado
+02:47:18 david coach dev: Ya vamos ya primero es p dependiente.
+02:47:24 Jesus Medina: Entonces, bueno se puede colocar la palabra completa.
+02:47:24 david coach dev: Escribamos de color y todo lo que yo estaba poniendo Pues yo cada uno le pongo un icono color para cuando se vea se vea diferente se va a tener que poner lo hago en el fondo pendiente ya siguiente ha de aprobado, está bien, ha de aprobado a mayús, aprobada siguiente r de rechazado por el jet. r Echazado siguiente aquí hay un problema, tengo que poner publicado. Nada, pongámosle PS publica Ah no, pues es una naturaleza no ponle.
+02:48:09 Jesus Medina: O el PS de coloca e y espera.
+02:48:14 david coach dev: Ya en espera, ya está bien Espera Ya dale ahí. Ahí ponle p de publicado.
+02:48:23 Jesus Medina: Cuál es la diferencia entre publicado y aprobado.
+02:48:26 david coach dev: Es que el aprobado es que depende el aprobado se puede probar y se puede publicar con es que ese es el problema El problema El problema, es que esto literalmente si lo aprueba se puede publicar o automáticamente o tú puedes aprobar y publicar por hora todos los días la diez de la noche se publican todos los aprobados me entiende. Por eso, por eso esa es la diferencia entre tener un campo aprobado y uno publicado el aprobado es que ya lo ya lo aprobó el editor programando Yo soy el editor, tengo 500 mensajes. Yo voy aprobando En diez en diez cuando tengo diez, pongo un clic y publicar y automáticamente se publica o voy uno por uno y cuando cambio a probar y doy a aceptar automáticamente se publica son flujos.
+02:49:10 david coach dev: pero igual una cosa que está una cosa, estará aprobado y otra cosa que está publicado porque entre la aprobación y la publicación puede haber un puede haber Cómo se llama un margen de tiempo, porque aquí puede ser aquí puede ser de una una vez de borrador y una Y un por una F de Five de archivado, una F está archivado nomás. Que son los archivados todos los comentarios mayores de un mes se archivan ya no se muestran me entiendes. Ya no están publicados están archivados.
+02:49:44 david coach dev: Ocultos puedes ponerle ya oculto también listo, por qué? Porque llegamos? Yo yo tengo mi comentario, pero yo no voy a mostrar en mi Carrusel Lo siento comentario, Pues de todo el año, o sea, solo pongo el comentario por mes y en los comentarios que ya no están en meta automáticamente se van ocultando ya no se muestra, pero el ya el el estado yendo publicado porque no están en una página está archivado. Fue aprobado fue publicado, pero ya está aquí todavía no está visible.
+02:50:12 david coach dev: Pero en tu en El dardo general podrías verlo y cambiarlo publicado de nuevo Así que necesita publicarlo ya. Listo, entonces tenían los estados. Bueno, los taps tampoco lo hiciste, supongo.
+02:50:26 Jesus Medina: No, no, porque no sé. Sí yo dije yo que sé, pero si ya tengo la categoría. Pues es como redundante.
+02:50:38 david coach dev: La categoría Es sobre lo que es y el estado de poner Excelente muy bueno, o sea, son cosas diferentes.
+02:50:49 Jesus Medina: es que el
+02:50:52 david coach dev: Sí todo todo en este caso, pero es que en este caso todos este caso todos los
+02:50:53 Jesus Medina: Tac Ajá bueno y el tag lo crea También el administrador, no?
+02:51:05 david coach dev: terrenos administrador Será muy bonito, pero Será muy costoso porque el pueblo estaba va a tener que sacarte la madre porque cada quien grite cada vez que ingrese un Man Es que literalmente aquí este.
+02:51:18 Jesus Medina: Bueno entonces entonces Porque Claro porque el detalle está ahora que la categoría sino iba como el cuento iba a un usuario a crear 50 categorías la misma palabra de diferente
+02:51:32 david coach dev: Lo mismo los hacen lo mismo Pues eso es lo que le da eso lo crea el Si quieres
+02:51:32 Jesus Medina: manera.
+02:51:40 david coach dev: ya me quiere crearlo, si no lo quiere, no lo cree y se la muestra en una categoría y se acabó es que cómo te explico. Yo estoy diciendo por el mismo ejemplo que yo que me tocó de cero Pues yo no, yo me guié en el ejemplo de beceros que lo sacó y lo saqué ya mismo es que en el ejemplo que lleva cero tienen dos uno que es la categoría que es servicio producto reseña y otro es muy bueno, perfecto, sobresaliente o no es calificativo y el otro. Uno lo califica y otro le da sus cualidades ya.
+02:52:12 david coach dev: Son dos cosas diferentes la categoría lo califica y lo talos le da como que bueno muy bueno, sobresaliente malo muy malo asqueroso. o sea, yo me yo me quedé eso porque vamos, que tengo de producto innovador
+02:52:22 Jesus Medina: bueno
+02:52:27 david coach dev: eficiente soporte soporte rápido servicio cálido profesional, o sea producto fácil resultados servicio intuitivo soporte o sea son cositas así pero igual de categoría y listo en la categoría te ponen todo lo que quiera poner Ya después vemos después de btv, si se le agrega también que el editor que el editor pueda agregar más. Es que si llegamos a los usuarios. Profesional con f. Con s con chef, ya sigamos con los más importantes Según esto la organizaciones a la organización le falta de que en este caso te quiero
+02:53:09 Jesus Medina: Organizaciones están muy simple la organización.
+02:53:12 david coach dev: ver
+02:53:13 Jesus Medina: Puede era puro.
+02:53:17 david coach dev: A la organización como organización y Microsoft el usuario y la fecha le falta El dominio al cual pertenece otra organización teatro cw punto com me entiendes Este es el dominio. Es un dominio. dominio también en la organización tiene que tener la piquín por organización nada más no van en el mensaje también va, pero me trae como un campo pero en el lápiz que viene en el en el mensaje, te tiene que validar cuando uno que no tiene grabado en El dominio ya, o sea, yo te mando yo te mando el mensaje y te viene dominio y a piquín, Yo vengo en mi dominio, es Microsoft Busco mi dominio, está en
+02:54:07 Jesus Medina: No entiendo por ejemplo un usuario. A que ustedes dicen con otro piquito así?
+02:54:17 david coach dev: caber Escúchame yo tengo me mira el ejemplo yo tengo mi usuario se llama Microsoft dominio Microsoft punto com Uno dos, tres cuatro el usuario y la fecha, verdad? Vamos al testimonio. Yo
+02:54:29 Jesus Medina: Aquí estamos.
+02:54:30 david coach dev: envío mi testimonio vaga tu testimonio para ver los campos, anda, yo tengo aquí testimonial. Ya me abrí el testimonio para yo no tengo idea tengo Microsoft organización ya escribí Microsoft Categoría no me interesa comentario no me interesa ranking. Sí, estado Sí aquí, pero tú en esto tiene a piquín. La piquique yo envío aquí debe ser la misma que yo tengo guardado en mi tabla de dominio, si la piqui, que yo envío aquí no es la misma de la tarde dominio, no rechazo ese este testimonio automático.
+02:55:05 Jesus Medina: Y Cómo y cómo yo y Ajá y el usuario, cómo va a ser cómo va a ser para coincidir? Un ejemplo, usar. Eso es el afiches para los usuarios anónimos.
+02:55:16 david coach dev: Para toda la aplicación se puede utilizar como una medida de esta seguridad? Cómo lo hace? Porque nos dashboard en el fronen en la variable en todos no se crean una que se llama testing testimonio rabia apiraya aquí y ahí se pega quien todas las solicitudes se le envía por cabecera, no se le envía como parte del cuerpo, se le envía como parte de la cabecera de la petición.
+02:55:42 david coach dev: Y Tú no viste una cabecera una petición a través de la petición de un es un es un archivo Jason que así como tú mandas de buen toque por cabecera. Cuando tú haces una solicitud tú mandas por barrio Y eso el token, verdad? Así mismo tomarla por ese mismo agregas un campo más y le pones a piquín y ahí mandas el número que en este caso sería un dos tres cuatro. Yo recibo eso esto no va aquí en el mensaje. Esto no no va Aquí pegando.
+02:56:14 Jesus Medina: Y eso es eso, Ah entonces eso no tiene nada que ver con los usuarios anónimos.
+02:56:19 david coach dev: No, anónimo también, pero no te lo envían en el cuerpo a mensaje, pero mira en la cabecera en la petición es como un hueso es como un Jason toque ya es una clave de acceso que no va en el cuerpo la petición, sino una cabecera porque van a cabecera porque la cabecera de los datos son más difíciles de de de de hackear, porque no es tan difícil un manco un poquito de conocimiento y por eso también va cifrado, no van, no se mueve cambio. Tú viste, me está devolviendo el token completo yo normalmente te toquen los cifros de nuevo.
+02:56:52 david coach dev: Aparte de tu cifrado de Jason yo normalmente en el vaca creo una creo una un cifrado del toque, o sea, yo yo a mí me toquen. Yo te toquen los lo le hago un filtrado y ese toque se lo manda el Front recibe y el nefrone lo decodifico, o sea, aparte del cohído el codificado del que ya te la da la aplicación yo creo otra función que codifica vuelve a codificar el toque, o sea le hago doble co.
+02:57:21 david coach dev: y ahí él va la mismo código con lo mismo que yo le meto en el fronten, la lápiz y con la la palabra clave o la que la codifico la decodifico en el Otro Ya contestó que suficiente, pero el Api no vana en f, en la piqui van a cabe ser cabe tú me llega mi a piquín por cabecera. Yo la cabecera voy a mitad de organizaciones Busco Microsoft punto apiquín cabecera punto de piquín, son iguales, perfecto. Pasó son diferentes se cayó ya.
+02:57:52 david coach dev: Esa es la diferencia, no se usa se pone aquí en el candadito aquí en el mismo candadito, donde tú pones el toque le pones el lápiz. o sea, es una es
+02:58:08 Jesus Medina: ok
+02:58:09 david coach dev: Un ponte a pensar que el lápiz como otro toque ya, pero un toque más pequeño entonces que lo haces tú mismo donde el básquet tiene que bueno túnel va que no o no, Sí tú en el baque debería generar una piquín deberías tener una
+02:58:22 Jesus Medina: Sí yo yo
+02:58:23 david coach dev: función.
+02:58:26 Jesus Medina: Que cada vez que cuando se crea una organización en automáticamente.
+02:58:34 david coach dev: Sobre el administrador debe tener un impuesto que solo pueda solo pueda solo la mitad puede ingresar donde el administrador. Ponga el no, no el administrador de acuerdo a piquín, pero igual habría que tener detenciones que sobre el administrador lo pueda ver que venía con todo que anda administrador y todo para que me vuelva solo, o sea, en la misma organización hace que solo en los mismos actos de organización que devuelve la Pekín listo, como administración usted lo puede entrar los administradores listo.
+02:59:06 david coach dev: Porque este dato hay que dárselo para que lo ponga como punto e en la variable en todo y con eso. Así mismo tú tienes que tener un Under en el en el backing que valide dominios primitivos. que están los durmiendo permitidos son dominios que tú le das ingreso a tu a tu O sea, nuestro dominio de testimonio al FM punto app debe estar en esa lista de dominio permitidos.
+02:59:41 david coach dev: Y esa lista se crean con dos valores una configurada a mano Y configurados a leyéndole de la tabla de organizaciones todos los dominios que están ahí esos no es una aplicación es bueno así como pone leyes de juventud para validar los dominios permitidos. Normalmente en el límite puedes ponerle también los dominios permitidos. Tiene la función del límite ahí en la función de Límite normalmente también viene una función para validar dominio Solo que no sé cómo lo tengas tú.
+03:00:21 Jesus Medina: Ya va entonces donde dice organización. Debería colocar un campo que diga si El dominio está permitido o no?
+03:00:31 david coach dev: no es sobre es un Lo que tiene que hacer es recibir El dominio y compararlo con todos los dominios que están en la organización. O sea, yo recibo El dominio que viene de la petición y voy y busco en la organización punto dominio. Si ese dominio está en esa lista, si está es permitido, si no está cero rechaza. Pero eso no Esto no es una empolla esto mide bueno.
+03:00:59 Jesus Medina: Sí pero yo creo que no es necesario el mío yo creo que el mismo por defecto ya ya lo detecta.
+03:01:10 david coach dev: allá
+03:01:11 Jesus Medina: Sí yo agregué lo del trading, yo agregué lo que me apareció.
+03:01:17 david coach dev: claro
+03:01:17 Jesus Medina: en la en la
+03:01:18 david coach dev: Y ya lo probaste?
+03:01:20 Jesus Medina: sí, no, pues no lo he probado Simplemente no estamos Tampoco sé cómo probar
+03:01:22 david coach dev: Pero está funcionando.
+03:01:26 Jesus Medina: eso Entonces yo lo único que hice fue que
+03:01:29 david coach dev: Aquí le pones aquí amo una petición de dónde estás por aquí a ver 60 horas. no, de 600 peticiones por hora estamos hablando de Cien petición de por minuto a dos sesenta por hora Esto está bien, está bien lo que podría hacer es Sí Son seis, son siete por minuto. Son 60 minutos 100 por minuto está bien, entonces es un usuario registrado si es un anónimo setenta por hora me parece perfecto.
+03:02:06 david coach dev: Está muy bien Esto si un usuario registrado 600 que Una nómina o 60 Podrías poner un anónimo ponerle veinte e irte a un al fronten. Ah que tú Lo Oh tú lo haces por medio de los usuarios registrados. Oh interesante anónimos tono de afuera o sea tendría que poner aquí diez y interrones si no tiene y mandarle una petición de frones al baking o en tu extra que puede ser mi postma y hacer un Point sin un sin logueo y pegarle así Dale entra más de diez veces le ponen máximo diez veces por hora. Abre postma hará el límite, ponle diez por hora, no más.
+03:02:52 david coach dev: Ahí pone diez por hora y vuelvelo y vuélvelo a cargar para que cargue los cambios. y ande poma a una ruta G que no tenga logueo y le pegas le das así está enseguida al onceava, oeste debe bloquear y no te debe dejar poder pedir petición hasta dentro de Hasta dentro de una hora. A una ruta que no tenga lo que no tenga login a cualquiera que sea a cualquiera que no tenga candadito tenía que darle una ya que cargue ya Dale dale nuevo Dale diez veces. Ahí mismo lo puedes hacer ahí mismo te da ahí mismo Debería darte. La debería darte las diez veces. Me está picando la mano por cambiarme a niños.
+03:04:02 david coach dev: Imagínate, me toca ponerme a configurar todo mi entorno Uy Dios mío, termino tirando la máquina. Terminó vendiendo papa en la esquina. Ndo cinco mil dólares vendiendo papá. Me estoy replanteando muy tenamente ir a vender papá a la esquina, no? Ay mis ojitos De la noche cuando lo bueno que ya los niños esta noche y media así que va a tener chance para meterme a Food Talent hacer la reunión y venir para acá a ver cómo van ustedes.
+03:04:52 david coach dev: Es con esto ya Me dediqué en pegué enviando soy ya, no voy a hacer
+03:05:00 Jesus Medina: al botón diez veces
+03:05:01 david coach dev: programador. Ponen integración con la binario subir de videos subir fotoglobinar y video que haga la integración. es que a ver, es que hay unas cositas para a ver, Hola Jesús Manda la cena la Cómo se llama la integración conglobinar. Hay una, hay una cosa llamada metodología para subir archivos de aquello peleo con mucho otras como mi amigo Marce yo cuando subo una foto yo la subo una vez si la foto es rechazada yo cancelo y rechazo la solicitud. Hay gente que le da intento intenta una dos y tres veces hasta que suba la foto.
+03:06:06 david coach dev: Tú tienes que tener una ahí, no Cómo se llama una gestión del del Point porque tú no puedes grabar los datos, vamos, yo te mando un imagen un testimonio con imagen. Entonces no deberías poder guardar el testimonio hasta que no tengas guardarlo guardar la imagen y tener el url. Ya cuando Tiene euro que está subida la imagen Ahí deberías poder guardar el testimonio, si acaso no se sube la imagen Tienes que rechazar esa solicitud.
+03:06:35 david coach dev: Porque no podrías Subir imágenes subir testimonio sin imagen el problema también que esa misma ese mismo chiste tiene que hacerlo para actualizar imágenes y eliminar imágenes. Tener un temporal que guardar sobre él que a través de subió la nueva imagen no puede borrar la anterior. Y eso eso se llama una Ay eso tiene eso tiene un flujo de un flujo de guardar información. Esa es la página luego de guardar información.
+03:08:15 david coach dev: No me pica, me pica, me pica. Me atravesó la pierna. bueno
+03:09:10 david coach dev: Qué entendí?
+03:09:59 david coach dev: En teoría si estás funcionando ahora el límite si tú tienes una protección
+03:10:06 Jesus Medina: aquí
+03:10:12 david coach dev: de 60 peticiones por hora Si tú mandas de un ipx. Y haces más de diez peticiones, debería automáticamente bloquearte más. Y no está funcionando Y fíjate que no está funcionando el límite. No, debe que te conteste tira las dos. una dos tres cuatro 5 6 7 8 9 Ahí está Ahí solicitud requiere peinados. Pues ya ya.
+03:11:25 Jesus Medina: cuando es la número 10 De negar O sea no es a partir de la noche sino hasta las 10.
+03:11:37 david coach dev: Está funcionando 60 por hora está bien la una por minuto quien te pegue mal una por minuto te quiere hacer que te quiera hacer pendejadita en la base de datos.
+03:11:46 Jesus Medina: Okay entonces
+03:11:48 david coach dev: Mira yo estoy tan mal lo que yo al usuario logueado le pongo 15 por minuto. Mientras tú le das 100 por minuto Yo le doy 15 por minuto. O sea, tu Aventura el límite le está dando 100 peticiones por minuto yo el usuario logueado le doy 15 repeticiones por minuto.
+03:12:09 Jesus Medina: Pero bueno, entonces yo creo que ya no soy yo creo que ya ya está cuadrado. Las tablas o o Usted cree que hace de lo que hemos hablado a faltar.
+03:12:23 david coach dev: La verdad lo que yo no es que yo te voy a tirar porque hay un pequeño problema se tiene una base de usuario administrativo, verdad? Son los usuarios que se que tienen errores de administrador. Estoy completa Pero estos son los usuarios que están registrados como administrador porque tienen error de administrador, no entiendo. Que a lo que a lo que se logueante y lo vean como administradores. Y aquí te hago, dice usuario de historiadores Estos son usuarios que tienen errores de editor que cuando se evitaron se registraron como editor.
+03:12:57 Jesus Medina: pero de qué está hablando usted los testimonios o
+03:13:01 david coach dev: administrativa Yo estoy en el borde de yango
+03:13:05 Jesus Medina: Donde haga esto.
+03:13:09 david coach dev: Tengo tres tablas usuario administrativo, sí, tengo usuario administrativo
+03:13:11 Jesus Medina: este
+03:13:16 david coach dev: usuario, editor usuario visitante. Ya es de tres que son la misma tabla. He hecho un filtrado o rol.
+03:13:26 Jesus Medina: sí, sí, sí, sí Yo es que ya va Él cree, yo estoy utilizando funcionalidades que tienen por defecto algunas funcionalidades, no las modifiqué, simplemente. La les agregué más funcionalidades, pero las que tienen no las mueve.
+03:13:52 david coach dev: la
+03:13:59 Jesus Medina: simplemente las La Le agregué. pero por defecto por defecto Dyango tiene
+03:14:06 david coach dev: Te entiendo.
+03:14:13 Jesus Medina: Tiene los usuarios con con varias. con varios Campos entonces Él tiene el campo. El campo tiene tres Campos que son murianos? Que son que son verdaderos o que son falsos? Entonces, esos tres Campos son es activo es súper usuario y es estar por qué son así no sé. simplemente son así y ya entonces cuando un usuario tiene los tres Campos habilitados los de es activo es súper usuario y Ese es considerado Army y puede entrar acá. Si no tiene esos tres Campos activos. No es considerado. Ánimo Entonces yo pues no agregué ningún rol.
+03:16:51 Jesus Medina: ya Aquí sí le puedo mostrar más o menos la Data Ya no tiene estos Campos por defecto.
+03:17:02 david coach dev: claro
+03:17:03 Jesus Medina: Él es is user vistaf y este que si es activo chistor, si son uno están en son verdaderos y creo que no me acuerdo cuál es el falso, si el cero o dos. Entonces Bueno entonces para ser considerado admin tiene que estar estos tres Campos en uno. y no, no Entonces yo por eso no agregué ningún rol de administrador porque como ya está esa función ahí simplemente cuando yo creo un usuario en este Point
+03:17:38 david coach dev: Ahora hay que mostrarte allá arriba, sí.
+03:17:40 Jesus Medina: En este en este Point cuando yo creo yo. A esos en Django sería el señalizador.
+03:17:50 david coach dev: claro
+03:17:51 Jesus Medina: le digo que sea Sea verdadero, entonces así así es como Django maneja, esos estados y
+03:18:01 david coach dev: Porque está filtrada por roleo por grupo o por lo que te quería preguntar nada
+03:18:08 Jesus Medina: solamente que tiene esos tres. Todo eso en verdadero es considerado admin y puede entrar a este apartado. O sea, así sea un un usuario de cómo se llama con el grupo por el rol visitante y todo lo que sea si no tiene estos tres en verdadero o en uno nos puede, no puede entrar a este apartado. Entonces supongamos. Creo un usuario. vamos Dice que se creó. Es algo de destapar. Y voy a iniciar sesión.
+03:19:00 Jesus Medina: con este y Con esta contraseña. Iniciar sesión Me dice que no. Y ese usuario Ajá Ahora la otra pregunta que usted me hizo. de los usuarios administradores Editores y visitarnos Todos esos usuarios entran aquí en la misma tabla. pero yo Pero yo lo filtro yo digo Aquí que los que tengan El Ajá aquí este cero cero lo que tengan el staff. El true o verdadero? Los muestra Quién es el usuario administradores. Ajá ahora lo que tengan. El el rol de de visitante aparezcan aquí visitantes, por ejemplo. O sea, yo los filtro.
+03:20:27 Jesus Medina: eso
+03:20:29 david coach dev: más.
+03:20:32 Jesus Medina: Exacto sí no es eso lo que yo hago aquí en Bueno entonces eso sería todo.
+03:20:46 david coach dev: Te hace falta el testimonio antes que te vayas.
+03:20:47 Jesus Medina: ya yo
+03:20:55 david coach dev: Si lo tiene, no.
+03:20:56 Jesus Medina: no, no
+03:20:59 david coach dev: Es un agrégale. integración
+03:21:05 Jesus Medina: voy a decirle, voy a decirle eso que ella haga feedback y Y la cosa esa de la nube. y yo me encargo el resto de cosas que Era esto de los métodos de que de que el administrador que agregue los roles que todos los usuarios se queden.
+03:21:33 david coach dev: ponerlo en la que cuando creo no me una organización se crea automáticamente la Pique, eso te falta.
+03:21:40 Jesus Medina: Quiero ser yo y que la chava.
+03:21:44 david coach dev: Listo, pues muchas gracias.
+03:21:46 Jesus Medina: Y que la chava esa haga lo que lo otro. Yo yo la No gracias a usted yo sinceramente. esta semana no voy a programar O sea ya me sentaré a programar ya el el viernes o el sábado para que sepas O sea no, no va a tener avances en un código porque
+03:22:10 david coach dev: Nada tiene exámenes, se entiende con esa base ya pueden hacer los chicos lo que son ya ya se pueden comenzar a tirar todo.
+03:22:19 Jesus Medina: Por eso, por eso también me me enfoqué esta semana en hacer todo hacerlo más
+03:22:20 david coach dev: OK Que no hay problema
+03:22:29 Jesus Medina: que pueda Porque después me voy a ausentar un poco por por trabajo y estudio entonces ahorita que tengo un tiempo libre. Voy a tratar de desarrollar todo lo posible y ya lo que quede falta que lo desarrolla la otra muchacha o Es otra vez después.
+03:22:52 david coach dev: Lo bueno que ya hicimos la gran mayoría ya está resuelto. Ya no es más.
+03:22:56 Jesus Medina: en el chat de unos
+03:22:59 david coach dev: Igual yo soy algo de Django Si necesito meterle mano a otro elemento, no también tengo un amigo quien trae mucho Le pido que me ayude. me han encantado porque mandamos a python, me mandil de payton y le brillan los Doritos Y todas esas cosas así, maneja bien eso. Bueno pues un gusto un placer nos vemos hasta cuando nos veamos no también entrar el jueves me voy a decir obligatorio.
+03:23:37 david coach dev: No te preocupes No te olvides entrar y ponerme Hola en el Chapa que te contabilices sí. Sí en general en el general escribe todos los días, aunque tú un mensaje entonces sube en el ranking de integraciones y te sube mientras. en el chat en general En el primerito. De Jesús todos los días Pon horas chicos, vamos muchachos, cualquier cualquier mensaje uno diario para que te contabilices que todos los días entre Y entonces sube el ranking.
+03:24:18 david coach dev: porque si no entra Lamentablemente se
+  

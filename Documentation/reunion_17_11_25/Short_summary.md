@@ -1,0 +1,3 @@
+# Short summary
+
+En la reunión se abordó el avance del proyecto, destacando la necesidad de coordinación entre los equipos de frontend y backend para mejorar la integración, manejo de roles de usuario y funcionalidades del login y dashboard. Se estableció la división de tareas entre los integrantes para finalizar la landing page y los dashboards de usuarios con distintos roles, y se acordó ajustar horarios de reuniones para facilitar la participación de todos. Además, se discutieron detalles técnicos sobre la seguridad, gestión de estados, y la importancia de contar con una documentación clara para agilizar el desarrollo y la colaboración.
