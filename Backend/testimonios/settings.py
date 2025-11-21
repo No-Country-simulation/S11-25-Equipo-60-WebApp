@@ -224,6 +224,14 @@ DATABASES = {
     }
 }
 
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+#}
+
 AUTH_USER_MODEL = 'app.User'
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -299,8 +307,8 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '60/hour',  # Limit unauthenticated users to 100 requests per hour
-        'user': '600/hour',  # Limit authenticated users to 1000 requests per hour
+        'anon': '60/hour',  # Limit unauthenticated users to 60 requests per hour
+        'user': '600/hour',  # Limit authenticated users to 600 requests per hour
     },
 
     #PERMISOS
@@ -364,8 +372,8 @@ SPECTACULAR_SETTINGS = {
     'TAGS': [
         {'name': 'Login', 'description': 'Operaciones de autenticación'},
         {'name': 'Token', 'description': 'Operaciones relacionadas con los tokens JWT'},
-        {'name': 'User', 'description': 'Operaciones relacionadas con los Usuarios(usuarios visitantes)'},
-        {'name': 'Compañias', 'description': 'Operaciones relacionadas con las Compañias(usuarios editores)'},
+        {'name': 'Visitantes', 'description': 'Operaciones relacionadas con los Usuarios(usuarios visitantes)'},
+        {'name': 'Editores', 'description': 'Operaciones relacionadas con las Editores(usuarios editores)'},
         {'name': 'Administradores', 'description': 'Operaciones relacionadas con las Usuarios(usuarios admins)'},
         {'name': 'Categorias', 'description': 'Operaciones relacionadas con las Categorias'},
         {'name': 'Organizaciones', 'description': 'Operaciones relacionadas con las Organizaciones(Dominios)'},

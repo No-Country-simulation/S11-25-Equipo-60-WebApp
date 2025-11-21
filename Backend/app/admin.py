@@ -5,9 +5,9 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
-# PRIMERO: Define UserAdmin y ClienteAdmin ANTES de usarlos
+# PRIMERO: Se Define UserAdmin y ClienteAdmin ANTES de usarlos
 class UserAdmin(BaseUserAdmin):
-    list_display = ('username', 'email', 'is_staff', 'is_active')
+    list_display = ('username', 'email', 'is_staff', 'is_active', 'get_user_groups')
     search_fields = ('username', 'email')
 
     add_fieldsets = (
@@ -27,6 +27,7 @@ class UserAdmin(BaseUserAdmin):
 
     fieldsets = (
         (None, {'fields': ('email', 'username', 'password')}),
+        ('Grupos', {'fields': ('groups',)}),  # 👈 Agregado grupos al editar
         #('Información personal', {'fields': ('first_name', 'last_name',)}),
         #('Permisos', {
         #    'fields': ('is_active',),
@@ -44,11 +45,16 @@ class UserAdmin(BaseUserAdmin):
         form = super().get_form(request, obj, **defaults)
 
         return form
+    
+    # Método para mostrar los grupos del usuario
+    def get_user_groups(self, obj):
+        return ", ".join([group.name for group in obj.groups.all()])
+    get_user_groups.short_description = 'Grupos'  # 👈 Nombre de la columna
 
     class Media:
         js = ('admin/js/user_admin.js',)
 
-# SEGUNDO: Define ClienteAdmin
+# SEGUNDO: Se Define ClienteAdmin
 class ClienteAdmin(UserAdmin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -59,22 +65,23 @@ class ClienteAdmin(UserAdmin):
         # Mostrar todos los usuarios
         return super().get_queryset(request)
 
-    list_display = ('username', 'email', 'date_joined', 
+    list_display = ('username', 'email', 'get_date_joined', 
     #'get_user_groups'
-                    )
+    )
     ordering = ('-date_joined',)
     list_filter = ('date_joined',)
-    
-    # Método para mostrar los grupos del usuario
-    #def get_user_groups(self, obj):
-    #    return ", ".join([group.name for group in obj.groups.all()])
-    #get_user_groups.short_description = 'Grupos'
+
+    # Método personalizado para mostrar date_joined con nombre personalizado
+    def get_date_joined(self, obj):
+        return obj.date_joined
+    get_date_joined.short_description = 'Fecha de registro'  # 👈 Cambiado aquí
+    get_date_joined.admin_order_field = 'date_joined'  # 👈 Para mantener el ordenamiento
 
 # Formulario para Visitantes
 @admin.register(Visitante)
 class VisitanteAdmin(ClienteAdmin):
     
-    group_name = "visitante"  # 🔥 Grupo a asignar automáticamente
+    group_name = "visitante"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -84,26 +91,33 @@ class VisitanteAdmin(ClienteAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).filter(groups__name=self.group_name)
 
-    # ❗ OCULTAR selector de grupos en el admin
-    exclude = ('groups',)
+    def get_exclude(self, request, obj=None):
+        # 👈 Solo excluir grupos al CREAR, no al EDITAR
+        if obj is None:  # Creando nuevo usuario
+            return ('groups',)
+        return super().get_exclude(request, obj)
 
     def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-
-        from django.contrib.auth.models import Group
-        grupo, created = Group.objects.get_or_create(name=self.group_name)
-
-        # Si es nuevo o no tiene grupo → asignarlo
-        if not obj.groups.filter(name=self.group_name).exists():
-            obj.groups.clear()
-            obj.groups.add(grupo)
+        # Solo asignar grupo automáticamente al CREAR
+        if not change:  # Si es nuevo usuario
+            super().save_model(request, obj, form, change)
+            from django.contrib.auth.models import Group
+            grupo, created = Group.objects.get_or_create(name=self.group_name)
+            
+            # Asignar grupo automáticamente solo al crear
+            if not obj.groups.filter(name=self.group_name).exists():
+                obj.groups.clear()
+                obj.groups.add(grupo)
+        else:
+            # Al editar, guardar normalmente (permite cambiar grupos)
+            super().save_model(request, obj, form, change)
 
 
 # Formulario para Editores
 @admin.register(Editor)
 class EditorAdmin(ClienteAdmin):
 
-    group_name = "editor"  # 🔥 Grupo a asignar automáticamente
+    group_name = "editor"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -113,19 +127,26 @@ class EditorAdmin(ClienteAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).filter(groups__name=self.group_name)
 
-    # ❗ OCULTAR selector de grupos
-    exclude = ('groups',)
+    def get_exclude(self, request, obj=None):
+        # 👈 Solo excluir grupos al CREAR, no al EDITAR
+        if obj is None:  # Creando nuevo usuario
+            return ('groups',)
+        return super().get_exclude(request, obj)
 
     def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-
-        from django.contrib.auth.models import Group
-        grupo, created = Group.objects.get_or_create(name=self.group_name)
-
-        # Si es nuevo o no tiene grupo → asignarlo
-        if not obj.groups.filter(name=self.group_name).exists():
-            obj.groups.clear()
-            obj.groups.add(grupo)
+        # Solo asignar grupo automáticamente al CREAR
+        if not change:  # Si es nuevo usuario
+            super().save_model(request, obj, form, change)
+            from django.contrib.auth.models import Group
+            grupo, created = Group.objects.get_or_create(name=self.group_name)
+            
+            # Asignar grupo automáticamente solo al crear
+            if not obj.groups.filter(name=self.group_name).exists():
+                obj.groups.clear()
+                obj.groups.add(grupo)
+        else:
+            # Al editar, guardar normalmente (permite cambiar grupos)
+            super().save_model(request, obj, form, change)
 
 #Formulario para admins
 

@@ -27,7 +27,7 @@ class RefreshTokenSerializer(serializers.Serializer):
     refresh = serializers.CharField()
 
 
-class UsuarioSerializer(serializers.ModelSerializer):
+class UsuarioVisitanteSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     class Meta:
         model = User
@@ -66,7 +66,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
         
         return user
     
-class CompaniaSerializer(serializers.ModelSerializer):
+class EditorSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     
     class Meta:
@@ -174,6 +174,59 @@ class OrganizacionSerializer(serializers.ModelSerializer):
         validated_data['usuario_organizacion'] = self.context['request'].user
         validated_data['fecha_registro'] = timezone.now()
         return super().create(validated_data)
+
+# Serializador para usuarios staff (muestra toda la información)
+class OrganizacionSerializerStaff(serializers.ModelSerializer):
+    usuario_organizacion = serializers.CharField(source='usuario_organizacion.email', read_only=True)
+
+    class Meta:
+        model = Organizacion
+        fields = ['id', 'usuario_organizacion', 'organizacion_nombre', 'fecha_registro']
+        read_only_fields = ['fecha_registro', 'usuario_organizacion']
+
+    def validate(self, data):
+        model_fields = {field.name for field in Organizacion._meta.get_fields()}
+        extra_fields = set(self.initial_data.keys()) - model_fields
+        
+        if extra_fields:
+            raise serializers.ValidationError(
+                f"Campos no permitidos: {', '.join(extra_fields)}. "
+                f"Campos válidos: {', '.join(model_fields)}"
+            )
+        
+        # Validar que el nombre de organización sea único
+        organizacion_nombre = data.get('organizacion_nombre')
+        if organizacion_nombre and Organizacion.objects.filter(organizacion_nombre=organizacion_nombre).exists():
+            raise serializers.ValidationError({
+                "organizacion_nombre": "Ya existe una organización con este nombre."
+            })
+        
+        return data
+
+    def create(self, validated_data):
+        # Asigna automáticamente el usuario actual al crear
+        validated_data['usuario_organizacion'] = self.context['request'].user
+        validated_data['fecha_registro'] = timezone.now()
+        return super().create(validated_data)
+
+# Serializador para usuarios públicos (oculta usuario_organizacion)
+class OrganizacionSerializerPublico(serializers.ModelSerializer):
+    class Meta:
+        model = Organizacion
+        fields = ['id', 'organizacion_nombre', 'fecha_registro']
+        read_only_fields = ['fecha_registro']
+
+    def validate(self, data):
+        model_fields = {field.name for field in Organizacion._meta.get_fields()}
+        extra_fields = set(self.initial_data.keys()) - model_fields
+        
+        if extra_fields:
+            raise serializers.ValidationError(
+                f"Campos no permitidos: {', '.join(extra_fields)}. "
+                f"Campos válidos: {', '.join(model_fields)}"
+            )
+        
+        return data
 
 ##Este es la respuesta que se va a mostrar de los endpoints aprobados cuando una persona quiere visualizar los testimonios de 
 ##una organizacion en especifico

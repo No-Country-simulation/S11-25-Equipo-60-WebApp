@@ -47,42 +47,94 @@ class LoginView(generics.GenericAPIView):
             'access': str(refresh.access_token),
         }, status=status.HTTP_200_OK)
     
-
 @extend_schema_view(
-    list=extend_schema(tags=['User']),
-    retrieve=extend_schema(tags=['User']),
-    create=extend_schema(tags=['User']),  # Excluye el create genérico
-    methods=['POST'], tags=['User'], # 👈 Asegura que el método POST también tenga la etiqueta 'User'
-    update=extend_schema(exclude=True),  # Oculta el método PUT (update)
-    partial_update=extend_schema(tags=['User']),
-    destroy=extend_schema(tags=['User']),
+    list=extend_schema(tags=['Visitantes']),
+    retrieve=extend_schema(tags=['Visitantes']),
+    create=extend_schema(tags=['Visitantes']),
+    methods=['POST'], tags=['Visitantes'],
+    update=extend_schema(exclude=True),
+    partial_update=extend_schema(tags=['Visitantes']),
+    destroy=extend_schema(tags=['Visitantes']),
 )
-
-class UsuarioViewSet(viewsets.ModelViewSet):
+class UsuarioVisitanteViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UsuarioSerializer
-    
+    serializer_class = UsuarioVisitanteSerializer
 
     def get_queryset(self):
+        user = self.request.user
+        
+        # Para acciones de listado (GET)
         if self.action == 'list':
-            # 🔓 TODOS los usuarios (autenticados y no autenticados) ven SOLO usuarios del grupo "visitante"
-            return User.objects.filter(groups__name='visitante', is_staff=False)
-                
-        # Para otras acciones (retrieve, partial_update, destroy), usamos el queryset por defecto
+            # 👇 STAFF ve TODOS los usuarios editores
+            if user.is_staff:
+                return User.objects.filter(groups__name='visitante', is_staff=False)
+            
+            # 👇 USUARIOS VISITANTES pueden ver SOLO sus propios datos
+            elif user.is_authenticated and user.groups.filter(name='visitante').exists():
+                return User.objects.filter(id=user.id)
+            
+            # 👇 USUARIOS NO AUTENTICADOS o sin permisos no pueden ver nada
+            else:
+                return User.objects.none()
+        
+        # Para acciones de detalle (retrieve)
+        elif self.action == 'retrieve':
+            # 👇 STAFF puede ver cualquier usuario visitante
+            if user.is_staff:
+                return User.objects.filter(groups__name='visitante', is_staff=False)
+            
+            # 👇 USUARIOS VISITANTES pueden ver SOLO sus propios datos
+            elif user.is_authenticated and user.groups.filter(name='visitante').exists():
+                return User.objects.filter(id=user.id)
+            
+            # 👇 USUARIOS NO AUTENTICADOS o sin permisos no pueden ver nada
+            else:
+                return User.objects.none()
+        
+        # Para otras acciones (partial_update, destroy)
         return User.objects.filter(groups__name='visitante')
 
-
     def get_permissions(self):
-        # Mantenemos la configuración para que 'list' y 'create' sean libres (AllowAny).
-        if self.action in ['create', 'list', 'retrieve']: 
+        # Mantenemos la configuración para que 'create' sea libre (AllowAny)
+        if self.action in ['create']: 
             return [AllowAny()]  
         
+        # Para 'list' y 'retrieve' ahora requerimos autenticación
+        elif self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        
         elif self.action in ['partial_update', 'destroy']:  
-            # Aquí se requiere autenticación para ver/modificar un recurso individual.
             return [IsAuthenticated()]  
             
         return [IsAuthenticated()]
-    
+
+    def list(self, request, *args, **kwargs):
+        user = request.user
+        
+        # Verificar permisos específicos para list
+        if not (user.is_staff or user.groups.filter(name='editor').exists() or 
+                (user.is_authenticated and user.groups.filter(name='visitante').exists())):
+            return Response(
+                {"detail": "No tienes permisos para acceder a este apartado"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        user = request.user
+        instance = self.get_object()
+        
+        # Verificar permisos específicos para retrieve
+        if not (user.is_staff or user.groups.filter(name='editor').exists() or 
+                (user.is_authenticated and user.id == instance.id and user.groups.filter(name='visitante').exists())):
+            return Response(
+                {"detail": "No tienes permisos para acceder a este apartado"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().retrieve(request, *args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -109,7 +161,6 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_201_CREATED
         )
-    
    
     def update(self, request, *args, **kwargs):
         if not kwargs.get('partial', False):
@@ -120,27 +171,42 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
     
     def partial_update(self, request, *args, **kwargs):
-        # Verificar que el usuario solo pueda modificar su propia información
         usuario = self.get_object()
-        if usuario != request.user:
-            return Response(
-                {"detail": "No tienes permisos para modificar este usuario. Solo puedes modificar tu propia información."},
-                status=status.HTTP_403_FORBIDDEN
-            )
         
-        # Verificar que el usuario pertenezca al grupo "visitante"
-        if not request.user.groups.filter(name='visitante').exists():
-            return Response(
-                {"detail": "Solo los usuarios del grupo 'visitante' pueden modificar su información."},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        # 👇 STAFF puede modificar cualquier usuario visitante
+        if not request.user.is_staff:
+            # 👇 USUARIOS NO STAFF solo pueden modificar su propia información
+            if usuario != request.user:
+                return Response(
+                    {"detail": "No tienes permisos para modificar este usuario. Solo puedes modificar tu propia información."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # 👇 USUARIOS NO STAFF deben pertenecer al grupo "visitante"
+            if not request.user.groups.filter(name='visitante').exists():
+                return Response(
+                    {"detail": "Solo los usuarios del grupo 'visitante' pueden modificar su información."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
         
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        # Verificar que el usuario solo pueda eliminar su propia cuenta
         usuario = self.get_object()
+        user = request.user
+        
+        # 👇 STAFF puede eliminar CUALQUIER usuario visitante
+        if user.is_staff:
+            # Verificar que el usuario a eliminar sea del grupo "visitante"
+            if not usuario.groups.filter(name='visitante').exists():
+                return Response(
+                    {"detail": "Solo se pueden eliminar usuarios del grupo 'visitante'."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            return super().destroy(request, *args, **kwargs)
+        
+        # 👇 USUARIOS NO STAFF solo pueden eliminar su propia cuenta
         if usuario != request.user:
             return Response(
                 {"detail": "No tienes permisos para eliminar este usuario. Solo puedes eliminar tu propia cuenta."},
@@ -157,62 +223,71 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
     
 @extend_schema_view(
-    list=extend_schema(tags=['Compañias']),
-    retrieve=extend_schema(tags=['Compañias']),
-    create=extend_schema(tags=['Compañias']),
+    list=extend_schema(tags=['Editores']),
+    retrieve=extend_schema(tags=['Editores']),
+    create=extend_schema(exclude=True),
     update=extend_schema(exclude=True),
-    partial_update=extend_schema(tags=['Compañias']),
-    destroy=extend_schema(tags=['Compañias']),
+    partial_update=extend_schema(tags=['Editores']),
+    destroy=extend_schema(tags=['Editores']),
 )
-class CompaniaViewSet(viewsets.ModelViewSet):
-    serializer_class = CompaniaSerializer
+class EditorViewSet(viewsets.ModelViewSet):
+    serializer_class = EditorSerializer
+    http_method_names = ['get', 'head', 'options', 'patch', 'delete']  # 👈 Elimina POST
     
     def get_queryset(self):
-        if self.action == 'list':
-            # 🔓 TODOS los usuarios (autenticados y no autenticados) ven SOLO usuarios del grupo "editor"
+        user = self.request.user
+        
+        # 👇 STAFF ve TODOS los usuarios editores
+        if user.is_staff:
             return User.objects.filter(groups__name='editor', is_staff=False)
-                
-        # Para otras acciones (retrieve, partial_update, destroy), filtramos por grupo "editor"
-        return User.objects.filter(groups__name='editor')
+        
+        # 👇 EDITOR ve SOLO sus propios datos
+        elif user.is_authenticated and user.groups.filter(name='editor').exists():
+            return User.objects.filter(id=user.id, groups__name='editor')
+        
+        # 👇 USUARIOS NO AUTENTICADOS o sin permisos no pueden ver nada
+        else:
+            return User.objects.none()
 
     def get_permissions(self):
-        # Permitir crear Compañias sin autenticación
-        if self.action in ['create', 'list', 'retrieve']: 
-            return [AllowAny()]  
-        
-        # Para otras acciones requiere autenticación
-        elif self.action in ['partial_update', 'destroy']:  
+        # Para todas las acciones requiere autenticación
+        if self.action in ['list', 'retrieve', 'partial_update', 'destroy']:  
             return [IsAuthenticated()]  
             
         return [IsAuthenticated()]
     
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        # Crear usuario (compañía) con contraseña hasheada
-        user = User.objects.create_user(
-            username=serializer.validated_data['username'],
-            email=serializer.validated_data['email'],
-            password=serializer.validated_data['password'],
-        )
+    def list(self, request, *args, **kwargs):
+        user = request.user
         
-        # Asignar automáticamente al grupo "editor"
-        try:
-            grupo_editor = Group.objects.get(name='editor')
-            user.groups.add(grupo_editor)
-        except Group.DoesNotExist:
-            # Si el grupo no existe, lo creamos (fallback)
-            grupo_editor = Group.objects.create(name='editor')
-            user.groups.add(grupo_editor)
-
+        # Verificar permisos específicos para list
+        if not (user.is_staff or user.groups.filter(name='editor').exists()):
+            return Response(
+                {"detail": "No tienes permisos para acceder a este apartado"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        user = request.user
+        instance = self.get_object()
+        
+        # Verificar permisos específicos para retrieve
+        if not (user.is_staff or (user.is_authenticated and user.id == instance.id and user.groups.filter(name='editor').exists())):
+            return Response(
+                {"detail": "No tienes permisos para acceder a este apartado"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        return super().retrieve(request, *args, **kwargs)
+    
+    def create(self, request, *args, **kwargs):
+        # 👈 Método completamente deshabilitado
         return Response(
-            {
-                "message": "Compañía creada exitosamente y asignada al grupo 'editor'",
-                "user_id": user.id
-            },
-            status=status.HTTP_201_CREATED
+            {"detail": "Método POST no permitido. No se pueden crear nuevos editores a través de este endpoint."},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
+    
     
     def update(self, request, *args, **kwargs):
         if not kwargs.get('partial', False):
@@ -223,42 +298,49 @@ class CompaniaViewSet(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
     
     def partial_update(self, request, *args, **kwargs):
-        # Verificar que la compañía solo pueda modificar su propia información
-        compania = self.get_object()
-        if compania != request.user:
-            return Response(
-                {"detail": "No tienes permisos para modificar esta compañía. Solo puedes modificar tu propia información."},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        editor = self.get_object()
         
-        # Verificar que el usuario pertenezca al grupo "editor"
-        if not request.user.groups.filter(name='editor').exists():
-            return Response(
-                {"detail": "Solo las compañías del grupo 'editor' pueden modificar su información."},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        # 👇 STAFF puede modificar cualquier editor
+        if not request.user.is_staff:
+            # 👇 EDITOR solo puede modificar su propia información
+            if editor != request.user:
+                return Response(
+                    {"detail": "No tienes permisos para modificar esta compañía. Solo puedes modificar tu propia información."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # 👇 EDITOR debe pertenecer al grupo "editor"
+            if not request.user.groups.filter(name='editor').exists():
+                return Response(
+                    {"detail": "Solo las compañías del grupo 'editor' pueden modificar su información."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
         
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        # Verificar que la compañía solo pueda eliminar su propia cuenta
-        compania = self.get_object()
-        if compania != request.user:
-            return Response(
-                {"detail": "No tienes permisos para eliminar esta compañía. Solo puedes eliminar tu propia cuenta."},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        editor = self.get_object()
         
-        # Verificar que el usuario pertenezca al grupo "editor"
-        if not request.user.groups.filter(name='editor').exists():
-            return Response(
-                {"detail": "Solo las compañías del grupo 'editor' pueden eliminar su cuenta."},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        # 👇 STAFF puede eliminar cualquier editor
+        if not request.user.is_staff:
+            # 👇 EDITOR solo puede eliminar su propia cuenta
+            if editor != request.user:
+                return Response(
+                    {"detail": "No tienes permisos para eliminar esta compañía. Solo puedes eliminar tu propia cuenta."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # 👇 EDITOR debe pertenecer al grupo "editor"
+            if not request.user.groups.filter(name='editor').exists():
+                return Response(
+                    {"detail": "Solo las compañías del grupo 'editor' pueden eliminar su cuenta."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
         
         return super().destroy(request, *args, **kwargs)
-    
+
+###############################USUARIOS ADMINISTRADORES    
 @extend_schema_view(
     list=extend_schema(tags=['Administradores'],
         description="Listar todos los administradores. Solo accesible por administradores."),
@@ -365,6 +447,8 @@ class AdminUserViewSet(viewsets.ModelViewSet):
             )
         return super().update(request, *args, **kwargs)
 
+
+####################################ORGANIZACIONES
 @extend_schema_view(
     list=extend_schema(tags=['Organizaciones']),
     retrieve=extend_schema(tags=['Organizaciones']),
@@ -377,46 +461,36 @@ class OrganizacionViewSet(viewsets.ModelViewSet):
     serializer_class = OrganizacionSerializer
 
     def get_queryset(self):
-        user = self.request.user
-        
-        # Para list, retrieve y acciones personalizadas, todos pueden ver las organizaciones
-        if self.action in ['list', 'retrieve', 'testimonios_aprobados']:
-            return Organizacion.objects.all()
-        
-        elif self.action in ['partial_update', 'destroy']:
-            if user.is_authenticated:
-                if user.is_staff:
-                    return Organizacion.objects.all()
-                elif user.groups.filter(name='editor').exists():
-                    return Organizacion.objects.filter(usuario_organizacion=user)
-        
-        # Para create y otras acciones, requerir autenticación
-        return Organizacion.objects.none()
+        return Organizacion.objects.all()
     
     def get_permissions(self):
         # Permitir list y retrieve sin autenticación (público)
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'testimonios_aprobados']:
             return [AllowAny()]
         
-        # Para create, update, delete requiere autenticación y ser editor/admin
+        # Para create, update, delete requiere ser staff
         return [IsAuthenticated()]
 
+    def get_serializer_class(self):
+        # Usar serializador diferente según el tipo de usuario
+        if self.request.user.is_staff:
+            return OrganizacionSerializerStaff
+        else:
+            return OrganizacionSerializerPublico
+
     def create(self, request, *args, **kwargs):
-        # Verificar que el usuario pertenezca al grupo "editor"
-        if not request.user.groups.filter(name='editor').exists():
+        # Verificar que el usuario sea staff
+        if not request.user.is_staff:
             return Response(
-                {"detail": "No tienes permisos para crear organizaciones. Debes ser del grupo 'editor'."},
+                {"detail": "No tienes permisos para crear organizaciones. Solo el personal autorizado puede crear organizaciones."},
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Validar que no exista una organización con el mismo nombre para este usuario
+        # Validar que no exista una organización con el mismo nombre
         organizacion_nombre = request.data.get('organizacion_nombre')
-        if Organizacion.objects.filter(
-            usuario_organizacion=request.user, 
-            organizacion_nombre=organizacion_nombre
-        ).exists():
+        if Organizacion.objects.filter(organizacion_nombre=organizacion_nombre).exists():
             return Response(
-                {"detail": "Ya existe una organización con este nombre para tu cuenta."},
+                {"detail": "Ya existe una organización con este nombre."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -431,22 +505,20 @@ class OrganizacionViewSet(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
-        # Verificar que el usuario sea el dueño de la organización o admin
-        organizacion = self.get_object()
-        if not (request.user.is_staff or organizacion.usuario_organizacion == request.user):
+        # Verificar que el usuario sea staff
+        if not request.user.is_staff:
             return Response(
-                {"detail": "No tienes permisos para modificar esta organización."},
+                {"detail": "No tienes permisos para modificar organizaciones."},
                 status=status.HTTP_403_FORBIDDEN
             )
         
         return super().partial_update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        # Verificar que el usuario sea el dueño de la organización o admin
-        organizacion = self.get_object()
-        if not (request.user.is_staff or organizacion.usuario_organizacion == request.user):
+        # Verificar que el usuario sea staff
+        if not request.user.is_staff:
             return Response(
-                {"detail": "No tienes permisos para eliminar esta organización."},
+                {"detail": "No tienes permisos para eliminar organizaciones."},
                 status=status.HTTP_403_FORBIDDEN
             )
         
