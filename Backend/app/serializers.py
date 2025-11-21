@@ -144,11 +144,23 @@ class AdminUserSerializer(serializers.ModelSerializer):
        
 class OrganizacionSerializer(serializers.ModelSerializer):
     usuario_organizacion = serializers.CharField(source='usuario_organizacion.email', read_only=True)
+    editores = serializers.PrimaryKeyRelatedField(
+        many=True, 
+        queryset=User.objects.filter(groups__name='Editor'), 
+        required=False
+    )
+    editores_emails = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Organizacion
-        fields = ['id', 'usuario_organizacion', 'organizacion_nombre', 'fecha_registro']
-        read_only_fields = ['fecha_registro', 'usuario_organizacion']
+        fields = [
+            'id', 'usuario_organizacion', 'organizacion_nombre', 
+            'dominio', 'api_key', 'fecha_registro', 'editores', 'editores_emails'
+        ]
+        read_only_fields = ['fecha_registro', 'usuario_organizacion', 'api_key']
+
+    def get_editores_emails(self, obj):
+        return [editor.email for editor in obj.editores.all()]
 
     def validate(self, data):
         model_fields = {field.name for field in Organizacion._meta.get_fields()}
@@ -170,10 +182,23 @@ class OrganizacionSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        # Asigna automáticamente el usuario actual al crear
+        editores_data = validated_data.pop('editores', [])
         validated_data['usuario_organizacion'] = self.context['request'].user
-        validated_data['fecha_registro'] = timezone.now()
-        return super().create(validated_data)
+        organizacion = super().create(validated_data)
+        
+        # Agregar editores si se proporcionaron
+        organizacion.editores.set(editores_data)
+        return organizacion
+
+    def update(self, instance, validated_data):
+        editores_data = validated_data.pop('editores', None)
+        organizacion = super().update(instance, validated_data)
+        
+        # Actualizar editores si se proporcionaron
+        if editores_data is not None:
+            organizacion.editores.set(editores_data)
+        
+        return organizacion
 
 # Serializador para usuarios staff (muestra toda la información)
 class OrganizacionSerializerStaff(serializers.ModelSerializer):
@@ -181,7 +206,7 @@ class OrganizacionSerializerStaff(serializers.ModelSerializer):
 
     class Meta:
         model = Organizacion
-        fields = ['id', 'usuario_organizacion', 'organizacion_nombre', 'fecha_registro']
+        fields = ['id', 'usuario_organizacion', 'organizacion_nombre','dominio', 'api_key', 'fecha_registro']
         read_only_fields = ['fecha_registro', 'usuario_organizacion']
 
     def validate(self, data):
@@ -213,7 +238,7 @@ class OrganizacionSerializerStaff(serializers.ModelSerializer):
 class OrganizacionSerializerPublico(serializers.ModelSerializer):
     class Meta:
         model = Organizacion
-        fields = ['id', 'organizacion_nombre', 'fecha_registro']
+        fields = ['id', 'organizacion_nombre', 'dominio',  'fecha_registro']
         read_only_fields = ['fecha_registro']
 
     def validate(self, data):
@@ -232,7 +257,7 @@ class OrganizacionSerializerPublico(serializers.ModelSerializer):
 ##una organizacion en especifico
 class TestimonioAprobadoSerializer(serializers.ModelSerializer):
     usuario_registrado = serializers.StringRelatedField(read_only=True)
-    categoria_nombre = serializers.CharField(source='categoria.categoria_texto', read_only=True)
+    categoria_nombre = serializers.CharField(source='categoria.nombre_categoria', read_only=True)
 
     class Meta:
         model = Testimonios
@@ -248,7 +273,7 @@ class CategoriaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Categoria
-        fields = ['id', 'categoria_texto', 'fecha_registro']
+        fields = ['id', 'nombre_categoria', 'icono', 'color', 'fecha_registro']
         read_only_fields = ['fecha_registro']
 
     def validate(self, data):
@@ -272,7 +297,7 @@ class CategoriaSerializer(serializers.ModelSerializer):
 class TestimonioSerializer(serializers.ModelSerializer):
     usuario_registrado = serializers.StringRelatedField(read_only=True)
     organizacion_nombre = serializers.CharField(source='organizacion.organizacion_nombre', read_only=True)
-    categoria_nombre = serializers.CharField(source='categoria.categoria_texto', read_only=True)
+    categoria_nombre = serializers.CharField(source='categoria.nombre_categoria', read_only=True)
 
     # Definir el ranking con validación de rango
     ranking = serializers.DecimalField(

@@ -461,20 +461,36 @@ class OrganizacionViewSet(viewsets.ModelViewSet):
     serializer_class = OrganizacionSerializer
 
     def get_queryset(self):
+        user = self.request.user
+        
+        # Staff ve todas las organizaciones
+        if user.is_staff:
+            return Organizacion.objects.all()
+        
+        # Editores ven las organizaciones donde son editores
+        elif user.is_authenticated:
+            return Organizacion.objects.filter(
+                models.Q(editores=user) | 
+                models.Q(usuario_organizacion=user)
+            ).distinct()
+        
+        # Público solo puede listar (sin filtros específicos)
         return Organizacion.objects.all()
-    
+
     def get_permissions(self):
         # Permitir list y retrieve sin autenticación (público)
         if self.action in ['list', 'retrieve', 'testimonios_aprobados']:
             return [AllowAny()]
         
-        # Para create, update, delete requiere ser staff
+        # Para create, update, delete requiere autenticación
         return [IsAuthenticated()]
 
     def get_serializer_class(self):
         # Usar serializador diferente según el tipo de usuario
         if self.request.user.is_staff:
             return OrganizacionSerializerStaff
+        elif self.request.user.is_authenticated:
+            return OrganizacionSerializer
         else:
             return OrganizacionSerializerPublico
 
@@ -505,10 +521,13 @@ class OrganizacionViewSet(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
-        # Verificar que el usuario sea staff
-        if not request.user.is_staff:
+        organizacion = self.get_object()
+        user = request.user
+        
+        # Verificar permisos: staff o editor de la organización
+        if not (user.is_staff or organizacion.editores.filter(id=user.id).exists()):
             return Response(
-                {"detail": "No tienes permisos para modificar organizaciones."},
+                {"detail": "No tienes permisos para modificar esta organización."},
                 status=status.HTTP_403_FORBIDDEN
             )
         

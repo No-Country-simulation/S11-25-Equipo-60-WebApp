@@ -372,9 +372,9 @@ SPECTACULAR_SETTINGS = {
     'TAGS': [
         {'name': 'Login', 'description': 'Operaciones de autenticación'},
         {'name': 'Token', 'description': 'Operaciones relacionadas con los tokens JWT'},
-        {'name': 'Visitantes', 'description': 'Operaciones relacionadas con los Usuarios(usuarios visitantes)'},
-        {'name': 'Editores', 'description': 'Operaciones relacionadas con las Editores(usuarios editores)'},
-        {'name': 'Administradores', 'description': 'Operaciones relacionadas con las Usuarios(usuarios admins)'},
+        {'name': 'Visitantes', 'description': 'Operaciones relacionadas con los Usuarios visitantes'},
+        {'name': 'Editores', 'description': 'Operaciones relacionadas con las Usuarios Editores'},
+        {'name': 'Administradores', 'description': 'Operaciones relacionadas con las Usuarios admins'},
         {'name': 'Categorias', 'description': 'Operaciones relacionadas con las Categorias'},
         {'name': 'Organizaciones', 'description': 'Operaciones relacionadas con las Organizaciones(Dominios)'},
         {'name': 'Testimonios', 'description': 'Operaciones relacionadas con los Testimonios'},

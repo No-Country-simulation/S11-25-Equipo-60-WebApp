@@ -232,8 +232,8 @@ class OrganizacionAdmin(admin.ModelAdmin):
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
 
-    list_display = ("categoria_texto", "fecha_registro")
-    search_fields = ("categoria_texto",)
+    list_display = ("nombre_categoria", 'icono', 'color', "fecha_registro")
+    search_fields = ("nombre_categoria",)
     list_filter = ("fecha_registro",)
     ordering = ("-id",)
 
@@ -262,7 +262,7 @@ class TestimoniosAdmin(admin.ModelAdmin):
         "usuario_registrado__username",
         "usuario_anonimo_username",
         "organizacion__organizacion_nombre",
-        "categoria__categoria_texto",
+        "categoria__nombre_categoria",
     )
 
     ordering = ("-fecha_comentario",)

@@ -5,6 +5,7 @@ from django.core.validators import MinValueValidator
 from django.db.models import Q, F
 # models.py
 from django.contrib.auth.models import Group
+import uuid
 
 class Roles(Group):
     class Meta:
@@ -64,7 +65,10 @@ class AdminUser(User):
 
 class Organizacion(models.Model):
     usuario_organizacion = models.ForeignKey(User, on_delete=models.CASCADE, related_name='usuario_organizacion')
+    editores = models.ManyToManyField(User, related_name='organizaciones_editables', blank=True)
+    dominio = models.CharField(max_length=50, blank=False, unique=True)
     organizacion_nombre = models.CharField(max_length=50, blank=False, unique=True)
+    api_key = models.CharField(max_length=50, blank=True, null=True) ##SE DEBE CREAR AUTOMATICAMENTE
     fecha_registro = models.DateTimeField(auto_now_add=True)  # ✅ Fecha automática
 
     class Meta:
@@ -75,10 +79,18 @@ class Organizacion(models.Model):
 
     def __str__(self):
         return self.organizacion_nombre
+    
+    def save(self, *args, **kwargs):
+        # Generar API key automáticamente si no existe
+        if not self.api_key:
+            self.api_key = str(uuid.uuid4())[:50]  # UUID truncado a 50 caracteres
+        super().save(*args, **kwargs)
 
 
 class Categoria(models.Model):
-    categoria_texto = models.CharField(max_length=50, blank=False, unique=True)  
+    icono = models.CharField(max_length=50, blank=False, null=False)  
+    color = models.CharField(max_length=50, blank=False, null=False)  
+    nombre_categoria = models.CharField(max_length=50, blank=False, unique=True)  ######Descripcion
     fecha_registro = models.DateTimeField(auto_now_add=True) 
 
     class Meta:
@@ -90,7 +102,7 @@ class Categoria(models.Model):
         ordering = ['-id']  # Ordenar por ID descendente
 
     def __str__(self):
-        return (f"Categoria {self.categoria_texto}")
+        return (f"Categoria {self.nombre_categoria}")
 
 class Testimonios(models.Model):
 
@@ -105,9 +117,12 @@ class Testimonios(models.Model):
     ranking = models.DecimalField(default=0, max_digits=3, decimal_places=1)
 
     OPCIONES_ESTADOS = (
-        ('A', 'APROBADO'),
         ('E', 'ESPERA'),
+        ('A', 'APROBADO'),
         ('R', 'RECHAZADO'),
+        ('P', 'PUBLICADO'),
+        ('B', 'BORRADOR'),
+        ('O', 'OCULTO'), ###DESPUES DE X TIEMPO SE OCULTAN
     )
 
     estado = models.CharField(max_length=1, choices=OPCIONES_ESTADOS, default='E', verbose_name='Estado')
