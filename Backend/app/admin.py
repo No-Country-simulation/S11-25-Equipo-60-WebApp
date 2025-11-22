@@ -6,9 +6,64 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
 # PRIMERO: Se Define UserAdmin y ClienteAdmin ANTES de usarlos
+class UserAdminForm(forms.ModelForm):
+    """
+    Formulario personalizado para manejar la selección única de grupos
+    """
+    group_choice = forms.ModelChoiceField(
+        queryset=Group.objects.all(),
+        widget=forms.RadioSelect,
+        required=True,
+        label="Grupo",
+        help_text="Selecciona UN solo grupo. El usuario debe pertenecer a un grupo."
+    )
+    
+    class Meta:
+        model = User
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = kwargs.get('instance')
+        
+        # Establecer el valor inicial si existe
+        if instance and instance.groups.exists():
+            self.fields['group_choice'].initial = instance.groups.first()
+        
+        # OCULTAR el campo groups original
+        if 'groups' in self.fields:
+            self.fields['groups'].widget = forms.HiddenInput()
+            self.fields['groups'].required = False
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        # Validar que se seleccionó un grupo
+        if not cleaned_data.get('group_choice'):
+            raise ValidationError({
+                'group_choice': 'Debe seleccionar un grupo para el usuario.'
+            })
+        return cleaned_data
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        
+        if commit:
+            user.save()
+        
+        # Asignar el grupo seleccionado
+        selected_group = self.cleaned_data.get('group_choice')
+        if selected_group:
+            user.groups.set([selected_group])
+        
+        return user
+
+# PRIMERO: Se Define UserAdmin y ClienteAdmin ANTES de usarlos
 class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'email', 'is_staff', 'is_active', 'get_user_groups')
     search_fields = ('username', 'email')
+
+    # Usar nuestro formulario personalizado
+    form = UserAdminForm
 
     add_fieldsets = (
         (None, {
@@ -27,7 +82,7 @@ class UserAdmin(BaseUserAdmin):
 
     fieldsets = (
         (None, {'fields': ('email', 'username', 'password')}),
-        ('Grupos', {'fields': ('groups',)}),  # 👈 Agregado grupos al editar
+        ('Grupos', {'fields': ('group_choice',)}),  # 👈 Cambiar 'groups' por 'group_choice'
         #('Información personal', {'fields': ('first_name', 'last_name',)}),
         #('Permisos', {
         #    'fields': ('is_active',),
@@ -35,21 +90,41 @@ class UserAdmin(BaseUserAdmin):
     )
 
     def get_form(self, request, obj=None, **kwargs):
-        defaults = {}
-        if obj is None:
-            defaults['form'] = self.add_form
-        else:
-            defaults['form'] = self.form
+        form = super().get_form(request, obj, **kwargs)
+        
+        # Personalizar el widget de grupos para selección única
+        if 'groups' in form.base_fields:
+            form.base_fields['groups'].widget = forms.RadioSelect()
+            form.base_fields['groups'].help_text = "Selecciona un solo grupo. El usuario debe pertenecer a un grupo."
+            form.base_fields['groups'].required = True
             
-        defaults.update(kwargs)
-        form = super().get_form(request, obj, **defaults)
-
         return form
     
     # Método para mostrar los grupos del usuario
     def get_user_groups(self, obj):
         return ", ".join([group.name for group in obj.groups.all()])
-    get_user_groups.short_description = 'Grupos'  # 👈 Nombre de la columna
+    get_user_groups.short_description = 'Grupos'
+
+    # Validar que el usuario tenga exactamente un grupo
+    def clean_groups(self):
+        groups = self.cleaned_data.get('groups')
+        if groups.count() != 1:
+            raise ValidationError("El usuario debe pertenecer a exactamente UN grupo.")
+        return groups
+
+    def save_model(self, request, obj, form, change):
+        # Asegurar que el usuario tenga exactamente un grupo después de guardar
+        super().save_model(request, obj, form, change)
+        
+        # Si no tiene grupos, asignar uno por defecto
+        if obj.groups.count() == 0:
+            default_group, created = Group.objects.get_or_create(name='visitante')
+            obj.groups.add(default_group)
+        
+        # Si tiene más de un grupo, dejar solo el primero
+        elif obj.groups.count() > 1:
+            first_group = obj.groups.first()
+            obj.groups.set([first_group])
 
     class Media:
         js = ('admin/js/user_admin.js',)
@@ -91,27 +166,6 @@ class VisitanteAdmin(ClienteAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).filter(groups__name=self.group_name)
 
-    def get_exclude(self, request, obj=None):
-        # 👈 Solo excluir grupos al CREAR, no al EDITAR
-        if obj is None:  # Creando nuevo usuario
-            return ('groups',)
-        return super().get_exclude(request, obj)
-
-    def save_model(self, request, obj, form, change):
-        # Solo asignar grupo automáticamente al CREAR
-        if not change:  # Si es nuevo usuario
-            super().save_model(request, obj, form, change)
-            from django.contrib.auth.models import Group
-            grupo, created = Group.objects.get_or_create(name=self.group_name)
-            
-            # Asignar grupo automáticamente solo al crear
-            if not obj.groups.filter(name=self.group_name).exists():
-                obj.groups.clear()
-                obj.groups.add(grupo)
-        else:
-            # Al editar, guardar normalmente (permite cambiar grupos)
-            super().save_model(request, obj, form, change)
-
 
 # Formulario para Editores
 @admin.register(Editor)
@@ -126,12 +180,7 @@ class EditorAdmin(ClienteAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).filter(groups__name=self.group_name)
-
-    def get_exclude(self, request, obj=None):
-        # 👈 Solo excluir grupos al CREAR, no al EDITAR
-        if obj is None:  # Creando nuevo usuario
-            return ('groups',)
-        return super().get_exclude(request, obj)
+    
 
     def save_model(self, request, obj, form, change):
         # Solo asignar grupo automáticamente al CREAR
@@ -148,6 +197,9 @@ class EditorAdmin(ClienteAdmin):
             # Al editar, guardar normalmente (permite cambiar grupos)
             super().save_model(request, obj, form, change)
 
+
+
+
 #Formulario para admins
 
 @admin.register(AdminUser)
@@ -158,8 +210,8 @@ class AdminUserAdmin(ClienteAdmin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.model._meta.verbose_name = 'Usuario Administrador'
-        self.model._meta.verbose_name_plural = 'Usuarios Administradores'
+        self.model._meta.verbose_name = 'Usuario Admin'
+        self.model._meta.verbose_name_plural = 'Usuarios Admins'
 
     def get_queryset(self, request):
         return super().get_queryset(request).filter(
@@ -170,7 +222,6 @@ class AdminUserAdmin(ClienteAdmin):
     # Campos que aparecen en la edición
     fieldsets = (
         (None, {'fields': ('email', 'username', 'password')}),
-        ('Estado', {'fields': ('is_active',)}),
     )
 
     # Campos que aparecen al crear un admin
@@ -212,19 +263,38 @@ class RolesAdmin(admin.ModelAdmin):
 @admin.register(Organizacion)
 class OrganizacionAdmin(admin.ModelAdmin):
 
-    list_display = ("organizacion_nombre", "usuario_organizacion", "fecha_registro")
-    search_fields = ("organizacion_nombre", "usuario_organizacion__username", "usuario_organizacion__email")
+    list_display = ("organizacion_nombre", "fecha_registro", "get_editores_count", "get_editores_list")
+    search_fields = ("organizacion_nombre",)
     list_filter = ("fecha_registro",)
     ordering = ("-id",)
-    list_select_related = ("usuario_organizacion",)
-    readonly_fields = ("fecha_registro",)
+    readonly_fields = ("fecha_registro", "api_key")
+    filter_horizontal = ("editores",)
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        # FILTRAR SOLO EDITORES
-        if db_field.name == "usuario_organizacion":
+    def get_editores_count(self, obj):
+        return obj.editores.count()
+    get_editores_count.short_description = "N° Editores"
+
+    def get_editores_list(self, obj):
+        editores = obj.editores.all()[:3]
+        return ", ".join([editor.username for editor in editores])
+    get_editores_list.short_description = "Editores"
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "editores":
             kwargs["queryset"] = User.objects.filter(groups__name="editor")
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
+    # 👈 AGREGAR ESTE MÉTODO PARA MEJORES MENSAJES DE ERROR
+    def save_model(self, request, obj, form, change):
+        try:
+            super().save_model(request, obj, form, change)
+        except Exception as e:
+            from django.contrib import messages
+            if "duplicate key" in str(e) and "dominio" in str(e):
+                messages.error(request, f"Error: Ya existe una organización con el dominio '{obj.dominio}'. Por favor usa un dominio diferente.")
+            else:
+                messages.error(request, f"Error al guardar: {str(e)}")
+            raise
 
 # ===============================
 #   ADMIN CATEGORIA
@@ -285,3 +355,6 @@ class TestimoniosAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     get_usuario.short_description = "Usuario"
+
+
+admin.site.register(User)

@@ -10,7 +10,7 @@ router=routers.DefaultRouter()
 #Modelos
 router.register(r'visitantes', views.UsuarioVisitanteViewSet, basename='visitantes')   # endpoint para usuarios visitantes
 router.register(r'editores', views.EditorViewSet, basename='editores')  # endpoint para Editores
-router.register(r'administradores', AdminUserViewSet, basename='administrador')  # endpoint para usuarios administradores
+router.register(r'administradores', AdminUserViewSet, basename='administrador')  # endpoint para Usuarios Admins
 router.register(r'categorias', CategoriaViewSet, basename='categorias')
 router.register(r'organizacion', OrganizacionViewSet, basename='organizacion')
 router.register(r'testimonios', TestimonioViewSet, basename='testimonios')

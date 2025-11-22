@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group
 # Agrega estos imports al inicio del archivo
 from django.utils import timezone
 
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
@@ -28,7 +29,14 @@ class RefreshTokenSerializer(serializers.Serializer):
 
 
 class UsuarioVisitanteSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(
+        write_only=True,
+        min_length=8,  # 👈 Validación adicional
+        error_messages={
+            'min_length': 'La contraseña debe tener al menos 8 caracteres.'
+        }
+    )
+
     class Meta:
         model = User
 
@@ -67,7 +75,13 @@ class UsuarioVisitanteSerializer(serializers.ModelSerializer):
         return user
     
 class EditorSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(
+        write_only=True,
+        min_length=8,  # 👈 Validación adicional
+        error_messages={
+            'min_length': 'La contraseña debe tener al menos 8 caracteres.'
+        }
+    )
     
     class Meta:
         model = User
@@ -143,21 +157,20 @@ class AdminUserSerializer(serializers.ModelSerializer):
         return user
        
 class OrganizacionSerializer(serializers.ModelSerializer):
-    usuario_organizacion = serializers.CharField(source='usuario_organizacion.email', read_only=True)
     editores = serializers.PrimaryKeyRelatedField(
         many=True, 
-        queryset=User.objects.filter(groups__name='Editor'), 
-        required=False
+        queryset=User.objects.filter(groups__name='editor'), 
+        required=False,
+        write_only=True
     )
-    editores_emails = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Organizacion
         fields = [
-            'id', 'usuario_organizacion', 'organizacion_nombre', 
-            'dominio', 'api_key', 'fecha_registro', 'editores', 'editores_emails'
+            'id', 'organizacion_nombre', 
+            'dominio', 'api_key', 'editores',
         ]
-        read_only_fields = ['fecha_registro', 'usuario_organizacion', 'api_key']
+        read_only_fields = ['fecha_registro']
 
     def get_editores_emails(self, obj):
         return [editor.email for editor in obj.editores.all()]
@@ -179,67 +192,69 @@ class OrganizacionSerializer(serializers.ModelSerializer):
                 "organizacion_nombre": "Ya existe una organización con este nombre."
             })
         
-        return data
-
-    def create(self, validated_data):
-        editores_data = validated_data.pop('editores', [])
-        validated_data['usuario_organizacion'] = self.context['request'].user
-        organizacion = super().create(validated_data)
-        
-        # Agregar editores si se proporcionaron
-        organizacion.editores.set(editores_data)
-        return organizacion
-
-    def update(self, instance, validated_data):
-        editores_data = validated_data.pop('editores', None)
-        organizacion = super().update(instance, validated_data)
-        
-        # Actualizar editores si se proporcionaron
-        if editores_data is not None:
-            organizacion.editores.set(editores_data)
-        
-        return organizacion
-
-# Serializador para usuarios staff (muestra toda la información)
-class OrganizacionSerializerStaff(serializers.ModelSerializer):
-    usuario_organizacion = serializers.CharField(source='usuario_organizacion.email', read_only=True)
-
-    class Meta:
-        model = Organizacion
-        fields = ['id', 'usuario_organizacion', 'organizacion_nombre','dominio', 'api_key', 'fecha_registro']
-        read_only_fields = ['fecha_registro', 'usuario_organizacion']
-
-    def validate(self, data):
-        model_fields = {field.name for field in Organizacion._meta.get_fields()}
-        extra_fields = set(self.initial_data.keys()) - model_fields
-        
-        if extra_fields:
-            raise serializers.ValidationError(
-                f"Campos no permitidos: {', '.join(extra_fields)}. "
-                f"Campos válidos: {', '.join(model_fields)}"
-            )
-        
-        # Validar que el nombre de organización sea único
-        organizacion_nombre = data.get('organizacion_nombre')
-        if organizacion_nombre and Organizacion.objects.filter(organizacion_nombre=organizacion_nombre).exists():
+        # Validar que el dominio sea único
+        dominio = data.get('dominio')
+        if dominio and Organizacion.objects.filter(dominio=dominio).exists():
             raise serializers.ValidationError({
-                "organizacion_nombre": "Ya existe una organización con este nombre."
+                "dominio": "Ya existe una organización con este dominio."
             })
         
         return data
 
     def create(self, validated_data):
-        # Asigna automáticamente el usuario actual al crear
-        validated_data['usuario_organizacion'] = self.context['request'].user
-        validated_data['fecha_registro'] = timezone.now()
-        return super().create(validated_data)
+        editores_data = validated_data.pop('editores', [])
+        organizacion = Organizacion.objects.create(**validated_data)
+        
+        # Agregar editores si se proporcionaron
+        if editores_data:
+            organizacion.editores.set(editores_data)
+        
+        return organizacion
 
-# Serializador para usuarios públicos (oculta usuario_organizacion)
+    def update(self, instance, validated_data):
+        editores_data = validated_data.pop('editores', None)
+        
+        # Actualizar campos normales
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        
+        # Actualizar editores si se proporcionaron
+        if editores_data is not None:
+            instance.editores.set(editores_data)
+        
+        return instance
+
+# Serializador para usuarios staff (muestra toda la información)
+class OrganizacionSerializerStaff(OrganizacionSerializer):
+    editores = serializers.SerializerMethodField(read_only=True)
+    
+    class Meta(OrganizacionSerializer.Meta):
+        fields = OrganizacionSerializer.Meta.fields + ['editores', 'api_key']
+
+    def get_editores(self, obj):
+        return [
+            {
+                'id': editor.id,
+                'email': editor.email,
+                'username': editor.username
+            } for editor in obj.editores.all()
+        ]
+
+# Serializador para usuarios públicos (oculta información sensible)
 class OrganizacionSerializerPublico(serializers.ModelSerializer):
     class Meta:
         model = Organizacion
-        fields = ['id', 'organizacion_nombre', 'dominio',  'fecha_registro']
-        read_only_fields = ['fecha_registro']
+        fields = ['id', 'organizacion_nombre', 'dominio']  # 👈 Solo estos campos
+        # read_only_fields no es necesario ya que todos son de solo lectura
+
+    def to_representation(self, instance):
+        """
+        Asegurar que solo se muestren los campos públicos
+        """
+        data = super().to_representation(instance)
+        # No necesitas personalizar más porque el Meta.fields ya limita los campos
+        return data
 
     def validate(self, data):
         model_fields = {field.name for field in Organizacion._meta.get_fields()}
@@ -252,6 +267,33 @@ class OrganizacionSerializerPublico(serializers.ModelSerializer):
             )
         
         return data
+
+class AgregarEditoresSerializer(serializers.Serializer):
+    editores = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=True,
+        help_text="Lista de IDs de usuarios editores a agregar. Ejemplo: [8, 9]"
+    )
+    
+    def validate_editores(self, value):
+        """Validar que los IDs correspondan a usuarios editores existentes"""
+        if not value:
+            raise serializers.ValidationError("La lista de editores no puede estar vacía.")
+        
+        # Verificar que todos los usuarios existan y sean editores
+        usuarios_existentes = User.objects.filter(
+            id__in=value, 
+            groups__name='editor'
+        ).values_list('id', flat=True)
+        
+        usuarios_inexistentes = set(value) - set(usuarios_existentes)
+        
+        if usuarios_inexistentes:
+            raise serializers.ValidationError(
+                f"Los siguientes IDs no corresponden a usuarios editores válidos: {list(usuarios_inexistentes)}"
+            )
+        
+        return value
 
 ##Este es la respuesta que se va a mostrar de los endpoints aprobados cuando una persona quiere visualizar los testimonios de 
 ##una organizacion en especifico
@@ -425,7 +467,6 @@ class CambiarEstadoTestimonioSerializer(serializers.ModelSerializer):
         return value
     
 class OrganizacionConTestimoniosSerializer(serializers.ModelSerializer):
-    usuario_organizacion = serializers.CharField(source='usuario_organizacion.email', read_only=True)
     testimonios_aprobados = serializers.SerializerMethodField()
     total_testimonios_aprobados = serializers.ReadOnlyField()
     promedio_ranking = serializers.ReadOnlyField()
@@ -433,10 +474,10 @@ class OrganizacionConTestimoniosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organizacion
         fields = [
-            'id', 'usuario_organizacion', 'organizacion_nombre', 'fecha_registro',
+            'id', 'organizacion_nombre', 'fecha_registro',
             'testimonios_aprobados', 'total_testimonios_aprobados', 'promedio_ranking'
         ]
-        read_only_fields = ['fecha_registro', 'usuario_organizacion']
+        read_only_fields = ['fecha_registro']
 
     def get_testimonios_aprobados(self, obj):
         """Obtener solo testimonios aprobados de esta organización"""

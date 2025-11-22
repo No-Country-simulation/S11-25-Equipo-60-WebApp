@@ -38,6 +38,20 @@ class User(AbstractUser):
         verbose_name_plural = 'Usuarios'
         ordering = ['-date_joined']
 
+    def clean(self):
+        super().clean()
+        
+        # ✅ validar grupos si el usuario ya tiene ID, es decir ya existentes
+        if self.pk and self.groups.count() > 1:
+            raise ValidationError({
+                'groups': 'El usuario solo puede pertenecer a un grupo.'
+            })
+
+    def save(self, *args, **kwargs):
+        # Asegurar validación al guardar
+        self.clean()
+        super().save(*args, **kwargs)
+
 #Para dividir los usuarios en el admin de Django en dos secciones (visitantes y editores), 
 #necesito crear modelos proxy y configurar el admin apropiadamente
 
@@ -64,10 +78,9 @@ class AdminUser(User):
 
 
 class Organizacion(models.Model):
-    usuario_organizacion = models.ForeignKey(User, on_delete=models.CASCADE, related_name='usuario_organizacion')
-    editores = models.ManyToManyField(User, related_name='organizaciones_editables', blank=True)
-    dominio = models.CharField(max_length=50, blank=False, unique=True)
     organizacion_nombre = models.CharField(max_length=50, blank=False, unique=True)
+    dominio = models.CharField(max_length=50, blank=False, unique=True)
+    editores = models.ManyToManyField(User, related_name='organizaciones_editables', blank=True)
     api_key = models.CharField(max_length=50, blank=True, null=True) ##SE DEBE CREAR AUTOMATICAMENTE
     fecha_registro = models.DateTimeField(auto_now_add=True)  # ✅ Fecha automática
 

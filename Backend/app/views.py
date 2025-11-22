@@ -5,7 +5,7 @@ from app.models import *
 # JWT
 from rest_framework.permissions import IsAuthenticated, AllowAny
 #DRF SPECTACULAR
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiExample, OpenApiResponse
 from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
@@ -340,7 +340,7 @@ class EditorViewSet(viewsets.ModelViewSet):
         
         return super().destroy(request, *args, **kwargs)
 
-###############################USUARIOS ADMINISTRADORES    
+###############################Usuarios Admins    
 @extend_schema_view(
     list=extend_schema(tags=['Administradores'],
         description="Listar todos los administradores. Solo accesible por administradores."),
@@ -356,7 +356,7 @@ class EditorViewSet(viewsets.ModelViewSet):
 )
 class AdminUserViewSet(viewsets.ModelViewSet):
     """
-    ViewSet para crear y gestionar usuarios administradores.
+    ViewSet para crear y gestionar Usuarios Admins.
     - Crear: Solo administradores pueden crear otros administradores
     - Listar/Ver: Solo administradores pueden ver otros administradores  
     - Editar: Solo puede editar su propia información
@@ -452,7 +452,21 @@ class AdminUserViewSet(viewsets.ModelViewSet):
 @extend_schema_view(
     list=extend_schema(tags=['Organizaciones']),
     retrieve=extend_schema(tags=['Organizaciones']),
-    create=extend_schema(tags=['Organizaciones']),
+    create=extend_schema(
+        tags=['Organizaciones'],
+        examples=[
+            OpenApiExample(
+                'Ejemplo crear organización',
+                value={
+                    "organizacion_nombre": "Mi Empresa",
+                    "dominio": "miempresa.com",
+                    "editores": [1, 2, 3]
+                },
+                request_only=True,
+                response_only=False
+            )
+        ]
+    ),
     update=extend_schema(exclude=True),
     partial_update=extend_schema(tags=['Organizaciones']),
     destroy=extend_schema(tags=['Organizaciones']),
@@ -467,15 +481,10 @@ class OrganizacionViewSet(viewsets.ModelViewSet):
         if user.is_staff:
             return Organizacion.objects.all()
         
-        # Editores ven las organizaciones donde son editores
-        elif user.is_authenticated:
-            return Organizacion.objects.filter(
-                models.Q(editores=user) | 
-                models.Q(usuario_organizacion=user)
-            ).distinct()
         
-        # Público solo puede listar (sin filtros específicos)
-        return Organizacion.objects.all()
+        # Visitantes autenticados y no autenticados ven TODAS las organizaciones (info pública)
+        else:
+            return Organizacion.objects.all()
 
     def get_permissions(self):
         # Permitir list y retrieve sin autenticación (público)
@@ -486,11 +495,13 @@ class OrganizacionViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]
 
     def get_serializer_class(self):
-        # Usar serializador diferente según el tipo de usuario
-        if self.request.user.is_staff:
+        user = self.request.user
+        
+        # SOLO staff ve toda la información
+        if user.is_staff:
             return OrganizacionSerializerStaff
-        elif self.request.user.is_authenticated:
-            return OrganizacionSerializer
+        
+        # CUALQUIER otro usuario (editor, visitante, no autenticado) ve información pública
         else:
             return OrganizacionSerializerPublico
 
@@ -511,6 +522,8 @@ class OrganizacionViewSet(viewsets.ModelViewSet):
             )
         
         return super().create(request, *args, **kwargs)
+
+    # ... el resto de tus métodos permanecen igual ...
 
     def update(self, request, *args, **kwargs):
         if not kwargs.get('partial', False):
@@ -543,6 +556,101 @@ class OrganizacionViewSet(viewsets.ModelViewSet):
         
         return super().destroy(request, *args, **kwargs)
     
+    # Endpoint 1: Listar organizaciones del editor (con información completa)
+    @extend_schema(
+        tags=['Organizaciones'],
+        description="Listar todas las organizaciones a las que pertenece el editor actual (solo para usuarios con rol editor)",
+        responses={200: OrganizacionSerializerStaff(many=True)}
+    )
+    @action(detail=False, methods=['get'], url_path='mis-organizaciones', permission_classes=[IsAuthenticated])
+    def mis_organizaciones(self, request):
+        """
+        Endpoint para que un editor liste todas las organizaciones a las que pertenece
+        """
+        user = request.user
+        
+        # Verificar que el usuario sea editor
+        if not user.groups.filter(name='editor').exists():
+            return Response(
+                {"detail": "No tienes permisos para acceder a este endpoint. Solo los editores pueden ver sus organizaciones."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Obtener organizaciones donde el usuario es editor
+        organizaciones = Organizacion.objects.filter(editores=user).distinct()
+        
+        # Serializar con el serializador staff para mostrar información completa
+        serializer = OrganizacionSerializerStaff(organizaciones, many=True, context={'request': request})
+        
+        return Response(serializer.data)
+
+    # Endpoint 2: Agregar editores a una organización
+    @extend_schema(
+        tags=['Organizaciones'],
+        description="Agregar editores a una organización específica (solo para editores de esa organización)",
+        request=AgregarEditoresSerializer,
+        responses={
+            200: OpenApiResponse(description="Editores agregados exitosamente"),
+            403: OpenApiResponse(description="No tienes permisos para modificar esta organización"),
+            404: OpenApiResponse(description="Organización no encontrada")
+        }
+    )
+    @action(detail=True, methods=['post'], url_path='agregar-editores', permission_classes=[IsAuthenticated])
+    def agregar_editores(self, request, pk=None):
+        """
+        Endpoint para que un editor agregue otros editores a una organización
+        """
+        organizacion = self.get_object()
+        user = request.user
+        
+        # Verificar permisos: el usuario debe ser editor de esta organización
+        if not (user.is_staff or organizacion.editores.filter(id=user.id).exists()):
+            return Response(
+                {"detail": "No tienes permisos para modificar esta organización. Solo los editores de la organización pueden agregar otros editores."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Validar que el usuario sea editor (no staff intentando usar este endpoint)
+        if not user.groups.filter(name='editor').exists() and not user.is_staff:
+            return Response(
+                {"detail": "Solo los editores pueden usar este endpoint."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        serializer = AgregarEditoresSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        editores_ids = serializer.validated_data['editores']
+        
+        # Obtener los usuarios editores
+        nuevos_editores = User.objects.filter(
+            id__in=editores_ids, 
+            groups__name='editor'
+        )
+        
+        # Agregar los editores a la organización (sin eliminar los existentes)
+        organizacion.editores.add(*nuevos_editores)
+        
+        # Obtener la lista actualizada de editores para la respuesta
+        editores_actuales = organizacion.editores.all()
+        editores_info = [
+            {
+                'id': editor.id,
+                'email': editor.email,
+                'username': editor.username
+            } for editor in editores_actuales
+        ]
+        
+        return Response({
+            "detail": "Editores agregados exitosamente",
+            "organizacion": {
+                "id": organizacion.id,
+                "nombre": organizacion.organizacion_nombre
+            },
+            "editores_actuales": editores_info,
+            "editores_agregados": editores_ids
+        }, status=status.HTTP_200_OK)
+    
     # Testimonios aprobados de una organización específica
     @extend_schema(
         tags=['Organizaciones'],
@@ -570,7 +678,6 @@ class OrganizacionViewSet(viewsets.ModelViewSet):
             'organizacion': {
                 'id': organizacion.id,
                 'nombre': organizacion.organizacion_nombre,
-                'usuario_organizacion': organizacion.usuario_organizacion.email
             },
             'testimonios_aprobados': serializer.data,
             'total_testimonios': testimonios_aprobados.count(),
@@ -740,8 +847,7 @@ class TestimonioViewSet(viewsets.ModelViewSet):
         puede_eliminar = (
             request.user.is_staff or 
             (testimonio.usuario_registrado and testimonio.usuario_registrado == request.user) or
-            (request.user.groups.filter(name='editor').exists() and 
-             testimonio.organizacion.usuario_organizacion == request.user)
+            (request.user.groups.filter(name='editor').exists())
         )
         
         if not puede_eliminar:
@@ -777,12 +883,6 @@ class TestimonioOrganizacionViewSet(viewsets.ReadOnlyModelViewSet):
         # Admin ve todos los testimonios
         if user.is_staff:
             return Testimonios.objects.all()
-        
-        # Editor ve SOLO los testimonios de SUS organizaciones (en cualquier estado)
-        if user.groups.filter(name='editor').exists():
-            return Testimonios.objects.filter(
-                organizacion__usuario_organizacion=user
-            )
         
         # Visitante ve SOLO SUS testimonios (en cualquier estado)
         if user.groups.filter(name='visitante').exists():
@@ -824,11 +924,6 @@ class TestimonioOrganizacionViewSet(viewsets.ReadOnlyModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        if user.groups.filter(name='editor').exists() and testimonio.organizacion.usuario_organizacion != user:
-            return Response(
-                {"detail": "No tienes permisos para ver este testimonio. Solo puedes ver testimonios de tus organizaciones."},
-                status=status.HTTP_403_FORBIDDEN
-            )
         
         return super().retrieve(request, *args, **kwargs)
 
@@ -850,14 +945,6 @@ class TestimonioOrganizacionViewSet(viewsets.ReadOnlyModelViewSet):
         if user.is_staff:
             # Admin ve estadísticas de todas las organizaciones
             organizaciones_stats = Organizacion.objects.annotate(
-                total_testimonios=models.Count('organizacion'),
-                aprobados=models.Count('organizacion', filter=models.Q(organizacion__estado='A')),
-                en_espera=models.Count('organizacion', filter=models.Q(organizacion__estado='E')),
-                rechazados=models.Count('organizacion', filter=models.Q(organizacion__estado='R'))
-            )
-        else:
-            # Editor ve solo sus organizaciones
-            organizaciones_stats = Organizacion.objects.filter(usuario_organizacion=user).annotate(
                 total_testimonios=models.Count('organizacion'),
                 aprobados=models.Count('organizacion', filter=models.Q(organizacion__estado='A')),
                 en_espera=models.Count('organizacion', filter=models.Q(organizacion__estado='E')),
@@ -911,10 +998,6 @@ class CambiarEstadoTestimonioViewSet(viewsets.ModelViewSet):
         
         # Verificar permisos de manera más estricta
         es_admin = user.is_staff
-        es_editor_con_permisos = (
-            user.groups.filter(name='editor').exists() and 
-            testimonio.organizacion.usuario_organizacion == user
-        )
         
         if not (es_admin or es_editor_con_permisos):
             return Response(
