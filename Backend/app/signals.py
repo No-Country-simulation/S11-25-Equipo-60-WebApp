@@ -1,10 +1,11 @@
 from django.db.models.signals import post_migrate, pre_delete, pre_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
-from django.contrib.auth import get_user_model
+from django.contrib.auth.management import create_permissions
 from .models import *
 from cloudinary import uploader
 
+#########   Crea los grupos editor y visitante por defecto
 @receiver(post_migrate)
 def create_default_groups(sender, **kwargs):
     """
@@ -18,8 +19,7 @@ def create_default_groups(sender, **kwargs):
     
     #print("✅ Grupos por defecto creados: admin, editor, visitante")
 
-# El decorador @receiver conecta la función 'delete_cloudinary_file'
-# a la señal 'pre_delete' del modelo 'Testimonios'.
+# Borra los archivos del storage de Cloudinary cuando el documento/data se borra
 @receiver(pre_delete, sender=Testimonios)
 def delete_cloudinary_file(sender, instance, **kwargs):
     """
@@ -57,7 +57,7 @@ def delete_cloudinary_file(sender, instance, **kwargs):
             # simplemente registra el error y permite que la eliminación del modelo continúe.
             print(f"⚠️ Error al eliminar archivo de Cloudinary: {e}")
 
-
+##Borra archivos antiguos como el documento/data actualiza unicamente su archivo
 @receiver(pre_save, sender=Testimonios)
 def delete_old_cloudinary_file(sender, instance, **kwargs):
     """
@@ -114,3 +114,10 @@ def delete_old_cloudinary_file(sender, instance, **kwargs):
             print(f"✅ Archivo Cloudinary antiguo eliminado al actualizar: {public_id}")
         except Exception as e:
             print(f"⚠️ Error al eliminar archivo Cloudinary antiguo en pre_save: {e}")
+
+def block_default_permissions(sender, **kwargs):
+    # Anula la función que crea permisos
+    pass
+
+# Desconectar la señal global
+post_migrate.disconnect(receiver=create_permissions, dispatch_uid="django.contrib.auth.management.create_permissions")

@@ -254,7 +254,33 @@ admin.site.unregister(DefaultGroup)
 class RolesAdmin(admin.ModelAdmin):
     list_display = ['name']
     search_fields = ['name']
-    filter_horizontal = ['permissions']
+    
+    # 👇 ESTAS SON LAS LÍNEAS CLAVE QUE NECESITAS AGREGAR/MODIFICAR
+    fields = ['name']  # Solo mostrar el campo 'name' en el formulario
+    exclude = ['permissions']  # Excluir completamente el campo permissions
+    
+    # Opcional: Si quieres usar filter_horizontal pero vacío
+    # filter_horizontal = []  # Esto mostrará interfaces vacías
+    
+    def get_form(self, request, obj=None, **kwargs):
+        """
+        Personalizar el formulario para ocultar completamente los permisos
+        """
+        form = super().get_form(request, obj, **kwargs)
+        
+        # Remover el campo permissions si existe en el formulario
+        if 'permissions' in form.base_fields:
+            del form.base_fields['permissions']
+            
+        return form
+    
+    def save_model(self, request, obj, form, change):
+        """
+        Guardar el modelo sin permisos
+        """
+        # Limpiar cualquier permiso que pudiera asignarse
+        obj.save()
+        obj.permissions.clear()  # Asegurar que no tenga permisos
 
 
 # ===============================

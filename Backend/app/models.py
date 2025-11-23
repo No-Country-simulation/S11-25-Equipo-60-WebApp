@@ -102,9 +102,9 @@ class Organizacion(models.Model):
 
 
 class Categoria(models.Model):
+    nombre_categoria = models.CharField(max_length=50, blank=False, unique=True)  ######Descripcion
     icono = models.CharField(max_length=50, blank=False, null=False)  
     color = models.CharField(max_length=50, blank=False, null=False)  
-    nombre_categoria = models.CharField(max_length=50, blank=False, unique=True)  ######Descripcion
     fecha_registro = models.DateTimeField(auto_now_add=True) 
 
     class Meta:
