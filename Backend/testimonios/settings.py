@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 from decouple import config, Csv
 from datetime import timedelta
 import os 
-
+import cloudinary
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'drf_spectacular', #django spectacular sirve como documentacion de swagger
     'corsheaders',
     'pwa',
+    'cloudinary', 
+    'cloudinary_storage',  
 ]
 
 MIDDLEWARE = [
@@ -224,6 +226,20 @@ DATABASES = {
     }
 }
 
+# Configuración de Cloudinary (agrega al final del archivo)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': config('CLOUDINARY_API_KEY'),
+    'API_SECRET': config('CLOUDINARY_API_SECRET'),
+}
+
+cloudinary.config(
+    cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
+    api_key=CLOUDINARY_STORAGE['API_KEY'],
+    api_secret=CLOUDINARY_STORAGE['API_SECRET']
+)
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 #DATABASES = {
 #    'default': {

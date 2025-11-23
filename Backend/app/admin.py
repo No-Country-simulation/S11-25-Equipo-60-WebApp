@@ -263,7 +263,7 @@ class RolesAdmin(admin.ModelAdmin):
 @admin.register(Organizacion)
 class OrganizacionAdmin(admin.ModelAdmin):
 
-    list_display = ("organizacion_nombre", "fecha_registro", "get_editores_count", "get_editores_list")
+    list_display = ("organizacion_nombre", "api_key", "get_editores_list")
     search_fields = ("organizacion_nombre",)
     list_filter = ("fecha_registro",)
     ordering = ("-id",)
@@ -320,7 +320,7 @@ class TestimoniosAdmin(admin.ModelAdmin):
         "get_usuario",
         "organizacion",
         "categoria",
-        "comentario_texto",
+        "comentario",
         "ranking",
         "estado",
         "fecha_comentario",
@@ -328,7 +328,7 @@ class TestimoniosAdmin(admin.ModelAdmin):
 
     list_filter = ("estado", "categoria", "organizacion")
     search_fields = (
-        "comentario_texto",
+        "comentario",
         "usuario_registrado__username",
         "usuario_anonimo_username",
         "organizacion__organizacion_nombre",
@@ -357,4 +357,4 @@ class TestimoniosAdmin(admin.ModelAdmin):
     get_usuario.short_description = "Usuario"
 
 
-admin.site.register(User)
+#admin.site.register(User)

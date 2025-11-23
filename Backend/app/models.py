@@ -6,6 +6,7 @@ from django.db.models import Q, F
 # models.py
 from django.contrib.auth.models import Group
 import uuid
+from cloudinary.models import CloudinaryField
 
 class Roles(Group):
     class Meta:
@@ -123,8 +124,15 @@ class Testimonios(models.Model):
     usuario_registrado = models.ForeignKey(User, on_delete=models.CASCADE, related_name='usuario_visitante', blank=True, null=True)
     usuario_anonimo_username = models.CharField(max_length=50, blank=True, null=True)
     usuario_anonimo_email = models.EmailField(blank=True, null=True) 
-    api_key = models.CharField(max_length=50, blank=True, null=True)
-    comentario_texto = models.CharField(max_length=100, blank=False, null=False)
+    api_key = models.CharField(max_length=50, blank=False, null=False)
+    comentario = models.CharField(max_length=100, blank=False, null=False)
+    archivo = CloudinaryField(
+        'archivo', 
+        folder='testimonios/archivos/',
+        resource_type='auto',  # Acepta cualquier tipo de archivo
+        blank=True, 
+        null=True
+    )
     fecha_comentario = models.DateTimeField(auto_now_add=True) 
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='categoria_testimonios', blank=False)
     ranking = models.DecimalField(default=0, max_digits=3, decimal_places=1)
@@ -158,7 +166,7 @@ class Testimonios(models.Model):
 
     def __str__(self):
         usuario = self.usuario_registrado.username if self.usuario_registrado else self.usuario_anonimo_username
-        return f"Testimonio de {usuario} para {self.organizacion.organizacion_nombre}"
+        return f"Testimonio del Usuario: {usuario} para la empresa: {self.organizacion.organizacion_nombre}"
 
     def clean(self):
         # Validación adicional a nivel de modelo
@@ -166,6 +174,7 @@ class Testimonios(models.Model):
             raise ValidationError(
                 "Para testimonios anónimos, tanto usuario_anonimo_username como usuario_anonimo_email son requeridos."
             )
+
         
 
     def save(self, *args, **kwargs):
@@ -173,7 +182,6 @@ class Testimonios(models.Model):
         if self.usuario_registrado:
             self.usuario_anonimo_username = None
             self.usuario_anonimo_email = None
-            self.api_key = None
         
         self.clean()
         super().save(*args, **kwargs)

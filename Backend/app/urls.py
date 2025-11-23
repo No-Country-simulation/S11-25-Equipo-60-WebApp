@@ -14,7 +14,7 @@ router.register(r'administradores', AdminUserViewSet, basename='administrador') 
 router.register(r'categorias', CategoriaViewSet, basename='categorias')
 router.register(r'organizacion', OrganizacionViewSet, basename='organizacion')
 router.register(r'testimonios', TestimonioViewSet, basename='testimonios')
-router.register(r'testimonios-organizacion', TestimonioOrganizacionViewSet, basename='testimonios-organizacion')
+router.register(r'testimonios-totales', TestimonioOrganizacionViewSet, basename='testimonios-totales')
 #La ruta de cambiar-estado-testimonio solamente puede ser usado por los editores de la organizacion a la que se le realizo el testimonio
 router.register(r'testimonios-cambiar-estado', CambiarEstadoTestimonioViewSet, basename='cambiar-estado-testimonio')
 

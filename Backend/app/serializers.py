@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group
 # Agrega estos imports al inicio del archivo
 from django.utils import timezone
 
+######################################33LOGIN
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -23,11 +24,11 @@ class LoginSerializer(serializers.Serializer):
         attrs['user'] = user
         return attrs
     
-# Nuevo serializador para el refresh token
+#################################3 TOKEN
 class RefreshTokenSerializer(serializers.Serializer):
     refresh = serializers.CharField()
 
-
+################################# USUARIOS VISITANTES
 class UsuarioVisitanteSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,
@@ -73,7 +74,8 @@ class UsuarioVisitanteSerializer(serializers.ModelSerializer):
         user.groups.add(grupo_visitante)
         
         return user
-    
+
+################################ USUARIOS EDITORES    
 class EditorSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,
@@ -116,7 +118,8 @@ class EditorSerializer(serializers.ModelSerializer):
         user.groups.add(grupo_editor)
         
         return user
-    
+
+########################### USUARIOS ADMINS    
 class AdminUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     
@@ -155,7 +158,35 @@ class AdminUserSerializer(serializers.ModelSerializer):
         # user.groups.clear()  # Opcional: limpiar grupos si es necesario
         
         return user
-       
+
+
+class CategoriaSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Categoria
+        fields = ['id', 'nombre_categoria', 'icono', 'color', 'fecha_registro']
+        read_only_fields = ['fecha_registro']
+
+    def validate(self, data):
+        model_fields = {field.name for field in Categoria._meta.get_fields()}
+        extra_fields = set(self.initial_data.keys()) - model_fields
+        
+        if extra_fields:
+            raise serializers.ValidationError(
+                f"Campos no permitidos: {', '.join(extra_fields)}. "
+                f"Campos válidos: {', '.join(model_fields)}"
+            )
+        
+        return data
+
+    def create(self, validated_data):
+        # Asigna automáticamente el usuario actual al crear
+        validated_data['fecha_registro'] = timezone.now()
+        return super().create(validated_data)
+
+
+
+################################## ORGANIZACION       
 class OrganizacionSerializer(serializers.ModelSerializer):
     editores = serializers.PrimaryKeyRelatedField(
         many=True, 
@@ -241,7 +272,7 @@ class OrganizacionSerializerStaff(OrganizacionSerializer):
             } for editor in obj.editores.all()
         ]
 
-# Serializador para usuarios públicos (oculta información sensible)
+# Serializador para usuarios públicos (oculta información sensible, solo muestra)
 class OrganizacionSerializerPublico(serializers.ModelSerializer):
     class Meta:
         model = Organizacion
@@ -267,7 +298,8 @@ class OrganizacionSerializerPublico(serializers.ModelSerializer):
             )
         
         return data
-
+    
+##########EDITORES A ORGANIZACIONES
 class AgregarEditoresSerializer(serializers.Serializer):
     editores = serializers.ListField(
         child=serializers.IntegerField(),
@@ -297,6 +329,7 @@ class AgregarEditoresSerializer(serializers.Serializer):
 
 ##Este es la respuesta que se va a mostrar de los endpoints aprobados cuando una persona quiere visualizar los testimonios de 
 ##una organizacion en especifico
+#####MUESTRA LOS TESTIMONIOS APROBADOS DE UNA ORGANIZACION ESPECIFICA
 class TestimonioAprobadoSerializer(serializers.ModelSerializer):
     usuario_registrado = serializers.StringRelatedField(read_only=True)
     categoria_nombre = serializers.CharField(source='categoria.nombre_categoria', read_only=True)
@@ -306,40 +339,22 @@ class TestimonioAprobadoSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'usuario_registrado', 'usuario_anonimo_email', 
             'usuario_anonimo_username', 'api_key', 'categoria', 
-            'categoria_nombre', 'comentario_texto', 'fecha_comentario', 
+            'categoria_nombre', 'comentario', 'fecha_comentario', 
             'ranking'
         ]
         # 👆 Excluimos: 'organizacion', 'organizacion_nombre', 'estado'
 
-class CategoriaSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = Categoria
-        fields = ['id', 'nombre_categoria', 'icono', 'color', 'fecha_registro']
-        read_only_fields = ['fecha_registro']
 
-    def validate(self, data):
-        model_fields = {field.name for field in Categoria._meta.get_fields()}
-        extra_fields = set(self.initial_data.keys()) - model_fields
-        
-        if extra_fields:
-            raise serializers.ValidationError(
-                f"Campos no permitidos: {', '.join(extra_fields)}. "
-                f"Campos válidos: {', '.join(model_fields)}"
-            )
-        
-        return data
+#######################ACA EMPIEZA LOS TESTIMONIOS COMO TAL
 
-    def create(self, validated_data):
-        # Asigna automáticamente el usuario actual al crear
-        validated_data['fecha_registro'] = timezone.now()
-        return super().create(validated_data)
 
 
 class TestimonioSerializer(serializers.ModelSerializer):
     usuario_registrado = serializers.StringRelatedField(read_only=True)
     organizacion_nombre = serializers.CharField(source='organizacion.organizacion_nombre', read_only=True)
     categoria_nombre = serializers.CharField(source='categoria.nombre_categoria', read_only=True)
+    archivo = serializers.FileField(required=False, allow_null=True)
 
     # Definir el ranking con validación de rango
     ranking = serializers.DecimalField(
@@ -360,12 +375,33 @@ class TestimonioSerializer(serializers.ModelSerializer):
     usuario_anonimo_email = serializers.EmailField(required=False, allow_blank=True, allow_null=True) 
     api_key = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
+    def validate_archivo(self, file):
+        """
+        Valida que el archivo no exceda los 5MB y que no se suba más de 1 archivo.
+        """
+        # 1. Validación de tamaño (Límite: 5 MB = 5 * 1024 * 1024 bytes)
+        MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 Megabytes
+        
+        if file:
+            # Dado que DRF solo envía un archivo por campo de tipo FileField,
+            # el límite de "más de 1 archivo" ya está cubierto por el diseño
+            # del modelo y serializador, pero validamos que no sea excesivo.
+
+            if file.size > MAX_FILE_SIZE:
+                # El archivo.size está en bytes
+                raise serializers.ValidationError(
+                    f"El tamaño del archivo no puede exceder los {MAX_FILE_SIZE / (1024*1024):.0f}MB."
+                )
+        
+        # Si todo es correcto, devuelve el archivo.
+        return file
+
     class Meta:
         model = Testimonios
         fields = [
             'id', 'organizacion', 'organizacion_nombre',  'usuario_registrado',  'usuario_anonimo_email', 
             'usuario_anonimo_username', 
-            'api_key', 'categoria',  'categoria_nombre', 'comentario_texto', 'fecha_comentario', 
+            'api_key', 'categoria',  'categoria_nombre', 'comentario', 'archivo', 'fecha_comentario', 
             'ranking', 'estado'
         ]
         read_only_fields = ['usuario_registrado', 'fecha_comentario', 'organizacion_nombre', 'categoria_nombre', 'estado']
@@ -392,6 +428,30 @@ class TestimonioSerializer(serializers.ModelSerializer):
         organizacion = data.get('organizacion')
         usuario_anonimo_username = data.get('usuario_anonimo_username')
         usuario_anonimo_email = data.get('usuario_anonimo_email')
+        api_key = data.get('api_key')
+
+        # 👇 DIFERENCIAR ENTRE CREACIÓN Y ACTUALIZACIÓN
+        # Si es una actualización (PATCH/PUT) y la instancia ya existe
+        if self.instance is not None:
+            # ES UNA ACTUALIZACIÓN - La API key no es requerida
+            # Pero si se proporciona una API key, validar que sea correcta
+            if api_key and organizacion:
+                if api_key != organizacion.api_key:
+                    raise serializers.ValidationError({
+                        "api_key": "La API key proporcionada no es válida para esta organización."
+                    })
+        else:
+            # ES UNA CREACIÓN - La API key es requerida
+            if not api_key:
+                raise serializers.ValidationError({
+                    "api_key": "La API key es requerida para crear un testimonio."
+                })
+
+            # Validar que la API key coincida con la organización SOLO para creación
+            if api_key != organizacion.api_key:
+                raise serializers.ValidationError({
+                    "api_key": "La API key proporcionada no es válida para esta organización."
+                })
 
         # Validaciones para usuarios autenticados
         if request and request.user.is_authenticated:
@@ -441,16 +501,27 @@ class TestimonioSerializer(serializers.ModelSerializer):
             validated_data['usuario_registrado'] = request.user
             validated_data['usuario_anonimo_username'] = None
             validated_data['usuario_anonimo_email'] = None  # 👈 Agrega esta línea
-            validated_data['api_key'] = None
         else:
             # Usuario no autenticado: asegurar que usuario_registrado sea None
             validated_data['usuario_registrado'] = None
-            # Si no se proporcionó api_key, establecerlo como None
-            if 'api_key' not in validated_data or not validated_data['api_key']:
-                validated_data['api_key'] = None
         
         # La fecha se establece automáticamente por auto_now_add=True
         return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        # Para actualizaciones, manejamos los campos específicos que pueden cambiar
+        # No modificamos usuario_registrado, usuario_anonimo_username, usuario_anonimo_email
+        # ya que estos están establecidos en la creación
+        
+        # Actualizar solo los campos permitidos
+        allowed_fields = ['organizacion', 'categoria', 'comentario', 'archivo', 'ranking']
+        
+        for field in allowed_fields:
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+        
+        instance.save()
+        return instance
     
 class CambiarEstadoTestimonioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -465,21 +536,3 @@ class CambiarEstadoTestimonioSerializer(serializers.ModelSerializer):
                 f"Estado no válido. Los estados permitidos son: {', '.join(estados_permitidos)}"
             )
         return value
-    
-class OrganizacionConTestimoniosSerializer(serializers.ModelSerializer):
-    testimonios_aprobados = serializers.SerializerMethodField()
-    total_testimonios_aprobados = serializers.ReadOnlyField()
-    promedio_ranking = serializers.ReadOnlyField()
-
-    class Meta:
-        model = Organizacion
-        fields = [
-            'id', 'organizacion_nombre', 'fecha_registro',
-            'testimonios_aprobados', 'total_testimonios_aprobados', 'promedio_ranking'
-        ]
-        read_only_fields = ['fecha_registro']
-
-    def get_testimonios_aprobados(self, obj):
-        """Obtener solo testimonios aprobados de esta organización"""
-        testimonios_aprobados = obj.organizacion.filter(estado='A')
-        return TestimonioSerializer(testimonios_aprobados, many=True, context=self.context).data
