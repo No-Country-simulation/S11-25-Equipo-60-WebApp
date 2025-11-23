@@ -276,8 +276,8 @@ class OrganizacionSerializerStaff(OrganizacionSerializer):
 class OrganizacionSerializerPublico(serializers.ModelSerializer):
     class Meta:
         model = Organizacion
-        fields = ['id', 'organizacion_nombre', 'dominio']  # 👈 Solo estos campos
-        # read_only_fields no es necesario ya que todos son de solo lectura
+        fields = ['id', 'organizacion_nombre', 'dominio', 'api_key']  # 👈 Solo estos campos
+        read_only_fields = ['api_key']
 
     def to_representation(self, instance):
         """
