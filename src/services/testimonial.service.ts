@@ -22,16 +22,51 @@ export const testimonialService = {
     // Obtener testimonios creados por el visitante actual
     getMyTestimonials: async () => {
         try {
+            console.log('📞 Llamando GET /app/testimonios-totales/');
+            
+            // Verificar que hay token antes de hacer la petición
+            if (typeof window !== 'undefined') {
+                const storage = localStorage.getItem('auth-storage');
+                if (!storage) {
+                    throw new Error('No hay sesión activa. Por favor inicia sesión.');
+                }
+                const { state } = JSON.parse(storage);
+                if (!state?.token) {
+                    throw new Error('No hay token de autenticación. Por favor inicia sesión.');
+                }
+                if (!state?.user) {
+                    throw new Error('No hay datos de usuario. Por favor inicia sesión nuevamente.');
+                }
+                console.log('🔐 Usuario logueado:', {
+                    id: state.user.id,
+                    email: state.user.email,
+                    role: state.user.role
+                });
+            }
+            
             const response = await api.get('/app/testimonios-totales/');
+            console.log('✅ Testimonios obtenidos:', response.data.length, 'testimonios');
             return response.data;
         } catch (error: any) {
-            // Si es 401, significa que el backend tiene un problema de permisos para este endpoint
-            // Logueamos el error y lo relanzamos
+            // Si es 401, el backend rechaza el token por permisos
             if (error.response?.status === 401) {
-                console.error('⚠️ [Service] Backend rechazó el token (401) en /app/testimonios-totales/');
-                console.error('⚠️ [Service] Esto es un error de permisos del backend. El usuario está autenticado pero el endpoint rechaza el acceso.');
-                throw error; // Relanzamos el error para que la UI pueda manejarlo
+                console.error('❌ [401 Unauthorized] El backend rechazó el acceso');
+                console.error('📋 Posibles causas:');
+                console.error('   1. El usuario no tiene el rol correcto en el backend');
+                console.error('   2. El token expiró (verifica que el backend esté generando tokens con tiempo suficiente)');
+                console.error('   3. El backend tiene un bug en los permisos del endpoint');
+                console.error('   4. Necesitas cerrar sesión y volver a iniciar sesión');
+                console.error('');
+                console.error('💡 Solución sugerida:');
+                console.error('   - Cierra sesión (botón en el dashboard)');
+                console.error('   - Vuelve a iniciar sesión');
+                console.error('   - Si persiste, contacta al equipo de backend');
+                
+                throw new Error('No tienes permisos para acceder a tus testimonios. Por favor cierra sesión y vuelve a iniciar sesión. Si el problema persiste, contacta al administrador.');
             }
+            
+            // Para otros errores
+            console.error('❌ Error obteniendo testimonios:', error.message);
             throw error;
         }
     },
@@ -99,6 +134,18 @@ export const testimonialService = {
     // Obtener todos los testimonios públicos (aprobados)
     getPublicTestimonials: async () => {
         const response = await api.get('/app/testimonios/');
+        return response.data;
+    },
+
+    // Cambiar estado de un testimonio (solo editor de la organización)
+    changeTestimonialStatus: async (id: number, estado: 'E' | 'A' | 'R' | 'P' | 'B' | 'O') => {
+        const response = await api.patch(`/app/testimonios-cambiar-estado/${id}/`, { estado });
+        return response.data;
+    },
+
+    // Obtener estadísticas de testimonios (solo editores)
+    getStatistics: async () => {
+        const response = await api.get('/app/testimonios-totales/estadisticas/');
         return response.data;
     },
 };

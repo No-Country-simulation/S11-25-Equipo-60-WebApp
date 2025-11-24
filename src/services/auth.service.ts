@@ -28,36 +28,47 @@ export const authService = {
 
     // Obtener datos del usuario y detectar su rol
     getUserData: async (userId: number, token: string): Promise<UserData> => {
-        // Configurar headers con el token para estas peticiones
+        // Configurar headers con el token JWT para estas peticiones
         const config = {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `JWT ${token}` // Backend requiere prefijo "JWT", no "Bearer"
             }
         };
 
-        console.log('🔑 Enviando petición con token:', token.substring(0, 20) + '...');
-        console.log('📋 Config headers:', config);
+        console.log('🔑 Detectando rol del usuario ID:', userId);
 
-        // Intentar obtener datos como visitante
+        // Intentar obtener datos como visitante primero (el más común)
         try {
             const response = await api.get(`/app/visitantes/${userId}/`, config);
+            console.log('✅ Usuario detectado como VISITANTE');
             return { ...response.data, role: 'visitante' as const };
-        } catch (error: any) {
-            // Si falla, intentar como editor
-            if (error.response?.status === 403 || error.response?.status === 404) {
+        } catch (visitanteError: any) {
+            console.log('❌ No es visitante, intentando editor...');
+            
+            // Si falla (403 o 404), intentar como editor
+            if (visitanteError.response?.status === 403 || visitanteError.response?.status === 404) {
                 try {
                     const response = await api.get(`/app/editores/${userId}/`, config);
+                    console.log('✅ Usuario detectado como EDITOR');
                     return { ...response.data, role: 'editor' as const };
                 } catch (editorError: any) {
-                    // Si falla, intentar como admin
+                    console.log('❌ No es editor, intentando admin...');
+                    
+                    // Si falla (403 o 404), intentar como admin
                     if (editorError.response?.status === 403 || editorError.response?.status === 404) {
-                        const response = await api.get(`/app/administradores/${userId}/`, config);
-                        return { ...response.data, role: 'admin' as const };
+                        try {
+                            const response = await api.get(`/app/administradores/${userId}/`, config);
+                            console.log('✅ Usuario detectado como ADMIN');
+                            return { ...response.data, role: 'admin' as const };
+                        } catch (adminError: any) {
+                            console.error('❌ No se pudo determinar el rol del usuario');
+                            throw new Error('No se pudo obtener información del usuario. El usuario no existe en ningún endpoint.');
+                        }
                     }
                     throw editorError;
                 }
             }
-            throw error;
+            throw visitanteError;
         }
     }
 };

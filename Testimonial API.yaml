@@ -1,0 +1,1400 @@
+openapi: 3.0.3
+info:
+  title: Testimonial API
+  version: 1.0.0
+  description: API REST utilizada como Backend para la plataforma Testimonial
+  contact:
+    name: Testimonial
+    email: support@testimonial-cms.com
+    url: https://testimonial-cms.vercel.app/prueba
+paths:
+  /app/administradores/:
+    get:
+      operationId: administradores_list
+      description: Listar todos los administradores. Solo accesible por administradores.
+      tags:
+      - Administradores
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminUser'
+          description: ''
+    post:
+      operationId: administradores_create
+      description: Crear un nuevo administrador. Solo accesible por administradores.
+      tags:
+      - Administradores
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminUser'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUser'
+          description: ''
+  /app/administradores/{id}/:
+    get:
+      operationId: administradores_retrieve
+      description: Obtener un administrador específico. Solo accesible por administradores.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Administradores
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUser'
+          description: ''
+    patch:
+      operationId: administradores_partial_update
+      description: Actualizar información de administrador. SOLO un administrador
+        puede editar su propia información.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Administradores
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUser'
+          description: ''
+    delete:
+      operationId: administradores_destroy
+      description: Eliminar administrador. SOLO un administrador puede eliminar su
+        propia cuenta.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Administradores
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /app/categorias/:
+    get:
+      operationId: categorias_list
+      tags:
+      - Categorias
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Categoria'
+          description: ''
+    post:
+      operationId: categorias_create
+      description: Solo el admin crea categorias, para que los usuarios no se vuelvan
+        locos creando categorias
+      tags:
+      - Categorias
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+          description: ''
+  /app/categorias/{id}/:
+    get:
+      operationId: categorias_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Categoria.
+        required: true
+      tags:
+      - Categorias
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+          description: ''
+    patch:
+      operationId: categorias_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Categoria.
+        required: true
+      tags:
+      - Categorias
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoria'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoria'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoria'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+          description: ''
+    delete:
+      operationId: categorias_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Categoria.
+        required: true
+      tags:
+      - Categorias
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /app/editores/:
+    get:
+      operationId: editores_list
+      tags:
+      - Editores
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Editor'
+          description: ''
+  /app/editores/{id}/:
+    get:
+      operationId: editores_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Editores
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Editor'
+          description: ''
+    patch:
+      operationId: editores_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Editores
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEditor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEditor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEditor'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Editor'
+          description: ''
+    delete:
+      operationId: editores_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Editores
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /app/login/:
+    post:
+      operationId: login_create
+      tags:
+      - Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: ''
+  /app/organizacion/:
+    get:
+      operationId: organizacion_list
+      description: Lista de todas las organizaciones
+      tags:
+      - Organizaciones
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrganizacionSerializerPublico'
+          description: ''
+    post:
+      operationId: organizacion_create
+      tags:
+      - Organizaciones
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizacionSerializerPublico'
+            examples:
+              EjemploCrearOrganización:
+                value:
+                  organizacion_nombre: Mi Empresa
+                  dominio: miempresa.com
+                  editores:
+                  - 1
+                  - 2
+                  - 3
+                summary: Ejemplo crear organización
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrganizacionSerializerPublico'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrganizacionSerializerPublico'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizacionSerializerPublico'
+          description: ''
+  /app/organizacion/{id}/:
+    get:
+      operationId: organizacion_retrieve
+      description: Lista de una organizacion en especifico
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Organizacion.
+        required: true
+      tags:
+      - Organizaciones
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizacionSerializerPublico'
+          description: ''
+    patch:
+      operationId: organizacion_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Organizacion.
+        required: true
+      tags:
+      - Organizaciones
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOrganizacionSerializerPublico'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOrganizacionSerializerPublico'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOrganizacionSerializerPublico'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizacionSerializerPublico'
+          description: ''
+    delete:
+      operationId: organizacion_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Organizacion.
+        required: true
+      tags:
+      - Organizaciones
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /app/organizacion/{id}/agregar-editores/:
+    post:
+      operationId: organizacion_agregar_editores_create
+      description: Este endpoint es para que un editor pueda agregar otros editores
+        a su organización(Ejemplo, el editor de microsoft solo puede agregar otros
+        editores a microsoft)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Organizacion.
+        required: true
+      tags:
+      - Organizaciones
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgregarEditores'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgregarEditores'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgregarEditores'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: Editores agregados exitosamente
+        '403':
+          description: No tienes permisos para modificar esta organización
+        '404':
+          description: Organización no encontrada
+  /app/organizacion/{id}/testimonios-aprobados/:
+    get:
+      operationId: organizacion_testimonios_aprobados_list
+      description: Obtener todos los testimonios APROBADOS de una organización específica(Obviamente
+        todos los que la organizacion aprobo que son los que quiere mostrar al publico).
+        Este endpoint es público.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Organizacion.
+        required: true
+      tags:
+      - Organizaciones
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TestimonioAprobado'
+          description: ''
+  /app/organizacion/editores/:
+    get:
+      operationId: organizacion_editores_list
+      description: Listar todas las organizaciones a las que pertenece el editor actual
+        (solo para usuarios con rol editor)
+      tags:
+      - Organizaciones
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrganizacionSerializerStaff'
+          description: ''
+  /app/testimonios/:
+    get:
+      operationId: testimonios_list
+      description: Este metodo GET permite listar todas los Testimonios APROBADOS
+        de TODAS las EMPRESAS y es LIBRE, todos los usuarios logeados y no logeados
+        pueden visualizarlo
+      tags:
+      - Testimonios
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Testimonio'
+          description: ''
+    post:
+      operationId: testimonios_create
+      description: Este metodo POST permite crear Testimonios, todos son creados por
+        defecto con el estado E(en espera de aprobacion), todos los usuarios logeados
+        y no logeados pueden usarlo. Los unicos que tienen prohibido realizar testimonios
+        son los usuarios con rol de editor, porque esos usuarios son considerados
+        una cuenta de una organizacion y no es considerado como un cliente
+      tags:
+      - Testimonios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Testimonio'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Testimonio'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Testimonio'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Testimonio'
+          description: ''
+  /app/testimonios-cambiar-estado/{id}/:
+    patch:
+      operationId: testimonios_cambiar_estado_partial_update
+      description: 'Este endpoint permite que el dueño de la organización cambie el
+        estado de los testimonios de SU organización (A: Aprobado, E: Espera, R: Rechazado)'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Testimonio.
+        required: true
+      tags:
+      - Testimonios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCambiarEstadoTestimonio'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCambiarEstadoTestimonio'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCambiarEstadoTestimonio'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CambiarEstadoTestimonio'
+          description: ''
+  /app/testimonios-totales/:
+    get:
+      operationId: testimonios_totales_list
+      description: |-
+        Este endpoint tiene doble funcionalidad:
+                - Para EDITORES: Muestra todos los testimonios de SUS organizaciones (sin importar estado)
+                - Para VISITANTES: Muestra todos los testimonios que HAN CREADO (sin importar estado)
+      tags:
+      - Testimonios
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Testimonio'
+          description: ''
+  /app/testimonios-totales/{id}/:
+    get:
+      operationId: testimonios_totales_retrieve
+      description: |-
+        Este endpoint tiene doble funcionalidad:
+                - Para EDITORES: Muestra testimonios específicos de SUS organizaciones
+                - Para VISITANTES: Muestra testimonios específicos que HAN CREADO
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Testimonio.
+        required: true
+      tags:
+      - Testimonios
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Testimonio'
+          description: ''
+  /app/testimonios-totales/estadisticas/:
+    get:
+      operationId: testimonios_totales_estadisticas_retrieve
+      description: Estadisticas de testimonios. Solamente puede ser usado por las
+        mismas organizaciones.
+      tags:
+      - Testimonios
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Testimonio'
+          description: ''
+  /app/testimonios/{id}/:
+    get:
+      operationId: testimonios_retrieve
+      description: Este metodo GET permite listar Testimonios especificos que han
+        sido APROBADOS de CUALQUIER EMPRESA y es LIBRE, todos los usuarios logeados
+        y no logeados pueden visualizarlo
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Testimonio.
+        required: true
+      tags:
+      - Testimonios
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Testimonio'
+          description: ''
+    patch:
+      operationId: testimonios_partial_update
+      description: Este metodo PATCH permite editar Testimonios, sin importar el estado
+        que tenga, solamente lo puede editar El usuario que creó el testimonio (usuario_registrado)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Testimonio.
+        required: true
+      tags:
+      - Testimonios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTestimonio'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTestimonio'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTestimonio'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Testimonio'
+          description: ''
+    delete:
+      operationId: testimonios_destroy
+      description: Este metodo DELETE permite eliminar Testimonios, sin importar el
+        estado que tenga, solamente lo puede borrar El usuario es el dueño del testimonio
+        (usuario_registrado) O El usuario que esta asociado a la organización
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Testimonio.
+        required: true
+      tags:
+      - Testimonios
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /app/token/refresh/:
+    post:
+      operationId: token_refresh_create
+      tags:
+      - Token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RefreshToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RefreshToken'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshToken'
+          description: ''
+  /app/visitantes/:
+    get:
+      operationId: visitantes_list
+      tags:
+      - Visitantes
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsuarioVisitante'
+          description: ''
+    post:
+      operationId: visitantes_create
+      tags:
+      - Visitantes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioVisitante'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsuarioVisitante'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioVisitante'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioVisitante'
+          description: ''
+  /app/visitantes/{id}/:
+    get:
+      operationId: visitantes_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Visitantes
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioVisitante'
+          description: ''
+    patch:
+      operationId: visitantes_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Visitantes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioVisitante'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioVisitante'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioVisitante'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioVisitante'
+          description: ''
+    delete:
+      operationId: visitantes_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Usuario.
+        required: true
+      tags:
+      - Visitantes
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    AdminUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de alta
+      required:
+      - date_joined
+      - email
+      - id
+      - password
+      - username
+    AgregarEditores:
+      type: object
+      properties:
+        editores:
+          type: array
+          items:
+            type: integer
+          description: 'Lista de IDs de usuarios editores a agregar. Ejemplo: [8,
+            9]'
+      required:
+      - editores
+    CambiarEstadoTestimonio:
+      type: object
+      properties:
+        estado:
+          $ref: '#/components/schemas/EstadoEnum'
+    Categoria:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre_categoria:
+          type: string
+          maxLength: 50
+        icono:
+          type: string
+          maxLength: 50
+        color:
+          type: string
+          maxLength: 50
+        fecha_registro:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - color
+      - fecha_registro
+      - icono
+      - id
+      - nombre_categoria
+    Editor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de alta
+      required:
+      - date_joined
+      - email
+      - id
+      - password
+      - username
+    EstadoEnum:
+      enum:
+      - E
+      - A
+      - R
+      - P
+      - B
+      - O
+      type: string
+      description: |-
+        * `E` - ESPERA
+        * `A` - APROBADO
+        * `R` - RECHAZADO
+        * `P` - PUBLICADO
+        * `B` - BORRADOR
+        * `O` - OCULTO
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    OrganizacionSerializerPublico:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organizacion_nombre:
+          type: string
+          maxLength: 50
+        dominio:
+          type: string
+          maxLength: 50
+        api_key:
+          type: string
+          readOnly: true
+          nullable: true
+      required:
+      - api_key
+      - dominio
+      - id
+      - organizacion_nombre
+    OrganizacionSerializerStaff:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organizacion_nombre:
+          type: string
+          maxLength: 50
+        dominio:
+          type: string
+          maxLength: 50
+        api_key:
+          type: string
+          nullable: true
+          maxLength: 50
+        editores:
+          type: string
+          readOnly: true
+      required:
+      - dominio
+      - editores
+      - id
+      - organizacion_nombre
+    PatchedAdminUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de alta
+    PatchedCambiarEstadoTestimonio:
+      type: object
+      properties:
+        estado:
+          $ref: '#/components/schemas/EstadoEnum'
+    PatchedCategoria:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre_categoria:
+          type: string
+          maxLength: 50
+        icono:
+          type: string
+          maxLength: 50
+        color:
+          type: string
+          maxLength: 50
+        fecha_registro:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedEditor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de alta
+    PatchedOrganizacionSerializerPublico:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organizacion_nombre:
+          type: string
+          maxLength: 50
+        dominio:
+          type: string
+          maxLength: 50
+        api_key:
+          type: string
+          readOnly: true
+          nullable: true
+    PatchedTestimonio:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organizacion:
+          type: integer
+        organizacion_nombre:
+          type: string
+          readOnly: true
+        usuario_registrado:
+          type: string
+          readOnly: true
+        usuario_anonimo_email:
+          type: string
+          format: email
+          nullable: true
+        usuario_anonimo_username:
+          type: string
+          nullable: true
+        api_key:
+          type: string
+          nullable: true
+        categoria:
+          type: integer
+        categoria_nombre:
+          type: string
+          readOnly: true
+        comentario:
+          type: string
+          maxLength: 100
+        archivo:
+          type: string
+          format: uri
+          nullable: true
+        fecha_comentario:
+          type: string
+          format: date-time
+          readOnly: true
+        ranking:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,1})?$
+        estado:
+          type: string
+          readOnly: true
+          default: E
+    PatchedUsuarioVisitante:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de alta
+    RefreshToken:
+      type: object
+      properties:
+        refresh:
+          type: string
+      required:
+      - refresh
+    Testimonio:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organizacion:
+          type: integer
+        organizacion_nombre:
+          type: string
+          readOnly: true
+        usuario_registrado:
+          type: string
+          readOnly: true
+        usuario_anonimo_email:
+          type: string
+          format: email
+          nullable: true
+        usuario_anonimo_username:
+          type: string
+          nullable: true
+        api_key:
+          type: string
+          nullable: true
+        categoria:
+          type: integer
+        categoria_nombre:
+          type: string
+          readOnly: true
+        comentario:
+          type: string
+          maxLength: 100
+        archivo:
+          type: string
+          format: uri
+          nullable: true
+        fecha_comentario:
+          type: string
+          format: date-time
+          readOnly: true
+        ranking:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,1})?$
+        estado:
+          type: string
+          readOnly: true
+          default: E
+      required:
+      - categoria
+      - categoria_nombre
+      - comentario
+      - estado
+      - fecha_comentario
+      - id
+      - organizacion
+      - organizacion_nombre
+      - ranking
+      - usuario_registrado
+    TestimonioAprobado:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        usuario_registrado:
+          type: string
+          readOnly: true
+        usuario_anonimo_email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        usuario_anonimo_username:
+          type: string
+          nullable: true
+          maxLength: 50
+        api_key:
+          type: string
+          maxLength: 50
+        categoria:
+          type: integer
+        categoria_nombre:
+          type: string
+          readOnly: true
+        comentario:
+          type: string
+          maxLength: 100
+        fecha_comentario:
+          type: string
+          format: date-time
+          readOnly: true
+        ranking:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,1})?$
+      required:
+      - api_key
+      - categoria
+      - categoria_nombre
+      - comentario
+      - fecha_comentario
+      - id
+      - usuario_registrado
+    UsuarioVisitante:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Fecha de alta
+      required:
+      - date_joined
+      - email
+      - id
+      - password
+      - username
+  securitySchemes:
+    jwtAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "JWT"
+tags:
+- name: Login
+  description: Operaciones de autenticación
+- name: Token
+  description: Operaciones relacionadas con los tokens JWT
+- name: Visitantes
+  description: Operaciones relacionadas con los Usuarios visitantes
+- name: Editores
+  description: Operaciones relacionadas con las Usuarios Editores
+- name: Administradores
+  description: Operaciones relacionadas con las Usuarios admins
+- name: Categorias
+  description: Operaciones relacionadas con las Categorias
+- name: Organizaciones
+  description: Operaciones relacionadas con las Organizaciones(Dominios)
+- name: Testimonios
+  description: Operaciones relacionadas con los Testimonios

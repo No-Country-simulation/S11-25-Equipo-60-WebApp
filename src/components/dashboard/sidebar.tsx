@@ -31,43 +31,49 @@ const navLinks: NavLink[] = [
         icon: LayoutDashboard,
         roles: ['visitante', 'editor', 'admin']
     },
-    // Visitante
+    // Visitante (disponible para todos)
     {
         name: "nav.myTestimonials",
         href: "/dashboard/visitante/mis-testimonios",
         icon: FileText,
-        roles: ['visitante']
+        roles: ['visitante', 'editor', 'admin']
     },
     {
         name: "nav.createTestimonial",
         href: "/dashboard/visitante/crear-testimonio",
         icon: PlusCircle,
-        roles: ['visitante']
+        roles: ['visitante', 'editor', 'admin']
     },
-    // Editor
+    // Editor (solo editores y admins)
     {
-        name: "nav.pendingTestimonials",
-        href: "/dashboard/editor/testimonios-pendientes",
+        name: "nav.manageTestimonials",
+        href: "/dashboard/editor/testimonios",
         icon: Clock,
-        roles: ['editor']
+        roles: ['editor', 'admin']
     },
     {
-        name: "nav.myOrganization",
-        href: "/dashboard/editor/mi-organizacion",
+        name: "nav.myOrganizations",
+        href: "/dashboard/editor/organizaciones",
         icon: Building2,
-        roles: ['editor']
+        roles: ['editor', 'admin']
     },
     {
         name: "nav.statistics",
         href: "/dashboard/editor/estadisticas",
         icon: BarChart3,
-        roles: ['editor']
+        roles: ['editor', 'admin']
     },
-    // Admin
+    // Admin (solo admins)
     {
         name: "nav.users",
         href: "/dashboard/admin/usuarios",
         icon: Users,
+        roles: ['admin']
+    },
+    {
+        name: "Testimonios",
+        href: "/dashboard/admin/testimonios",
+        icon: FileText,
         roles: ['admin']
     },
     {

@@ -20,4 +20,22 @@ export const categoryService = {
         const response = await api.get(`/app/categorias/${id}/`);
         return response.data;
     },
+
+    // Crear categoría (solo admin)
+    createCategory: async (data: Partial<Categoria>) => {
+        const response = await api.post('/app/categorias/', data);
+        return response.data;
+    },
+
+    // Actualizar categoría (solo admin)
+    updateCategory: async (id: number, data: Partial<Categoria>) => {
+        const response = await api.patch(`/app/categorias/${id}/`, data);
+        return response.data;
+    },
+
+    // Eliminar categoría (solo admin)
+    deleteCategory: async (id: number) => {
+        const response = await api.delete(`/app/categorias/${id}/`);
+        return response.data;
+    },
 };

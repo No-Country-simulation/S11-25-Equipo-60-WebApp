@@ -47,39 +47,42 @@ export function LoginForm() {
         try {
             // 1. Login y obtener token
             const loginResponse = await authService.login(values)
-            console.log('Login response:', loginResponse)
+            console.log('🔐 Login response:', loginResponse)
 
             if (!loginResponse.access || !loginResponse.user_id) {
                 toast.error("Error en la respuesta del servidor")
                 return
             }
 
-            // 2. Guardar token
-            setToken(loginResponse.access)
+            // 2. Guardar token temporalmente
+            const token = loginResponse.access
+            setToken(token)
 
-            // 3. Por ahora, asumimos que es visitante (solo visitantes pueden registrarse)
-            // TODO: Implementar detección de rol cuando el backend lo permita
-            const userData = {
-                id: loginResponse.user_id,
-                email: values.email,
-                username: values.email.split('@')[0],
-                role: 'visitante' as const,
-                date_joined: new Date().toISOString()
-            }
+            // 3. Detectar rol del usuario usando el servicio
+            console.log('🔍 Detectando rol del usuario...')
+            const userData = await authService.getUserData(loginResponse.user_id, token)
 
-            // 4. Guardar usuario con rol
+            console.log('✅ Usuario logueado:', userData)
+
+            // 4. Guardar usuario en el store
             setUser(userData)
 
-            // 5. Mensaje de bienvenida
-            toast.success(`¡Bienvenido! 🎉`)
+            // 5. Mensaje de bienvenida según rol
+            const roleMessages = {
+                visitante: '¡Bienvenido! 🎉',
+                editor: '¡Bienvenido, Editor! 📝',
+                admin: '¡Bienvenido, Administrador! 👑'
+            }
+            toast.success(roleMessages[userData.role])
 
             // 6. Redirigir al dashboard
             router.push("/dashboard")
         } catch (error: any) {
-            console.error('Login error:', error)
+            console.error('❌ Login error:', error)
             const errorMessage = error.response?.data?.non_field_errors?.[0]
                 || error.response?.data?.detail
-                || "Credenciales inválidas"
+                || error.message
+                || "Credenciales inválidas. Verifica tu email y contraseña."
             toast.error(errorMessage)
         } finally {
             setIsLoading(false)

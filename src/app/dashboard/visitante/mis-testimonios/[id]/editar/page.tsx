@@ -1,15 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { testimonialService } from "@/services/testimonial.service"
+import { testimonialService, Testimonio } from "@/services/testimonial.service"
 import { categoryService, Categoria } from "@/services/category.service"
-import { organizationService, Organizacion } from "@/services/organization.service"
-import { useAuthStore } from "@/store/auth.store"
-import { useTranslation } from "@/lib/i18n-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -21,7 +18,6 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import {
     Select,
@@ -34,12 +30,9 @@ import { toast } from "sonner"
 import { ArrowLeft } from "lucide-react"
 
 const formSchema = z.object({
-    organizacion: z.string().min(1, {
-        message: "Debes seleccionar una organización",
-    }),
     comentario: z.string().min(10, {
         message: "El testimonio debe tener al menos 10 caracteres",
-    }).max(100, { // backend limit
+    }).max(100, {
         message: "El comentario no debe exceder 100 caracteres",
     }),
     categoria: z.string().min(1, {
@@ -48,86 +41,72 @@ const formSchema = z.object({
     ranking: z.string().min(1, {
         message: "Debes seleccionar una calificación",
     }),
-    archivo: z.any().optional(), // file upload
 })
 
-export default function CrearTestimonioPage() {
+export default function EditarTestimonioPage() {
     const [loading, setLoading] = useState(false)
+    const [loadingData, setLoadingData] = useState(true)
     const [categories, setCategories] = useState<Categoria[]>([])
-    const [organizations, setOrganizations] = useState<Organizacion[]>([])
+    const [testimonial, setTestimonial] = useState<Testimonio | null>(null)
     const router = useRouter()
-    const { t } = useTranslation()
+    const params = useParams()
+    const id = parseInt(params.id as string)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            organizacion: "",
             comentario: "",
             categoria: "",
             ranking: "",
-            archivo: undefined,
         },
     })
 
     useEffect(() => {
         loadData()
-    }, [])
+    }, [id])
 
     const loadData = async () => {
         try {
-            const [categoriesData, organizationsData] = await Promise.all([
+            const [testimonialData, categoriesData] = await Promise.all([
+                testimonialService.getTestimonial(id),
                 categoryService.getCategories(),
-                organizationService.getOrganizations(),
             ])
+            
+            setTestimonial(testimonialData)
             setCategories(categoriesData)
-            setOrganizations(organizationsData)
+            
+            // Populate form with existing data
+            form.reset({
+                comentario: testimonialData.comentario,
+                categoria: testimonialData.categoria.toString(),
+                ranking: testimonialData.ranking,
+            })
         } catch (error) {
             console.error('Error loading data:', error)
             toast.error("Error al cargar los datos")
+            router.push('/dashboard/visitante/mis-testimonios')
+        } finally {
+            setLoadingData(false)
         }
     }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log('🚀 [Page] onSubmit called with values:', values);
         setLoading(true)
         try {
-            // Find the selected organization to get its API key
-            const selectedOrg = organizations.find(org => org.id.toString() === values.organizacion);
-            console.log('🏢 [Page] Selected Organization:', selectedOrg);
-
-            if (!selectedOrg?.api_key) {
-                console.error('❌ [Page] Error: Organization has no API Key');
-                toast.error("Error: La organización seleccionada no tiene una API Key válida.");
-                setLoading(false);
-                return;
+            const updateData = {
+                comentario: values.comentario,
+                categoria: parseInt(values.categoria),
+                ranking: values.ranking,
             }
 
-            const formData = new FormData();
-            formData.append('organizacion', parseInt(values.organizacion).toString());
-            formData.append('api_key', selectedOrg.api_key); // Required by backend
-            formData.append('comentario', values.comentario);
-            formData.append('categoria', parseInt(values.categoria).toString());
-            formData.append('ranking', values.ranking);
-
-            // NO enviar usuario_anonimo_* cuando el usuario está autenticado
-            // El backend debe extraer el usuario_registrado del token JWT
-
-            if (values.archivo) {
-                console.log('Vk [Page] Adding file to FormData:', values.archivo.name);
-                formData.append('archivo', values.archivo);
-            }
-
-            console.log('📤 [Page] Sending FormData to service...');
-            await testimonialService.createTestimonial(formData);
-            console.log('✅ [Page] Testimonial created successfully');
-            toast.success("¡Testimonio creado exitosamente!")
-            router.push("/dashboard/visitante/mis-testimonios")
+            await testimonialService.updateTestimonial(id, updateData)
+            toast.success("¡Testimonio actualizado exitosamente!")
+            router.push('/dashboard/visitante/mis-testimonios')
         } catch (error: any) {
-            console.error('❌ [Page] Error in onSubmit:', error);
+            console.error('Error updating testimonial:', error)
             const errorMessage = error.response?.data?.detail ||
-                error.response?.data?.archivo?.[0] ||
-                error.response?.data?.api_key?.[0] ||
-                "Error al crear el testimonio"
+                error.response?.data?.comentario?.[0] ||
+                "Error al actualizar el testimonio"
             toast.error(errorMessage)
         } finally {
             setLoading(false)
@@ -142,6 +121,18 @@ export default function CrearTestimonioPage() {
         { value: "5.0", label: "⭐⭐⭐⭐⭐ Excelente" },
     ]
 
+    if (loadingData) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+        )
+    }
+
+    if (!testimonial) {
+        return null
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4">
@@ -153,51 +144,30 @@ export default function CrearTestimonioPage() {
                     <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">{t('testimonials.create')}</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">Editar Testimonio</h1>
                     <p className="text-muted-foreground mt-2">
-                        Comparte tu experiencia con una organización
+                        Actualiza la información de tu testimonio
                     </p>
                 </div>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Nuevo Testimonio</CardTitle>
+                    <CardTitle>Editar Testimonio</CardTitle>
                     <CardDescription>
-                        Tu testimonio será revisado antes de ser publicado
+                        Modifica los campos que desees actualizar. La organización no puede ser cambiada.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
+                    {testimonial.organizacion_nombre && (
+                        <div className="mb-6 p-4 bg-muted rounded-lg">
+                            <p className="text-sm text-muted-foreground">Organización</p>
+                            <p className="font-medium">{testimonial.organizacion_nombre}</p>
+                        </div>
+                    )}
+
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                            <FormField
-                                control={form.control}
-                                name="organizacion"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel htmlFor="organizacion-select">Organización *</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger id="organizacion-select">
-                                                    <SelectValue placeholder="Selecciona una organización" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {organizations.map((org) => (
-                                                    <SelectItem key={org.id} value={org.id.toString()}>
-                                                        {org.organizacion_nombre}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormDescription>
-                                            ¿Sobre qué organización quieres dejar tu testimonio?
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
                             <FormField
                                 control={form.control}
                                 name="comentario"
@@ -282,31 +252,6 @@ export default function CrearTestimonioPage() {
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="archivo"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel htmlFor="archivo-input">Archivo (Opcional)</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                id="archivo-input"
-                                                type="file"
-                                                accept="image/*,video/*"
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    field.onChange(file);
-                                                }}
-                                            />
-                                        </FormControl>
-                                        <FormDescription>
-                                            Adjunta una imagen o video para complementar tu testimonio
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
                             <div className="flex gap-4">
                                 <Button
                                     type="button"
@@ -314,10 +259,10 @@ export default function CrearTestimonioPage() {
                                     onClick={() => router.back()}
                                     disabled={loading}
                                 >
-                                    {t('common.cancel')}
+                                    Cancelar
                                 </Button>
                                 <Button type="submit" disabled={loading}>
-                                    {loading ? "Creando..." : t('common.save')}
+                                    {loading ? "Guardando..." : "Guardar cambios"}
                                 </Button>
                             </div>
                         </form>
