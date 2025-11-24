@@ -17,9 +17,27 @@ export interface Testimonio {
     estado?: string; // E, A, R, P, B, O
 }
 
-// Obtener todos los testimonios del visitante
+/**
+ * Servicio de Testimonios
+ * 
+ * IMPORTANTE: El endpoint /app/testimonios-totales/ tiene DOBLE FUNCIONALIDAD según el rol del usuario:
+ * 
+ * - VISITANTE: Devuelve testimonios que EL USUARIO CREÓ (como cliente)
+ * - EDITOR: Devuelve testimonios de LAS ORGANIZACIONES a las que pertenece (como staff)
+ * - ADMIN: NO DEBE USAR ESTE ENDPOINT (usar getPublicTestimonials en su lugar)
+ * 
+ * El backend detecta automáticamente el rol desde el token JWT y devuelve los datos correspondientes.
+ */
 export const testimonialService = {
-    // Obtener testimonios creados por el visitante actual
+    /**
+     * GET /app/testimonios-totales/
+     * 
+     * Función dual según el rol del usuario autenticado:
+     * - VISITANTE: Obtiene testimonios que el usuario creó personalmente
+     * - EDITOR: Obtiene testimonios de las organizaciones que gestiona
+     * 
+     * @returns Array de testimonios (filtrado automáticamente por el backend según rol)
+     */
     getMyTestimonials: async () => {
         try {
             console.log('📞 Llamando GET /app/testimonios-totales/');
@@ -131,7 +149,18 @@ export const testimonialService = {
         return response.data;
     },
 
-    // Obtener todos los testimonios públicos (aprobados)
+    /**
+     * GET /app/testimonios/
+     * 
+     * Obtiene TODOS los testimonios APROBADOS de TODAS las organizaciones.
+     * Este endpoint es PÚBLICO (no requiere autenticación).
+     * 
+     * Usado por:
+     * - Admin: Para ver todos los testimonios públicos del sistema
+     * - Landing page: Para mostrar testimonios aprobados al público
+     * 
+     * @returns Array de testimonios aprobados públicos
+     */
     getPublicTestimonials: async () => {
         const response = await api.get('/app/testimonios/');
         return response.data;

@@ -58,7 +58,7 @@ export default function EditorDashboardPage() {
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Dashboard de Editor</h1>
                 <p className="text-muted-foreground mt-2">
-                    Gestiona los testimonios de tus organizaciones
+                    Gestiona los testimonios de las organizaciones a las que perteneces como editor
                 </p>
             </div>
 

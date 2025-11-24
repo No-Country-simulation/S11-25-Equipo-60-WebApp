@@ -25,8 +25,9 @@ export default function AdminDashboardPage() {
 
     const loadData = async () => {
         try {
-            // Admin NO puede usar /app/testimonios-totales/ (ese endpoint es para visitantes y editores)
+            // Admin NO puede usar /app/testimonios-totales/ (endpoint exclusivo de visitantes/editores)
             // Admin usa /app/organizacion/ para ver todas las organizaciones
+            // Admin usa /app/testimonios/ para ver testimonios públicos aprobados (en la página de testimonios)
             const [
                 visitantesData,
                 editoresData,
@@ -37,7 +38,7 @@ export default function AdminDashboardPage() {
                 userService.getVisitantes(),
                 userService.getEditores(),
                 userService.getAdministradores(),
-                organizationService.getOrganizations(), // Admin puede ver todas las organizaciones
+                organizationService.getOrganizations(), // GET /app/organizacion/ - Admin ve TODAS las organizaciones
                 categoryService.getCategories(),
             ])
             
@@ -46,7 +47,8 @@ export default function AdminDashboardPage() {
             setAdministradores(adminsData)
             setOrganizations(orgsData)
             setCategories(catsData)
-            // Admin NO tiene acceso directo a testimonios via API
+            // Admin NO tiene acceso a /app/testimonios-totales/ en el dashboard principal
+            // Para ver testimonios, admin debe ir a /dashboard/admin/testimonios
             setTestimonials([])
         } catch (error) {
             console.error('Error loading admin data:', error)

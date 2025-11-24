@@ -31,59 +31,62 @@ const navLinks: NavLink[] = [
         icon: LayoutDashboard,
         roles: ['visitante', 'editor', 'admin']
     },
-    // Visitante (disponible para todos)
+    // === SECCIÓN VISITANTE (Cliente) ===
+    // Todos los usuarios pueden crear y gestionar SUS testimonios como clientes
     {
-        name: "nav.myTestimonials",
+        name: "Mis Testimonios",
         href: "/dashboard/visitante/mis-testimonios",
         icon: FileText,
         roles: ['visitante', 'editor', 'admin']
     },
     {
-        name: "nav.createTestimonial",
+        name: "Crear Testimonio",
         href: "/dashboard/visitante/crear-testimonio",
         icon: PlusCircle,
         roles: ['visitante', 'editor', 'admin']
     },
-    // Editor (solo editores y admins)
+    // === SECCIÓN EDITOR (Staff de Organización) ===
+    // Solo editores y admins gestionan testimonios de organizaciones
     {
-        name: "nav.manageTestimonials",
+        name: "Gestionar Testimonios",
         href: "/dashboard/editor/testimonios",
         icon: Clock,
         roles: ['editor', 'admin']
     },
     {
-        name: "nav.myOrganizations",
+        name: "Mis Organizaciones",
         href: "/dashboard/editor/organizaciones",
         icon: Building2,
         roles: ['editor', 'admin']
     },
     {
-        name: "nav.statistics",
+        name: "Estadísticas",
         href: "/dashboard/editor/estadisticas",
         icon: BarChart3,
         roles: ['editor', 'admin']
     },
-    // Admin (solo admins)
+    // === SECCIÓN ADMIN (Supervisión) ===
+    // Solo admins tienen acceso administrativo total
     {
-        name: "nav.users",
+        name: "Usuarios",
         href: "/dashboard/admin/usuarios",
         icon: Users,
         roles: ['admin']
     },
     {
-        name: "Testimonios",
+        name: "Testimonios Públicos",
         href: "/dashboard/admin/testimonios",
         icon: FileText,
         roles: ['admin']
     },
     {
-        name: "nav.organizations",
+        name: "Organizaciones",
         href: "/dashboard/admin/organizaciones",
         icon: Building2,
         roles: ['admin']
     },
     {
-        name: "nav.categories",
+        name: "Categorías",
         href: "/dashboard/admin/categorias",
         icon: FolderKanban,
         roles: ['admin']
