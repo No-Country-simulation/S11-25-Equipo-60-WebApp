@@ -1,0 +1,111 @@
+{
+  "common": {
+    "welcome": "Bienvenido",
+    "logout": "Cerrar sesión",
+    "settings": "Configuración",
+    "profile": "Perfil",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "add": "Agregar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "back": "Volver"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "myTestimonials": "Mis Testimonios",
+    "createTestimonial": "Crear Testimonio",
+    "pendingTestimonials": "Testimonios Pendientes",
+    "myOrganization": "Mi Organización",
+    "users": "Usuarios",
+    "organizations": "Organizaciones",
+    "categories": "Categorías",
+    "statistics": "Estadísticas"
+  },
+  "roles": {
+    "visitante": "Visitante",
+    "editor": "Editor",
+    "admin": "Administrador"
+  },
+  "dashboard": {
+    "overview": "Resumen",
+    "welcomeMessage": "¡Bienvenido de nuevo!",
+    "stats": {
+      "totalTestimonials": "Total de Testimonios",
+      "pending": "Pendientes",
+      "approved": "Aprobados",
+      "rejected": "Rechazados"
+    }
+  },
+  "testimonials": {
+    "title": "Testimonios",
+    "create": "Crear Testimonio",
+    "edit": "Editar Testimonio",
+    "delete": "Eliminar Testimonio",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "status": {
+      "pending": "Pendiente de Revisión",
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "published": "Publicado"
+    },
+    "empty": {
+      "title": "No hay testimonios aún",
+      "description": "Comienza creando tu primer testimonio"
+    }
+  },
+  "page": {
+    "title": "Página en Construcción",
+    "description": "Estamos trabajando duro para traerte esta funcionalidad. ¡Vuelve pronto!"
+  },
+  "function": {
+    "title": "Función en Construcción",
+    "description": "Esta funcionalidad está siendo desarrollada. Estará disponible pronto."
+  },
+  "buttons": {
+    "back": "Volver"
+  },
+  "statusCards": {
+    "dev": {
+      "title": "En Desarrollo",
+      "desc": "Construyendo nuevas características"
+    },
+    "soon": {
+      "title": "Próximamente",
+      "desc": "Lanzamiento muy pronto"
+    },
+    "improve": {
+      "title": "Mejorando",
+      "desc": "Optimizando tu experiencia"
+    }
+  },
+  "contact": {
+    "prompt": "¿Tienes sugerencias? Contáctanos en",
+    "email": "support@testimonial-cms.com"
+  },
+  "table": {
+    "title": "Visor de Tabla",
+    "add": "Agregar",
+    "headers": {
+      "name": "Tarjeta",
+      "fee": "Tasa (%)",
+      "days": "Plazo recepción (días)",
+      "actions": "Acciones"
+    },
+    "placeholders": {
+      "name": "Nombre de la tarjeta",
+      "fee": "Tasa",
+      "days": "Días"
+    },
+    "buttons": {
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "add": "Agregar",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    }
+  }
+}
