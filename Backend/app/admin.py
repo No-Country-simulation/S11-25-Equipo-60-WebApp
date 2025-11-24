@@ -4,9 +4,10 @@ from django.contrib.auth.models import Group as DefaultGroup
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 # PRIMERO: Se Define UserAdmin y ClienteAdmin ANTES de usarlos
-class UserAdminForm(forms.ModelForm):
+class UserAdminForm(forms.ModelForm, UnfoldModelAdmin):
     """
     Formulario personalizado para manejar la selección única de grupos
     """
@@ -58,7 +59,7 @@ class UserAdminForm(forms.ModelForm):
         return user
 
 # PRIMERO: Se Define UserAdmin y ClienteAdmin ANTES de usarlos
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(BaseUserAdmin, UnfoldModelAdmin):
     list_display = ('username', 'email', 'is_staff', 'is_active', 'get_user_groups')
     search_fields = ('username', 'email')
 
@@ -130,7 +131,7 @@ class UserAdmin(BaseUserAdmin):
         js = ('admin/js/user_admin.js',)
 
 # SEGUNDO: Se Define ClienteAdmin
-class ClienteAdmin(UserAdmin):
+class ClienteAdmin(UserAdmin, UnfoldModelAdmin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.model._meta.verbose_name = 'Usuario'
@@ -154,7 +155,7 @@ class ClienteAdmin(UserAdmin):
 
 # Formulario para Visitantes
 @admin.register(Visitante)
-class VisitanteAdmin(ClienteAdmin):
+class VisitanteAdmin(ClienteAdmin, UnfoldModelAdmin):
     
     group_name = "visitante"
 
@@ -169,7 +170,7 @@ class VisitanteAdmin(ClienteAdmin):
 
 # Formulario para Editores
 @admin.register(Editor)
-class EditorAdmin(ClienteAdmin):
+class EditorAdmin(ClienteAdmin, UnfoldModelAdmin):
 
     group_name = "editor"
 
@@ -203,7 +204,7 @@ class EditorAdmin(ClienteAdmin):
 #Formulario para admins
 
 @admin.register(AdminUser)
-class AdminUserAdmin(ClienteAdmin):
+class AdminUserAdmin(ClienteAdmin, UnfoldModelAdmin):
 
     add_form = UserCreationForm
     form = forms.ModelForm
@@ -251,7 +252,7 @@ admin.site.unregister(DefaultGroup)
 
 # Registrar tu modelo personalizado de Roles
 @admin.register(Roles)
-class RolesAdmin(admin.ModelAdmin):
+class RolesAdmin(UnfoldModelAdmin):
     list_display = ['name']
     search_fields = ['name']
     
@@ -287,7 +288,7 @@ class RolesAdmin(admin.ModelAdmin):
 #   ADMIN ORGANIZACION
 # ===============================
 @admin.register(Organizacion)
-class OrganizacionAdmin(admin.ModelAdmin):
+class OrganizacionAdmin(UnfoldModelAdmin):
 
     list_display = ("organizacion_nombre", "api_key", "get_editores_list")
     search_fields = ("organizacion_nombre",)
@@ -326,7 +327,7 @@ class OrganizacionAdmin(admin.ModelAdmin):
 #   ADMIN CATEGORIA
 # ===============================
 @admin.register(Categoria)
-class CategoriaAdmin(admin.ModelAdmin):
+class CategoriaAdmin(UnfoldModelAdmin):
 
     list_display = ("nombre_categoria", 'icono', 'color', "fecha_registro")
     search_fields = ("nombre_categoria",)
@@ -340,7 +341,7 @@ class CategoriaAdmin(admin.ModelAdmin):
 #   ADMIN TESTIMONIOS
 # ===============================
 @admin.register(Testimonios)
-class TestimoniosAdmin(admin.ModelAdmin):
+class TestimoniosAdmin(UnfoldModelAdmin):
 
     list_display = (
         "get_usuario",
