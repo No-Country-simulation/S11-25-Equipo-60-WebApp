@@ -82,7 +82,8 @@ class Organizacion(models.Model):
     organizacion_nombre = models.CharField(max_length=50, blank=False, unique=True)
     dominio = models.CharField(max_length=50, blank=False, unique=True)
     editores = models.ManyToManyField(User, related_name='organizaciones_editables', blank=True)
-    api_key = models.CharField(max_length=50, blank=True, null=True) ##SE DEBE CREAR AUTOMATICAMENTE
+    visitantes = models.ManyToManyField(User, related_name='organizaciones_visitantes', blank=True)
+    api_key = models.CharField(max_length=50, blank=True, null=True, unique=True) ##SE DEBE CREAR AUTOMATICAMENTE
     fecha_registro = models.DateTimeField(auto_now_add=True)  # ✅ Fecha automática
 
     class Meta:
@@ -125,7 +126,8 @@ class Testimonios(models.Model):
     usuario_anonimo_username = models.CharField(max_length=50, blank=True, null=True)
     usuario_anonimo_email = models.EmailField(blank=True, null=True) 
     api_key = models.CharField(max_length=50, blank=False, null=False)
-    comentario = models.CharField(max_length=100, blank=False, null=False)
+    comentario = models.CharField(max_length=100, blank=True, null=True)
+    enlace = models.CharField(max_length=100, blank=True, null=True)
     archivo = CloudinaryField(
         'archivo', 
         folder='testimonios/archivos/',

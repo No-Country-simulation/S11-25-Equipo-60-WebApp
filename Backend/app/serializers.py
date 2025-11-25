@@ -256,12 +256,41 @@ class OrganizacionSerializer(serializers.ModelSerializer):
         
         return instance
 
+# Serializador para EDITORES (muestra editores y visitantes de SU organización)
+class OrganizacionSerializerEditor(serializers.ModelSerializer):
+    editores = serializers.SerializerMethodField(read_only=True)
+    visitantes = serializers.SerializerMethodField(read_only=True)
+    
+    class Meta:
+        model = Organizacion
+        fields = ['id', 'organizacion_nombre', 'dominio', 'api_key', 'editores', 'visitantes']
+        read_only_fields = ['api_key']
+
+    def get_editores(self, obj):
+        return [
+            {
+                'id': editor.id,
+                'email': editor.email,
+                'username': editor.username
+            } for editor in obj.editores.all()
+        ]
+
+    def get_visitantes(self, obj):
+        return [
+            {
+                'id': visitante.id,
+                'email': visitante.email,
+                'username': visitante.username
+            } for visitante in obj.visitantes.all()
+        ]
+
+
 # Serializador para usuarios staff (muestra toda la información)
 class OrganizacionSerializerStaff(OrganizacionSerializer):
     editores = serializers.SerializerMethodField(read_only=True)
     
     class Meta(OrganizacionSerializer.Meta):
-        fields = OrganizacionSerializer.Meta.fields + ['editores', 'api_key']
+        fields = OrganizacionSerializer.Meta.fields + ['editores', 'visitantes', 'api_key']
 
     def get_editores(self, obj):
         return [
@@ -323,6 +352,35 @@ class AgregarEditoresSerializer(serializers.Serializer):
         if usuarios_inexistentes:
             raise serializers.ValidationError(
                 f"Los siguientes IDs no corresponden a usuarios editores válidos: {list(usuarios_inexistentes)}"
+            )
+        
+        return value
+    
+    
+##########VISITANTES A ORGANIZACIONES
+class AgregarVisitantesSerializer(serializers.Serializer):
+    visitantes = serializers.ListField(  
+        child=serializers.IntegerField(),
+        required=True,
+        help_text="Lista de IDs de usuarios visitantes a agregar. Ejemplo: [8, 9]"
+    )
+    
+    def validate_visitantes(self, value): 
+        """Validar que los IDs correspondan a usuarios visitantes existentes"""
+        if not value:
+            raise serializers.ValidationError("La lista de visitantes no puede estar vacía.")
+        
+        # Verificar que todos los usuarios existan y sean visitantes
+        usuarios_existentes = User.objects.filter(
+            id__in=value, 
+            groups__name='visitante'
+        ).values_list('id', flat=True)
+        
+        usuarios_inexistentes = set(value) - set(usuarios_existentes)
+        
+        if usuarios_inexistentes:
+            raise serializers.ValidationError(
+                f"Los siguientes IDs no corresponden a usuarios visitantes válidos: {list(usuarios_inexistentes)}"
             )
         
         return value
@@ -401,7 +459,7 @@ class TestimonioSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'organizacion', 'organizacion_nombre',  'usuario_registrado',  'usuario_anonimo_email', 
             'usuario_anonimo_username', 
-            'api_key', 'categoria',  'categoria_nombre', 'comentario', 'archivo', 'fecha_comentario', 
+            'api_key', 'categoria',  'categoria_nombre', 'comentario', 'enlace', 'archivo', 'fecha_comentario', 
             'ranking', 'estado'
         ]
         read_only_fields = ['usuario_registrado', 'fecha_comentario', 'organizacion_nombre', 'categoria_nombre', 'estado']
@@ -431,10 +489,8 @@ class TestimonioSerializer(serializers.ModelSerializer):
         api_key = data.get('api_key')
 
         # 👇 DIFERENCIAR ENTRE CREACIÓN Y ACTUALIZACIÓN
-        # Si es una actualización (PATCH/PUT) y la instancia ya existe
         if self.instance is not None:
             # ES UNA ACTUALIZACIÓN - La API key no es requerida
-            # Pero si se proporciona una API key, validar que sea correcta
             if api_key and organizacion:
                 if api_key != organizacion.api_key:
                     raise serializers.ValidationError({
@@ -453,21 +509,29 @@ class TestimonioSerializer(serializers.ModelSerializer):
                     "api_key": "La API key proporcionada no es válida para esta organización."
                 })
 
-        # Validaciones para usuarios autenticados
+        # 👇 NUEVA VALIDACIÓN: Usuarios visitantes SOLO pueden crear testimonios en organizaciones a las que pertenecen
         if request and request.user.is_authenticated:
+            user = request.user
+            
+            # Si es usuario visitante, verificar que pertenezca a la organización
+            if user.groups.filter(name='visitante').exists() and organizacion:
+                if not organizacion.visitantes.filter(id=user.id).exists():
+                    raise serializers.ValidationError({
+                        "organizacion": f"No perteneces a la organización '{organizacion.organizacion_nombre}'. Solo puedes crear testimonios en organizaciones a las que perteneces."
+                    })
+            
+            # Validar que no exista un testimonio de este usuario para esta organización
             if organizacion:
-                # Verificar si ya existe un testimonio de este usuario para esta organización
                 if Testimonios.objects.filter(
                     organizacion=organizacion, 
-                    usuario_registrado=request.user
+                    usuario_registrado=user
                 ).exists():
                     raise serializers.ValidationError({
                         "organizacion": "Ya has creado un testimonio para esta organización. Solo puedes crear uno por organización."
                     })
         
-        # Validaciones para usuarios NO autenticados
+        # 👇 Validaciones para usuarios NO autenticados (mantener lógica actual)
         else:
-            # Para usuarios no autenticados, validar que proporcionen ambos campos anónimos
             if not usuario_anonimo_username:
                 raise serializers.ValidationError({
                     "usuario_anonimo_username": "Este campo es requerido para usuarios no autenticados."
@@ -484,13 +548,14 @@ class TestimonioSerializer(serializers.ModelSerializer):
                     organizacion=organizacion,
                     usuario_anonimo_username=usuario_anonimo_username,
                     usuario_anonimo_email=usuario_anonimo_email,
-                    usuario_registrado__isnull=True  # Solo testimonios anónimos
+                    usuario_registrado__isnull=True
                 ).exists():
                     raise serializers.ValidationError({
                         "detail": "Ya existe un testimonio anónimo para esta organización con el mismo nombre de usuario y email."
                     })
         
         return data
+        
 
     def create(self, validated_data):
         # Obtener el usuario del contexto (JWT)

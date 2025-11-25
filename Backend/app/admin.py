@@ -290,16 +290,22 @@ class RolesAdmin(UnfoldModelAdmin):
 @admin.register(Organizacion)
 class OrganizacionAdmin(UnfoldModelAdmin):
 
-    list_display = ("organizacion_nombre", "api_key", "get_editores_list")
+    list_display = ("organizacion_nombre", "api_key", "get_editores_list", "get_visitantes_count")
     search_fields = ("organizacion_nombre",)
     list_filter = ("fecha_registro",)
     ordering = ("-id",)
     readonly_fields = ("fecha_registro", "api_key")
-    filter_horizontal = ("editores",)
+    
+    # 👇 AGREGAR filter_horizontal PARA AMBOS CAMPOS
+    filter_horizontal = ("editores", "visitantes")
 
     def get_editores_count(self, obj):
         return obj.editores.count()
     get_editores_count.short_description = "N° Editores"
+
+    def get_visitantes_count(self, obj):
+        return obj.visitantes.count()
+    get_visitantes_count.short_description = "N° Visitantes"
 
     def get_editores_list(self, obj):
         editores = obj.editores.all()[:3]
@@ -309,9 +315,32 @@ class OrganizacionAdmin(UnfoldModelAdmin):
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "editores":
             kwargs["queryset"] = User.objects.filter(groups__name="editor")
+            # 👇 PERSONALIZAR LAS ETIQUETAS PARA EDITORES
+            kwargs["label"] = "Editores"
+            kwargs["help_text"] = ""
+        elif db_field.name == "visitantes":
+            kwargs["queryset"] = User.objects.filter(groups__name="visitante")
+            # 👇 PERSONALIZAR LAS ETIQUETAS PARA VISITANTES
+            kwargs["label"] = "Visitantes"
+            kwargs["help_text"] = ""
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
-    # 👈 AGREGAR ESTE MÉTODO PARA MEJORES MENSAJES DE ERROR
+    # 👇 SOBREESCRIBER EL MÉTODO PARA PERSONALIZAR LOS TÍTULOS
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        
+        # Personalizar las etiquetas de los campos ManyToMany
+        if 'editores' in form.base_fields:
+            form.base_fields['editores'].label = "Editores"
+            form.base_fields['editores'].help_text = "Selecciona los editores para esta organización"
+            
+        if 'visitantes' in form.base_fields:
+            form.base_fields['visitantes'].label = "Visitantes"
+            form.base_fields['visitantes'].help_text = "Selecciona los visitantes para esta organización"
+            
+        return form
+
+    # 👇 AGREGAR ESTE MÉTODO PARA MEJORES MENSAJES DE ERROR
     def save_model(self, request, obj, form, change):
         try:
             super().save_model(request, obj, form, change)
@@ -323,6 +352,24 @@ class OrganizacionAdmin(UnfoldModelAdmin):
                 messages.error(request, f"Error al guardar: {str(e)}")
             raise
 
+    # 👇 OPCIONAL: PERSONALIZAR LOS FIELDSETS PARA MEJOR ORGANIZACIÓN
+    fieldsets = (
+        ('Información Básica', {
+            'fields': ('organizacion_nombre', 'dominio', 'api_key')
+        }),
+        ('Editores', {
+            'fields': ('editores',),
+            'description': 'Selecciona los editores que pueden gestionar esta organización'
+        }),
+        ('Visitantes', {
+            'fields': ('visitantes',),
+            'description': 'Selecciona los visitantes que pueden acceder a esta organización'
+        }),
+        ('Fechas', {
+            'fields': ('fecha_registro',),
+            'classes': ('collapse',)
+        }),
+    )
 # ===============================
 #   ADMIN CATEGORIA
 # ===============================
