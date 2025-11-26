@@ -267,19 +267,10 @@ SIMPLE_JWT = {
     'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
     #Tiempo de expiracion del TOKEN
 
-    #PARA DESARROLLO ESTA CONFIGURACION
-
-    # Tiempo de vida del token de acceso (default: 5 minutos)
-    #'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # 1 hora
-    ## Tiempo de vida del token de refresco (default: 1 día)
-    #'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # 1 semana
-
-    #PARA PRODUCCION ESTA CONFIGURACION
-    #'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'ACCESS_TOKEN_LIFETIME': timedelta(days=365*100),  # 100 años (prácticamente nunca)
 
-    #'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=365*100),  # 100 años (prácticamente nunca)
+    
     # Tiempo de vida del token de refresco cuando se usa para renovar (default: None)
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,

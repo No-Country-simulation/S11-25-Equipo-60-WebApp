@@ -6,6 +6,22 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
+class CustomUserCreationForm(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Aplicar clases de Unfold a los campos de contraseña
+        unfold_classes = "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+        
+        self.fields['password1'].widget.attrs.update({
+            'class': unfold_classes,
+            'placeholder': 'Contraseña'
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': unfold_classes,
+            'placeholder': 'Confirmar contraseña'
+        })
+
 # PRIMERO: Se Define UserAdmin y ClienteAdmin ANTES de usarlos
 class UserAdminForm(forms.ModelForm, UnfoldModelAdmin):
     """
@@ -16,7 +32,7 @@ class UserAdminForm(forms.ModelForm, UnfoldModelAdmin):
         widget=forms.RadioSelect,
         required=True,
         label="Grupo",
-        help_text="Selecciona UN solo grupo. El usuario debe pertenecer a un grupo."
+        help_text="Selecciona un solo grupo. El usuario debe pertenecer a un grupo."
     )
     
     class Meta:
@@ -63,8 +79,10 @@ class UserAdmin(BaseUserAdmin, UnfoldModelAdmin):
     list_display = ('username', 'email', 'is_staff', 'is_active', 'get_user_groups')
     search_fields = ('username', 'email')
 
-    # Usar nuestro formulario personalizado
+    # Usar formularios personalizados
+    add_form = CustomUserCreationForm  # 👈 NUEVO FORMULARIO PARA CREACIÓN
     form = UserAdminForm
+
 
     add_fieldsets = (
         (None, {
