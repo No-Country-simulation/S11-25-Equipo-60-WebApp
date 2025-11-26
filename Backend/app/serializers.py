@@ -1,10 +1,12 @@
+import re
+import cloudinary
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from app.models import *
 from django.contrib.auth.models import Group
 # Agrega estos imports al inicio del archivo
 from django.utils import timezone
-
+import os
 ######################################33LOGIN
 
 class LoginSerializer(serializers.Serializer):
@@ -406,13 +408,66 @@ class TestimonioAprobadoSerializer(serializers.ModelSerializer):
 
 #######################ACA EMPIEZA LOS TESTIMONIOS COMO TAL
 
-
+# Función auxiliar para extraer public_id y resource_type
+def extract_public_id_and_type_from_url(url):
+    """
+    Extrae el public_id y determina el resource_type de una URL de Cloudinary.
+    """
+    try:
+        # Extraer public_id
+        pattern = r'/upload/(?:v\d+/)?(.+?)(?:\.[^/.]+)?$'
+        match = re.search(pattern, url)
+        
+        if match:
+            public_id = match.group(1)
+            
+            # Determinar resource_type basado en la extensión
+            extension = os.path.splitext(url.lower())[1]
+            
+            image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg', '.ico']
+            video_extensions = ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv']
+            raw_extensions = ['.pdf', '.doc', '.docx', '.txt', '.zip', '.rar', '.7z', 
+                             '.xls', '.xlsx', '.ppt', '.pptx', '.psd', '.ai', '.eps']
+            
+            if extension in image_extensions:
+                resource_type = 'image'
+            elif extension in video_extensions:
+                resource_type = 'video'
+            elif extension in raw_extensions:
+                resource_type = 'raw'
+            else:
+                resource_type = 'raw'
+            
+            return public_id, resource_type
+            
+    except:
+        pass
+    
+    return None, None
 
 class TestimonioSerializer(serializers.ModelSerializer):
     usuario_registrado = serializers.StringRelatedField(read_only=True)
     organizacion_nombre = serializers.CharField(source='organizacion.organizacion_nombre', read_only=True)
     categoria_nombre = serializers.CharField(source='categoria.nombre_categoria', read_only=True)
-    archivo = serializers.FileField(required=False, allow_null=True)
+    archivos = serializers.ListField(
+        child=serializers.FileField(
+            max_length=100,
+            allow_empty_file=False,
+            use_url=False
+        ),
+        required=False,
+        allow_empty=True,
+        max_length=4,
+        write_only=True
+    )
+
+
+    # 👇 NUEVO: Campo solo para lectura que muestra las URLs
+    archivos_urls = serializers.ListField(
+        child=serializers.URLField(read_only=True),
+        source='archivos',  # 👈 Mapea al campo 'archivos' del modelo
+        read_only=True
+    )
 
     # Definir el ranking con validación de rango
     ranking = serializers.DecimalField(
@@ -433,33 +488,54 @@ class TestimonioSerializer(serializers.ModelSerializer):
     usuario_anonimo_email = serializers.EmailField(required=False, allow_blank=True, allow_null=True) 
     api_key = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
-    def validate_archivo(self, file):
+    def validate_archivos(self, archivos):
         """
-        Valida que el archivo no exceda los 5MB y que no se suba más de 1 archivo.
+        Valida el array de archivos
         """
-        # 1. Validación de tamaño (Límite: 5 MB = 5 * 1024 * 1024 bytes)
-        MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 Megabytes
+        MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB por archivo
+        MAX_TOTAL_SIZE = 20 * 1024 * 1024  # 20MB total
+        MAX_FILE_COUNT = 4
         
-        if file:
-            # Dado que DRF solo envía un archivo por campo de tipo FileField,
-            # el límite de "más de 1 archivo" ya está cubierto por el diseño
-            # del modelo y serializador, pero validamos que no sea excesivo.
-
-            if file.size > MAX_FILE_SIZE:
-                # El archivo.size está en bytes
+        if archivos:
+            # Validar cantidad de archivos
+            if len(archivos) > MAX_FILE_COUNT:
                 raise serializers.ValidationError(
-                    f"El tamaño del archivo no puede exceder los {MAX_FILE_SIZE / (1024*1024):.0f}MB."
+                    f"No se pueden subir más de {MAX_FILE_COUNT} archivos."
+                )
+            
+            total_size = 0
+            allowed_extensions = ['.jpg', '.jpeg', '.png', '.pdf', '.doc', '.docx', '.txt']
+            
+            for archivo in archivos:
+                # Validar tamaño individual
+                if archivo.size > MAX_FILE_SIZE:
+                    raise serializers.ValidationError(
+                        f"El archivo {archivo.name} excede el tamaño máximo de {MAX_FILE_SIZE / (1024*1024):.0f}MB."
+                    )
+                
+                # Validar extensión
+                ext = os.path.splitext(archivo.name)[1].lower()
+                if ext not in allowed_extensions:
+                    raise serializers.ValidationError(
+                        f"Tipo de archivo no permitido: {archivo.name}. Extensiones permitidas: {', '.join(allowed_extensions)}"
+                    )
+                
+                total_size += archivo.size
+            
+            # Validar tamaño total
+            if total_size > MAX_TOTAL_SIZE:
+                raise serializers.ValidationError(
+                    f"El tamaño total de los archivos ({total_size / (1024*1024):.1f}MB) excede el límite de {MAX_TOTAL_SIZE / (1024*1024):.0f}MB."
                 )
         
-        # Si todo es correcto, devuelve el archivo.
-        return file
+        return archivos
 
     class Meta:
         model = Testimonios
         fields = [
             'id', 'organizacion', 'organizacion_nombre',  'usuario_registrado',  'usuario_anonimo_email', 
             'usuario_anonimo_username', 
-            'api_key', 'categoria',  'categoria_nombre', 'comentario', 'enlace', 'archivo', 'fecha_comentario', 
+            'api_key', 'categoria',  'categoria_nombre', 'comentario', 'enlace', 'archivos',  'archivos_urls', 'fecha_comentario', 
             'ranking', 'estado'
         ]
         read_only_fields = ['usuario_registrado', 'fecha_comentario', 'organizacion_nombre', 'categoria_nombre', 'estado']
@@ -487,6 +563,13 @@ class TestimonioSerializer(serializers.ModelSerializer):
         usuario_anonimo_username = data.get('usuario_anonimo_username')
         usuario_anonimo_email = data.get('usuario_anonimo_email')
         api_key = data.get('api_key')
+        archivos = data.get('archivos', [])
+
+        if len(archivos) > 4:
+            raise serializers.ValidationError({
+                "archivos": "No se pueden subir más de 4 archivos."
+            })
+        
 
         # 👇 DIFERENCIAR ENTRE CREACIÓN Y ACTUALIZACIÓN
         if self.instance is not None:
@@ -561,32 +644,115 @@ class TestimonioSerializer(serializers.ModelSerializer):
         # Obtener el usuario del contexto (JWT)
         request = self.context.get('request')
         
+        # 👇 EXTRAER los archivos ANTES de crear el testimonio
+        archivos_data = validated_data.pop('archivos', [])
+        
         if request and request.user.is_authenticated:
             # Usuario autenticado: asignar usuario y limpiar campos anónimos automáticamente
             validated_data['usuario_registrado'] = request.user
             validated_data['usuario_anonimo_username'] = None
-            validated_data['usuario_anonimo_email'] = None  # 👈 Agrega esta línea
+            validated_data['usuario_anonimo_email'] = None
         else:
             # Usuario no autenticado: asegurar que usuario_registrado sea None
             validated_data['usuario_registrado'] = None
         
-        # La fecha se establece automáticamente por auto_now_add=True
+        # 👇 SUBIR ARCHIVOS A CLOUDINARY ANTES de crear el testimonio
+        archivos_urls = []
+        try:
+            for archivo in archivos_data:
+                # Subir cada archivo a Cloudinary
+                uploaded_file = cloudinary.uploader.upload(
+                    archivo,
+                    folder='testimonios/archivos/',
+                    resource_type='auto'
+                )
+                archivos_urls.append(uploaded_file['secure_url'])
+            
+            # 👇 AGREGAR las URLs al validated_data
+            validated_data['archivos'] = archivos_urls
+            
+        except Exception as e:
+            # 👇 SI HAY ERROR en la subida, NO se crea el testimonio
+            raise serializers.ValidationError({
+                "archivos": f"Error al subir los archivos: {str(e)}"
+            })
+        
+        # 👇 SOLO SI TODO SALE BIEN, crear el testimonio
         return super().create(validated_data)
-    
+        
     def update(self, instance, validated_data):
-        # Para actualizaciones, manejamos los campos específicos que pueden cambiar
-        # No modificamos usuario_registrado, usuario_anonimo_username, usuario_anonimo_email
-        # ya que estos están establecidos en la creación
+        """
+        Actualiza un testimonio con manejo flexible de archivos.
+        Permite:
+        - Reemplazar todos los archivos (comportamiento actual)
+        - Agregar nuevos archivos sin eliminar los existentes
+        - Eliminar archivos específicos
+        """
+        # 1. Extraer archivos del validated_data
+        archivos_data = validated_data.pop('archivos', None)
         
-        # Actualizar solo los campos permitidos
-        allowed_fields = ['organizacion', 'categoria', 'comentario', 'archivo', 'ranking']
+        # 2. Si se envían nuevos archivos, procesarlos
+        if archivos_data is not None:
+            # Obtener archivos actuales
+            archivos_actuales = instance.archivos.copy() if instance.archivos else []
+            
+            # 👇 ESTRATEGIA: Reemplazar todos los archivos (comportamiento actual)
+            # Si quieres mantener archivos existentes y solo agregar nuevos, cambia esta lógica
+            archivos_nuevos_urls = []
+            
+            try:
+                for archivo in archivos_data:
+                    # Validar tamaño
+                    MAX_FILE_SIZE = 5 * 1024 * 1024
+                    if archivo.size > MAX_FILE_SIZE:
+                        raise serializers.ValidationError({
+                            "archivos": f"El archivo '{archivo.name}' excede el tamaño máximo de 5MB."
+                        })
+                    
+                    # Subir a Cloudinary
+                    uploaded_file = cloudinary.uploader.upload(
+                        archivo,
+                        folder='testimonios/archivos/',
+                        resource_type='auto'
+                    )
+                    archivos_nuevos_urls.append(uploaded_file['secure_url'])
+                
+                # 👇 REEMPLAZAR todos los archivos existentes con los nuevos
+                instance.archivos = archivos_nuevos_urls
+                
+            except Exception as e:
+                # Si hay error, limpiar archivos nuevos subidos
+                for url in archivos_nuevos_urls:
+                    try:
+                        public_id, resource_type = extract_public_id_and_type_from_url(url)
+                        if public_id and resource_type:
+                            cloudinary.uploader.destroy(public_id, resource_type=resource_type)
+                    except:
+                        pass
+                
+                raise serializers.ValidationError({
+                    "archivos": f"Error al actualizar archivos: {str(e)}"
+                })
         
+        # 3. Actualizar otros campos
+        allowed_fields = ['organizacion', 'categoria', 'comentario', 'enlace', 'ranking']
         for field in allowed_fields:
             if field in validated_data:
                 setattr(instance, field, validated_data[field])
         
         instance.save()
         return instance
+
+    def to_representation(self, instance):
+        """
+        Personalizar la representación para mostrar las URLs de los archivos
+        """
+        representation = super().to_representation(instance)
+        
+        # Asegurar que archivos siempre sea una lista
+        representation['archivos_urls'] = instance.archivos if instance.archivos else []
+        
+        return representation
     
 class CambiarEstadoTestimonioSerializer(serializers.ModelSerializer):
     class Meta:

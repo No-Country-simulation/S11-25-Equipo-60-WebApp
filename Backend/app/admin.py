@@ -159,7 +159,7 @@ class ClienteAdmin(UserAdmin, UnfoldModelAdmin):
         # Mostrar todos los usuarios
         return super().get_queryset(request)
 
-    list_display = ('username', 'email', 'get_date_joined', 
+    list_display = ('id', 'username', 'email', 'get_date_joined', 
     #'get_user_groups'
     )
     ordering = ('-date_joined',)
@@ -224,7 +224,7 @@ class EditorAdmin(ClienteAdmin, UnfoldModelAdmin):
 @admin.register(AdminUser)
 class AdminUserAdmin(ClienteAdmin, UnfoldModelAdmin):
 
-    add_form = UserCreationForm
+    add_form = CustomUserCreationForm  # 👈 CAMBIAR AQUÍ
     form = forms.ModelForm
 
     def __init__(self, *args, **kwargs):
@@ -271,7 +271,7 @@ admin.site.unregister(DefaultGroup)
 # Registrar tu modelo personalizado de Roles
 @admin.register(Roles)
 class RolesAdmin(UnfoldModelAdmin):
-    list_display = ['name']
+    list_display = ["id", 'name']
     search_fields = ['name']
     
     # 👇 ESTAS SON LAS LÍNEAS CLAVE QUE NECESITAS AGREGAR/MODIFICAR
@@ -308,7 +308,7 @@ class RolesAdmin(UnfoldModelAdmin):
 @admin.register(Organizacion)
 class OrganizacionAdmin(UnfoldModelAdmin):
 
-    list_display = ("organizacion_nombre", "api_key", "get_editores_list", "get_visitantes_count")
+    list_display = ("id", "organizacion_nombre", "api_key", "get_editores_list", "get_visitantes_count")
     search_fields = ("organizacion_nombre",)
     list_filter = ("fecha_registro",)
     ordering = ("-id",)
@@ -394,7 +394,7 @@ class OrganizacionAdmin(UnfoldModelAdmin):
 @admin.register(Categoria)
 class CategoriaAdmin(UnfoldModelAdmin):
 
-    list_display = ("nombre_categoria", 'icono', 'color', "fecha_registro")
+    list_display = ("id", "nombre_categoria", 'icono', 'color', "fecha_registro")
     search_fields = ("nombre_categoria",)
     list_filter = ("fecha_registro",)
     ordering = ("-id",)
@@ -409,6 +409,7 @@ class CategoriaAdmin(UnfoldModelAdmin):
 class TestimoniosAdmin(UnfoldModelAdmin):
 
     list_display = (
+        "id",
         "get_usuario",
         "organizacion",
         "categoria",

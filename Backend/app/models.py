@@ -6,7 +6,6 @@ from django.db.models import Q, F
 # models.py
 from django.contrib.auth.models import Group
 import uuid
-from cloudinary.models import CloudinaryField
 
 class Roles(Group):
     class Meta:
@@ -128,13 +127,7 @@ class Testimonios(models.Model):
     api_key = models.CharField(max_length=50, blank=False, null=False)
     comentario = models.CharField(max_length=100, blank=True, null=True)
     enlace = models.CharField(max_length=100, blank=True, null=True)
-    archivo = CloudinaryField(
-        'archivo', 
-        folder='testimonios/archivos/',
-        resource_type='auto',  # Acepta cualquier tipo de archivo
-        blank=True, 
-        null=True
-    )
+    archivos = models.JSONField(default=list, blank=True, null=True)  # Array de URLs de archivos
     fecha_comentario = models.DateTimeField(auto_now_add=True) 
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='categoria_testimonios', blank=False)
     ranking = models.DecimalField(default=0, max_digits=3, decimal_places=1)
