@@ -91,7 +91,7 @@ UNFOLD = {
             "href":lambda request: static ("images/logo1.png"),
         },
     ],
-    "SHOW_HISTORY": True, # show/hide "History" button, default: True
+    "SHOW_HISTORY": False, # show/hide "History" button, default: True
     "SHOW_VIEW_ON_SITE": True, # show/hide "View on site" button, default: True
 
     "COLORS": {
