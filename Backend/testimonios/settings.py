@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'pwa',
     'cloudinary', 
     'cloudinary_storage',  
+    "django_otp", #https://django-otp-official.readthedocs.io/en/stable/overview.html
+    "django_otp.plugins.otp_totp",
 ]
 
 MIDDLEWARE = [
@@ -64,6 +66,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
+    'testimonios.middleware.OTPVerificationMiddleware',  # Agregar este middleware
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

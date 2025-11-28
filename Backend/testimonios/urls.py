@@ -37,7 +37,9 @@ class HiddenSchemaView(SpectacularAPIView):
 
 urlpatterns = [
     path('', include('pwa.urls')), #Siempre de primera o sino no funciona
+    path('admin/otp-verification/', OTPVerificationView.as_view(), name='otp_verification'),
     path('admin/', admin.site.urls),
+    path('logout/', custom_logout, name='logout'), 
     path('app/', include('app.urls')), #ESTO LLAMO LOS ENDPOINTS
     #swagger
     path('app/docs/', SpectacularSwaggerView.as_view(), name='docs'),

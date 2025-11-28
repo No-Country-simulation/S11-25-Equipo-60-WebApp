@@ -2,8 +2,8 @@ from django.db import models
 from django.core.exceptions import ValidationError  # 👈 Agrega esta importación
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
-from django.db.models import Q, F
-# models.py
+from django_otp import user_has_device
+from django_otp.plugins.otp_totp.models import TOTPDevice 
 from django.contrib.auth.models import Group
 import uuid
 
@@ -37,6 +37,18 @@ class User(AbstractUser):
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
         ordering = ['-date_joined']
+
+    def is_verified(self):
+        """
+        Verifica si el usuario ha completado la autenticación de dos factores.
+        En este caso, verificamos si tiene dispositivos OTP configurados.
+        """
+        return user_has_device(self)
+    
+    def verify_token(self, token):
+        """Verifica un token OTP para el usuario"""
+        devices = TOTPDevice.objects.devices_for_user(self)
+        return any(device.verify_token(token) for device in devices)
 
     def clean(self):
         super().clean()

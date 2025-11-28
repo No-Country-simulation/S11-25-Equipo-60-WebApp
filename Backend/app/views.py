@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status, generics
 from app.serializers import *
-
+from django.shortcuts import render, redirect
 from app.models import *
 # JWT
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -10,6 +10,60 @@ from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 
+#OTP
+from django.contrib.auth import logout as auth_logout
+from django.views import View
+from django.contrib import messages
+from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+def custom_logout(request):
+    """Logout personalizado que limpia la sesión OTP"""
+    if request.session.get('otp_verified'):
+        del request.session['otp_verified']
+    auth_logout(request)
+    return redirect('/admin/login/?next=/admin/')
+
+class OTPVerificationView(LoginRequiredMixin, View):
+    """Vista para verificar el token OTP"""
+    
+    def get(self, request):
+        # Si ya está verificado, redirigir al admin
+        if request.session.get('otp_verified'):
+            return redirect('admin:index')
+        
+        # Verificar si el usuario tiene dispositivo OTP
+        if not user_has_device(request.user):
+            device = TOTPDevice.objects.create(user=request.user, name='default')
+            messages.info(request, 'Se ha creado un dispositivo de autenticación. Usa tu app de autenticación para generar el código.')
+        
+        return render(request, 'otp_verification.html')
+    
+    def post(self, request):
+        # Verificar si es el botón "Saltar verificación" (solo para desarrollo)
+        if 'skip_verification' in request.POST and settings.DEBUG:
+            request.session['otp_verified'] = True
+            messages.warning(request, 'Verificación OTP saltada (solo en modo desarrollo).')
+            return redirect('admin:index')
+        
+        token = request.POST.get('token', '').strip()
+        
+        if not token:
+            messages.error(request, 'Por favor ingresa el token.')
+            return render(request, 'otp_verification.html')
+        
+        # Verificar el token usando django-otp
+        devices = TOTPDevice.objects.devices_for_user(request.user)
+        verified = any(device.verify_token(token) for device in devices)
+        
+        if verified:
+            request.session['otp_verified'] = True
+            messages.success(request, 'Verificación exitosa. Bienvenido al panel de administración.')
+            return redirect('admin:index')
+        else:
+            messages.error(request, 'Token inválido. Intenta nuevamente.')
+            return render(request, 'otp_verification.html')
+        
 @extend_schema(tags=['Token'], request=RefreshTokenSerializer)
 class TokenRefreshView(generics.GenericAPIView):
     serializer_class = RefreshTokenSerializer  # 👈 Serializador creado manualmente
