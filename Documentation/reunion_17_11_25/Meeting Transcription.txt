@@ -114,7 +114,7 @@ admin
 26:38 Jesus Medina: pero no no, no, no ese es para loguearse como administrador pero ese ese panel es el que está en Dyango
 26:50 Alejandro Navarro: Sí perdón, perdón Jesús
 26:51 Jesus Medina: Bueno yo no sé si pronto manejaría eso.
-26:52 Jesus Medina: https://apitestimonial.vercel.app/admin/
+26:52 Jesus Medina: https://apptestimonial.vercel.app/admin/
 26:57 Alejandro Navarro: No todavía no
 26:59 Jesus Medina: Ah bueno pero ese el admin, los usuarios administrativos se deberían en la URL que acaba de mandar. O sea, yo creo que no no debería hacer un dashboard.
 27:11 david coach dev: Cuentas de prueba:
@@ -472,7 +472,7 @@ Respuesta del login
 01:37:17 david coach dev: Más funcionalidades literalmente el para nosotros el editor.
 01:37:22 José Ortega: Editor
 01:37:23 david coach dev: Tiene que tener todo lo que es amigo del ingreso publicación.
-01:37:28 Alejandro Navarro: https://apitestimonial.vercel.app/app/docs
+01:37:28 Alejandro Navarro: https://apptestimonial.vercel.app/app/docs
 01:37:32 Alejandro Navarro: sabías, te la mandé por aquí Ah bueno Sí ahí ya.
 01:37:33 José Ortega: Sí, sí. Sí pero me comentaba Bueno ahorita, dijo Jesús que iba a subir este a producción ya entonces para que ver que tiene el local y ver que tiene en él ahorita en producción, porque yo también lo estaba revisando y pues para avanzar en lo que tiene más y dejar lo que Ya este lo demás.
 01:37:54 Vladimir Villacrés: Consulta consulta va landing. Luego se abre login y luego entra al dashboard

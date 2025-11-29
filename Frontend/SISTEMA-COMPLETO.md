@@ -4,7 +4,7 @@
 
 **Estado General**: 98% Completo  
 **Fecha**: 24 de noviembre de 2025  
-**Backend**: https://apitestimonial.vercel.app  
+**Backend**: https://apptestimonial.vercel.app  
 **Autenticación**: JWT con prefijo "JWT" (no "Bearer")
 
 ---

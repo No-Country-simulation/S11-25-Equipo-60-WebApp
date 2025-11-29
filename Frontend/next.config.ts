@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'apitestimonial.vercel.app',
+        hostname: 'apptestimonial.vercel.app',
       },
       {
         protocol: 'https',

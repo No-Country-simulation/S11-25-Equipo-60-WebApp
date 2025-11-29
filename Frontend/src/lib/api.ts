@@ -2,7 +2,7 @@ import axios from 'axios';
 import { logger } from './logger';
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://apitestimonial.vercel.app',
+    baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://apptestimonial.vercel.app',
 });
 
 api.interceptors.request.use((config) => {
