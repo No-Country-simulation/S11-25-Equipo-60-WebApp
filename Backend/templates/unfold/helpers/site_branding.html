@@ -1,0 +1,9 @@
+<div id="site-name">
+    {% if site_dropdown %}
+        {{ site_header|default:_('Dashboard Adminsitradores') }}
+    {% else %}
+        <a href="{% url 'admin:index' %}">
+            {{ site_header|default:_('Dashboard Adminsitradores') }}
+        </a>
+    {% endif %}
+</div>

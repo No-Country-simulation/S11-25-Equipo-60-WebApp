@@ -1,0 +1,26 @@
+# Generate Action Items
+
+- [ ] Alejandro: Finalizar la integración del login, incluyendo el manejo del estado global con sustan.  
+- [ ] José: Encargarse del desarrollo de la landing page y coordinar tareas con Alejandro.  
+- [ ] Jesús: Subir a producción el backend, crear el endpoint para auto-login en Django y gestionar roles y permisos según lo discutido.  
+- [ ] Luis: Aprender Next.js, React y colaborar con Alejandro en componentes del frontend.  
+- [ ] Vladimir: Terminar la landing page y coordinar con José para evitar duplicación de trabajo.  
+- [ ] Jesús: Crear sistema para crear usuarios administradores y manejar roles de usuarios según estructura definida.  
+- [ ] José: Vaciar usuarios de prueba y mantener solo dos cuentas de prueba estandarizadas (admin y editor).  
+- [ ] Jesús: Implementar validación de dominios permitidos en la organización y la lógica para usuarios anónimos con API key.  
+- [ ] Todos: Acordar y respetar horario fijo para reuniones, proponiendo 10:30 pm hora Argentina para próximas sesiones.  
+- [ ] David: Gestionar y mantener la documentación actualizada, incluyendo casos de uso, diseños y estructura general.  
+- [ ] Jesús y David: Revisar y organizar tablas en Django para roles, estados y permisos, definiendo claramente flujos para testimonio, categorías y organización.  
+- [ ] Todos los miembros del equipo Frontend: Definir un responsable de frontend que coordine avances y evite solapamientos.  
+- [ ] David: Planificar integración entre escritor y editor con el flujo del campo "feedback" en los testimonios.  
+- [ ] Todos: Implementar estilos de diseño uniformes para evitar inconsistencias visuales en la aplicación.  
+- [ ] Todos: Mantener comunicación constante en el chat de equipo para seguimiento diario y reportar avances.  
+- [ ] David, Jesús y Jesús backend: Organizar reunión próxima para ajustar detalles técnicos sobre permisos y endpoints.  
+- [ ] José y Vladimir: Dividir tareas del frontend (landing y login) y avanzar en paralelo para cumplir con entregables del jueves.  
+- [ ] Jesús: Implementar límites y seguridad en las peticiones API para usuarios anónimos y autenticados.  
+- [ ] Todos: Actualizar la base de datos con los estados aprobados para testimonios y organizar campos para la correcta gestión y visualización.  
+- [ ] Jesús: Implementar cambio automático de roles y permisos para usuarios desde el dashboard con control del administrador.  
+- [ ] Todos: Realizar pruebas con las cuentas de prueba proporcionadas para validar roles y navegación entre dashboards.  
+- [ ] Todos: Usar preferentemente navegador Chrome para pruebas y desarrollos debido a problemas detectados con otros navegadores.  
+- [ ] David y Jesús: Definir roles detallados y responsabilidades diferenciadas para administrador global, administrador de dominio, editor y visitante.  
+- [ ] David: Hacer saneamiento en repositorios, roles de usuarios y documentación para mantener coherencia y control.
