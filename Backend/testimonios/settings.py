@@ -34,7 +34,11 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
-
+if DEBUG:
+    FRONTEND_URL = config('DEV_FRONTEND_URL', default='http://localhost:3000')
+else:
+    FRONTEND_URL = config('PROD_FRONTEND_URL', default='https://testimonial-cms.vercel.app')
+    
 # Application definition
 
 INSTALLED_APPS = [
@@ -322,7 +326,7 @@ DJOSER = {
     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': 
     [
         #Aqui esta mandando el backend a las urls del frontend
-        'https://testimonial-cms.vercel.app', #WEB
+        FRONTEND_URL,
     ],
     'EMAIL': {
         'password_reset': 'app.custom_email.CustomPasswordResetEmail', #solicitud para recuperar password olvidada
