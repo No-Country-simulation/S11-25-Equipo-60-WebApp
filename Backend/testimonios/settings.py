@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',  
     "django_otp", #https://django-otp-official.readthedocs.io/en/stable/overview.html
     "django_otp.plugins.otp_totp",
+    'djoser', #envio de emails
 ]
 
 MIDDLEWARE = [
@@ -239,18 +240,18 @@ CORS_ALLOW_HEADERS = [
 REST_FRAMEWORK = {
 
     #DRF JWT
-       'DEFAULT_AUTHENTICATION_CLASSES': (
-           'rest_framework_simplejwt.authentication.JWTAuthentication',
-       ),
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework_simplejwt.authentication.JWTAuthentication',
+        ),
     #Funcionalidad de limites de peticiones por la misma IP
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '60/hour',  # Limit unauthenticated users to 60 requests per hour
-        'user': '600/hour',  # Limit authenticated users to 600 requests per hour
-    },
+        'DEFAULT_THROTTLE_CLASSES': [
+            'rest_framework.throttling.AnonRateThrottle',
+            'rest_framework.throttling.UserRateThrottle',
+        ],
+        'DEFAULT_THROTTLE_RATES': {
+            'anon': '60/hour',  # Limit unauthenticated users to 60 requests per hour
+            'user': '600/hour',  # Limit authenticated users to 600 requests per hour
+        },
 
     #PERMISOS
        'DEFAULT_PERMISSION_CLASS': ('rest_framework.permissions.IsAuthenticated',),
@@ -289,6 +290,46 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': True,
 }
 
+#########3ENVIOS DE EMAILS, EN ESTE CASO ES PARA RECUPERACION DE CONTRASEÑA
+##SE ACTIVA LA VERIFICACION EN 2 PASOS Y DESPUES SE ESCRIBE CONTASEÑAS DE APLICACION
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = 587
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
+
+DEFAULT_FROM_EMAIL = 'Testimonial CMS <sistemaetiac@gmail.com>' 
+DOMAIN = config('DOMAIN')
+SITE_NAME = 'Testimonial CMS' 
+PROTOCOL = config('PROTOCOLO')
+
+
+
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': False,
+    'USERNAME_CHANGED_EMAIL_CONFIRMATION': False,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': False,
+    'SEND_CONFIRMATION_EMAIL': False,
+    'SEND_ACTIVATION_EMAIL': False,
+    'SET_USERNAME_RETYPE': False,
+    'SET_PASSWORD_RETYPE': True,
+    # Aquí Djoser construirá la URL por mi, por eso no debo poner el dominio
+    'PASSWORD_RESET_CONFIRM_URL': 'password/confirm/{uid}/{token}',
+    'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
+    'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': 
+    [
+        #Aqui esta mandando el backend a las urls del frontend
+        'https://testimonial-cms.vercel.app', #WEB
+    ],
+    'EMAIL': {
+        'password_reset': 'app.custom_email.CustomPasswordResetEmail', #solicitud para recuperar password olvidada
+        'password_changed_confirmation': 'app.custom_email.CustomPasswordConfirmEmail', #enlace que abro para nueva password
+    },
+}
+
 
 #Configuracion de Swagger
 SPECTACULAR_SETTINGS = {
@@ -304,6 +345,7 @@ SPECTACULAR_SETTINGS = {
     'TAGS': [
         {'name': 'Login', 'description': 'Operaciones de autenticación'},
         {'name': 'Token', 'description': 'Operaciones relacionadas con los tokens JWT'},
+        {'name': 'auth', 'description': 'Operaciones relacionadas con la recuperacion de contraseñas'},
         {'name': 'Visitantes', 'description': 'Operaciones relacionadas con los Usuarios visitantes'},
         {'name': 'Editores', 'description': 'Operaciones relacionadas con las Usuarios Editores'},
         {'name': 'Administradores', 'description': 'Operaciones relacionadas con las Usuarios admins'},

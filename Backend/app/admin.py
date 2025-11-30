@@ -6,6 +6,25 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
+from django_otp.plugins.otp_totp.models import TOTPDevice
+from django_otp.plugins.otp_totp.admin import TOTPDeviceAdmin
+
+# Desregistrar el admin por defecto de TOTPDevice
+admin.site.unregister(TOTPDevice)
+
+# Registrar TOTPDevice con nombre personalizado
+@admin.register(TOTPDevice)
+class CustomTOTPDeviceAdmin(TOTPDeviceAdmin):
+    # Cambiar el verbose_name del modelo
+    class Meta:
+        verbose_name = 'Usuario 2FA'
+        verbose_name_plural = 'Usuarios 2FA'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Cambiar el nombre en la lista de modelos
+        self.model._meta.verbose_name = 'Usuario 2FA'
+        self.model._meta.verbose_name_plural = 'Usuarios 2FA'
 class CustomUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

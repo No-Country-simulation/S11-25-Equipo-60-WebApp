@@ -1,4 +1,4 @@
-from django.urls import path,include
+from django.urls import path,include, re_path
 from rest_framework import routers
 from app import views
 from .views import *
@@ -20,6 +20,8 @@ router.register(r'testimonios-cambiar-estado', CambiarEstadoTestimonioViewSet, b
 
 urlpatterns=[
     path('', include(router.urls)),
+    path('auth/reset/password/', UserViewSet.as_view({'post': 'reset_password'}), name='password-reset'),
+    path('auth/reset/password/confirm/', UserViewSet.as_view({'post': 'reset_password_confirm'}), name='password-reset-confirm'),
 ]
 
 

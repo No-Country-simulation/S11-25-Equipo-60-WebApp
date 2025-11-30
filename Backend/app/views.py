@@ -17,6 +17,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from djoser.views import UserViewSet
 def custom_logout(request):
     """Logout personalizado que limpia la sesión OTP"""
     if request.session.get('otp_verified'):
