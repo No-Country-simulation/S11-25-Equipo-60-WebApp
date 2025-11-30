@@ -6,24 +6,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verificación OTP - Testimonial CMS</title>
     <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #101828;
+            --text-primary: #000000;
+            --text-secondary: #666666;
+            --border-color: #dddddd;
+            --primary-color: #667eea;
+            --secondary-color: #6c757d;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #101828;
+            --bg-secondary: #101828;
+            --text-primary: #666666;
+            --text-secondary: #cccccc;
+            --border-color: #444444;
+            --primary-color: #7c93f5;
+            --secondary-color: #5a6268;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: var(--bg-primary);
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            transition: background-color 0.3s ease;
         }
 
         .otp-container {
-            background: white;
+            background: var(--bg-primary);
             padding: 2rem;
             border-radius: 10px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 400px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .theme-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .theme-toggle {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--border-color);
+        }
+
+        .theme-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px;
+            min-width: 120px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+
+        .theme-menu.show {
+            display: block;
+        }
+
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-primary);
+            transition: background-color 0.2s ease;
+        }
+
+        .theme-option:hover {
+            background: var(--border-color);
+        }
+
+        .theme-option.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .theme-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .logo {
@@ -31,14 +128,9 @@
             margin-bottom: 2rem;
         }
 
-        .logo img {
-            max-width: 150px;
-            height: auto;
-        }
-
         h1 {
             text-align: center;
-            color: #333;
+            color: var(--text-primary);
             margin-bottom: 1.5rem;
             font-size: 1.5rem;
         }
@@ -50,14 +142,14 @@
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #555;
+            color: var(--text-secondary);
             font-weight: 500;
         }
 
         input[type="text"] {
             width: 100%;
             padding: 12px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--border-color);
             border-radius: 5px;
             font-size: 16px;
             transition: border-color 0.3s;
@@ -66,24 +158,31 @@
             letter-spacing: 8px;
             font-size: 20px;
             font-weight: bold;
+            background: var(--bg-primary);
+            color: var(--text-primary);
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary-color);
         }
 
         .btn {
             width: 100%;
             padding: 12px;
-            background: #667eea;
+            background: var(--primary-color);
             color: white;
             border: none;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
             transition: background 0.3s;
-            margin-bottom: 10px;
+            margin-bottom: 0;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            box-sizing: border-box;
+            font-family: inherit;
         }
 
         .btn:hover {
@@ -91,7 +190,7 @@
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: var(--secondary-color);
         }
 
         .btn-secondary:hover {
@@ -106,30 +205,31 @@
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 1rem;
+            border: 1px solid;
         }
 
         .alert-error {
             background: #fee;
-            border: 1px solid #fcc;
+            border-color: #fcc;
             color: #c33;
         }
 
         .alert-info {
             background: #eef;
-            border: 1px solid #ccf;
+            border-color: #ccf;
             color: #336;
         }
 
         .alert-success {
             background: #efe;
-            border: 1px solid #cfc;
+            border-color: #cfc;
             color: #363;
         }
 
         .user-info {
             text-align: center;
             margin-bottom: 1rem;
-            color: #666;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
 
@@ -142,6 +242,28 @@
 </head>
 
 <body>
+    <div class="theme-selector">
+        <div class="theme-dropdown">
+            <button class="theme-toggle" id="themeToggle">
+                <span class="theme-icon">🌙</span>
+            </button>
+            <div class="theme-menu" id="themeMenu">
+                <div class="theme-option" data-theme="light">
+                    <span class="theme-icon">☀️</span>
+                    <span>Light</span>
+                </div>
+                <div class="theme-option" data-theme="dark">
+                    <span class="theme-icon">🌙</span>
+                    <span>Dark</span>
+                </div>
+                <div class="theme-option" data-theme="system">
+                    <span class="theme-icon">💻</span>
+                    <span>System</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="otp-container">
         <div class="logo">
             <h1>🔒 Verificación OTP</h1>
@@ -169,20 +291,98 @@
                     pattern="[0-9]{6}">
             </div>
 
-            <!-- En el div .button-group, agrega este botón adicional SOLO PARA DESARROLLO -->
-            <!-- En tu template, reemplaza el botón de salir con esto: -->
             <div class="button-group">
-                <button type="submit" class="btn">Verificar</button>
-                <a href="/logout/" class="btn btn-secondary" style="text-decoration: none; text-align: center;">
-                    Salir
-                </a>
+                <button type="submit" class="btn btn-form">Verificar</button>
+                <a href="/logout/" class="btn btn-secondary btn-link">Salir</a>
             </div>
         </form>
 
-        <div style="margin-top: 1rem; text-align: center; color: #666; font-size: 0.9rem;">
+        <div style="margin-top: 1rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
             <p>Usa tu aplicación de autenticación para generar el código de 6 dígitos.</p>
         </div>
     </div>
+
+    <script>
+        // Funcionalidad del selector de tema
+        const themeToggle = document.getElementById('themeToggle');
+        const themeMenu = document.getElementById('themeMenu');
+        const themeOptions = document.querySelectorAll('.theme-option');
+
+        // Toggle del menú
+        themeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            themeMenu.classList.toggle('show');
+        });
+
+        // Cerrar menú al hacer clic fuera
+        document.addEventListener('click', () => {
+            themeMenu.classList.remove('show');
+        });
+
+        // Prevenir que el clic en el menú lo cierre
+        themeMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Cambiar tema
+        themeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const theme = option.getAttribute('data-theme');
+                setTheme(theme);
+                themeMenu.classList.remove('show');
+                
+                // Actualizar opción activa
+                themeOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                
+                // Actualizar icono del toggle
+                updateToggleIcon(theme);
+            });
+        });
+
+        function setTheme(theme) {
+            let actualTheme = theme;
+            
+            if (theme === 'system') {
+                actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            
+            document.documentElement.setAttribute('data-theme', actualTheme);
+            localStorage.setItem('theme', theme);
+        }
+
+        function updateToggleIcon(theme) {
+            const iconMap = {
+                'light': '☀️',
+                'dark': '🌙',
+                'system': '💻'
+            };
+            themeToggle.querySelector('.theme-icon').textContent = iconMap[theme];
+        }
+
+        // Cargar tema guardado al iniciar
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'system';
+            const optionToActivate = document.querySelector(`[data-theme="${savedTheme}"]`);
+            
+            if (optionToActivate) {
+                optionToActivate.click();
+            } else {
+                setTheme('system');
+            }
+        }
+
+        // Escuchar cambios del sistema
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'system') {
+                setTheme('system');
+            }
+        });
+
+        // Inicializar
+        loadTheme();
+    </script>
 </body>
 
 </html>
