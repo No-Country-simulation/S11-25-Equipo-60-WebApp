@@ -7,6 +7,8 @@ from django.contrib.auth.models import Group
 # Agrega estos imports al inicio del archivo
 from django.utils import timezone
 import os
+from .utils import get_domain_from_url
+
 ######################################33LOGIN
 
 class LoginSerializer(serializers.Serializer):
@@ -541,6 +543,7 @@ class TestimonioSerializer(serializers.ModelSerializer):
         read_only_fields = ['usuario_registrado', 'fecha_comentario', 'organizacion_nombre', 'categoria_nombre', 'estado']
 
     def validate(self, data):
+    
         model_fields = {field.name for field in Testimonios._meta.get_fields()}
         extra_fields = set(self.initial_data.keys()) - model_fields
         
@@ -557,88 +560,75 @@ class TestimonioSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     "ranking": "El ranking debe estar entre 1 y 5."
                 })
-        
+    
         request = self.context.get('request')
         organizacion = data.get('organizacion')
-        usuario_anonimo_username = data.get('usuario_anonimo_username')
-        usuario_anonimo_email = data.get('usuario_anonimo_email')
         api_key = data.get('api_key')
         archivos = data.get('archivos', [])
-
+    
+        # Validación de archivos (igual que antes)
         if len(archivos) > 4:
-            raise serializers.ValidationError({
-                "archivos": "No se pueden subir más de 4 archivos."
-            })
-        
-
-        # 👇 DIFERENCIAR ENTRE CREACIÓN Y ACTUALIZACIÓN
-        if self.instance is not None:
-            # ES UNA ACTUALIZACIÓN - La API key no es requerida
-            if api_key and organizacion:
-                if api_key != organizacion.api_key:
-                    raise serializers.ValidationError({
-                        "api_key": "La API key proporcionada no es válida para esta organización."
-                    })
-        else:
-            # ES UNA CREACIÓN - La API key es requerida
+            raise serializers.ValidationError({"archivos": "No se pueden subir más de 4 archivos."})
+    
+        # Validación de API key (igual que antes para creación vs actualización)
+        if self.instance is None:  # Creación
             if not api_key:
-                raise serializers.ValidationError({
-                    "api_key": "La API key es requerida para crear un testimonio."
-                })
+                raise serializers.ValidationError({"api_key": "La API key es requerida para crear un testimonio."})
+            if organizacion and api_key != organizacion.api_key:
+                raise serializers.ValidationError({"api_key": "La API key no es válida para esta organización."})
+        else:  # Actualización
+            if organizacion and api_key and api_key != organizacion.api_key:
+                raise serializers.ValidationError({"api_key": "La API key no es válida para esta organización."})
+    
+        # 👇 NUEVA LÓGICA: ¿El frontend coincide con el dominio de la organización?
+        if organizacion and request and self.instance is None:  # Solo en creación
+            referer = request.META.get('HTTP_REFERER')
+            current_frontend_domain = get_domain_from_url(referer) if referer else None
+            organizacion_domain = get_domain_from_url(f"https://{organizacion.dominio}")
 
-            # Validar que la API key coincida con la organización SOLO para creación
-            if api_key != organizacion.api_key:
-                raise serializers.ValidationError({
-                    "api_key": "La API key proporcionada no es válida para esta organización."
-                })
 
-        # 👇 NUEVA VALIDACIÓN: Usuarios visitantes SOLO pueden crear testimonios en organizaciones a las que pertenecen
-        if request and request.user.is_authenticated:
-            user = request.user
-            
-            # Si es usuario visitante, verificar que pertenezca a la organización
-            if user.groups.filter(name='visitante').exists() and organizacion:
-                if not organizacion.visitantes.filter(id=user.id).exists():
-                    raise serializers.ValidationError({
-                        "organizacion": f"No perteneces a la organización '{organizacion.organizacion_nombre}'. Solo puedes crear testimonios en organizaciones a las que perteneces."
-                    })
-            
-            # Validar que no exista un testimonio de este usuario para esta organización
-            if organizacion:
-                if Testimonios.objects.filter(
-                    organizacion=organizacion, 
-                    usuario_registrado=user
-                ).exists():
-                    raise serializers.ValidationError({
-                        "organizacion": "Ya has creado un testimonio para esta organización. Solo puedes crear uno por organización."
-                    })
-        
-        # 👇 Validaciones para usuarios NO autenticados (mantener lógica actual)
-        else:
-            if not usuario_anonimo_username:
-                raise serializers.ValidationError({
-                    "usuario_anonimo_username": "Este campo es requerido para usuarios no autenticados."
-                })
-            
-            if not usuario_anonimo_email:
-                raise serializers.ValidationError({
-                    "usuario_anonimo_email": "Este campo es requerido para usuarios no autenticados."
-                })
-            
-            # Validar que no exista un testimonio anónimo con la misma combinación
-            if organizacion and usuario_anonimo_username and usuario_anonimo_email:
-                if Testimonios.objects.filter(
-                    organizacion=organizacion,
-                    usuario_anonimo_username=usuario_anonimo_username,
-                    usuario_anonimo_email=usuario_anonimo_email,
-                    usuario_registrado__isnull=True
-                ).exists():
-                    raise serializers.ValidationError({
-                        "detail": "Ya existe un testimonio anónimo para esta organización con el mismo nombre de usuario y email."
-                    })
-        
+            print(f"REFERER recibido: {referer}")
+            print(f"Frontend (extraído): {current_frontend_domain}")
+            print(f"Dominio organización (configurado): {organizacion.dominio}")
+            print(f"Organización (extraído): {organizacion_domain}")
+    
+            # ✅ Si el dominio del frontend coincide con el dominio de la organización → permitir
+            if current_frontend_domain == organizacion_domain:
+                # Permitir el testimonio incluso si el usuario no está asignado
+                pass
+            else:
+                # 👇 Aplicar la regla antigua solo si NO hay coincidencia de dominio
+                if request.user.is_authenticated:
+                    user = request.user
+                    if user.groups.filter(name='visitante').exists():
+                        if not organizacion.visitantes.filter(id=user.id).exists():
+                            raise serializers.ValidationError({
+                                "organizacion": f"No perteneces a la organización '{organizacion.organizacion_nombre}'."
+                            })
+                    # Verificar duplicado por usuario registrado
+                    if Testimonios.objects.filter(
+                        organizacion=organizacion,
+                        usuario_registrado=user
+                    ).exists():
+                        raise serializers.ValidationError({
+                            "organizacion": "Ya has creado un testimonio para esta organización."
+                        })
+                else:
+                    # Usuario anónimo: validar duplicado por email + username
+                    usuario_anonimo_username = data.get('usuario_anonimo_username')
+                    usuario_anonimo_email = data.get('usuario_anonimo_email')
+                    if organizacion and usuario_anonimo_username and usuario_anonimo_email:
+                        if Testimonios.objects.filter(
+                            organizacion=organizacion,
+                            usuario_anonimo_username=usuario_anonimo_username,
+                            usuario_anonimo_email=usuario_anonimo_email,
+                            usuario_registrado__isnull=True
+                        ).exists():
+                            raise serializers.ValidationError({
+                                "detail": "Ya existe un testimonio anónimo para esta organización con el mismo nombre y email."
+                            })
+    
         return data
-        
 
     def create(self, validated_data):
         # Obtener el usuario del contexto (JWT)
