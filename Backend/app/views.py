@@ -9,7 +9,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiExam
 from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
-
+from urllib.parse import urlparse 
 #OTP
 from django.contrib.auth import logout as auth_logout
 from django.views import View
@@ -200,6 +200,39 @@ class UsuarioVisitanteViewSet(viewsets.ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
+        # --- Nueva Lógica ---
+        origin = request.META.get('HTTP_ORIGIN', None)
+        organizacion_asociar = None
+
+        if origin:
+            try:
+                # Parsea la URL para obtener solo el dominio neto
+                parsed_origin = urlparse(origin)
+                origin_domain = f"{parsed_origin.scheme}://{parsed_origin.netloc}".lower()
+                # O si solo almacenas 'microsoft.com' sin 'https://', usa:
+                # origin_domain = parsed_origin.netloc.lower()
+
+                # Busca la organización por el dominio exacto
+                # Asegúrate de que el campo 'dominio' en tu modelo esté almacenado consistentemente
+                # (con o sin 'https://') para que coincida correctamente.
+                # Si almacenas solo 'microsoft.com', usa:
+                # origin_domain = parsed_origin.netloc.lower()
+                # Si almacenas 'https://microsoft.com', usa la línea comentada arriba.
+                # Suponiendo que almacenas 'https://microsoft.com':
+                organizacion_asociar = Organizacion.objects.get(dominio__iexact=origin_domain)
+                # logger.debug(f"Coincidencia de dominio encontrada: {origin_domain} -> {organizacion_asociar.organizacion_nombre}")
+            except Organizacion.DoesNotExist:
+                # logger.debug(f"No se encontró organización para el dominio: {origin_domain}")
+                pass # No hacer nada si no hay coincidencia
+            except Exception as e:
+                # logger.error(f"Error buscando organización por dominio: {e}")
+                pass # Manejo de error genérico, opcional
+        else:
+            # logger.debug("No se encontró encabezado Origin en la solicitud.")
+            pass # Origin no está presente, no se puede asociar
+
+        # --- Fin Nueva Lógica ---
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -218,13 +251,33 @@ class UsuarioVisitanteViewSet(viewsets.ModelViewSet):
             grupo_visitante = Group.objects.create(name='visitante')
             user.groups.add(grupo_visitante)
 
-        return Response(
-            {
-                "message": "Usuario creado exitosamente y asignado al grupo 'visitante'",
-                "user_id": user.id
-            },
-            status=status.HTTP_201_CREATED
-        )
+        # --- Nueva Lógica (continuación) ---
+        if organizacion_asociar:
+            try:
+                # Agrega el usuario recién creado a la lista de visitantes de la organización
+                organizacion_asociar.visitantes.add(user)
+                # logger.info(f"Usuario {user.email} agregado como visitante a la organización {organizacion_asociar.organizacion_nombre} basado en Origin: {origin}")
+            except Exception as e:
+                # logger.error(f"Error agregando usuario {user.email} a la organización {organizacion_asociar.organizacion_nombre}: {e}")
+                # Puedes optar por continuar o devolver un error
+                # Si decides continuar, el usuario se crea pero no se asocia a la organización
+                pass # Opcional: manejar error al agregar a la organización
+
+        # --- Fin Nueva Lógica (continuación) ---
+
+        # Opcional: Devolver información adicional sobre la asociación
+        response_data = {
+            "message": "Usuario creado exitosamente y asignado al grupo 'visitante'",
+            "user_id": user.id,
+        }
+        if organizacion_asociar:
+            response_data["asociado_a_organizacion"] = {
+                "id": organizacion_asociar.id,
+                "nombre": organizacion_asociar.organizacion_nombre,
+                "dominio": organizacion_asociar.dominio
+            }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
    
     def update(self, request, *args, **kwargs):
         if not kwargs.get('partial', False):
