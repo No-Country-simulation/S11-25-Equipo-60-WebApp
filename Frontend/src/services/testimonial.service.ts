@@ -80,6 +80,12 @@ export const testimonialService = {
     },
 
     // Crear un nuevo testimonio
+    // IMPORTANTE: La API acepta hasta 4 archivos mediante FormData con el campo "archivos"
+    // Ejemplo FormData:
+    //   formData.append('archivos', file1);
+    //   formData.append('archivos', file2);
+    //   formData.append('archivos', file3);
+    //   formData.append('archivos', file4);
     createTestimonial: async (data: FormData | Partial<Testimonio>) => {
         const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
 
@@ -140,7 +146,6 @@ export const testimonialService = {
      * Este endpoint es PÚBLICO (no requiere autenticación).
      *
      * Usado por:
-     * - Admin: Para ver todos los testimonios públicos del sistema
      * - Landing page: Para mostrar testimonios aprobados al público
      *
      * @returns Array de testimonios aprobados públicos
@@ -150,13 +155,38 @@ export const testimonialService = {
         return response.data;
     },
 
+    /**
+     * GET /app/testimonios-totales/
+     *
+     * Obtiene TODOS los testimonios según el rol:
+     * - ADMIN: Obtiene TODOS los testimonios del sistema (cualquier estado)
+     * - EDITOR: Obtiene testimonios de sus organizaciones (cualquier estado)
+     * - VISITANTE: Obtiene sus propios testimonios
+     *
+     * Este es el endpoint correcto para que ADMIN vea TODOS los testimonios.
+     *
+     * @returns Array de testimonios según permisos del usuario
+     */
+    getAllTestimonials: async () => {
+        const response = await api.get('/app/testimonios-totales/');
+        return response.data;
+    },
+
     // Cambiar estado de un testimonio (solo editor de la organización)
     changeTestimonialStatus: async (id: number, estado: 'E' | 'A' | 'R' | 'P' | 'B' | 'O') => {
         const response = await api.patch(`/app/testimonios-cambiar-estado/${id}/`, { estado });
         return response.data;
     },
 
-    // Obtener estadísticas de testimonios (solo editores)
+    /**
+     * GET /app/testimonios-totales/estadisticas/
+     *
+     * Obtiene estadísticas de testimonios por organización:
+     * - ADMIN: Estadísticas de TODAS las organizaciones
+     * - EDITOR: Estadísticas de SUS organizaciones
+     *
+     * @returns Array de estadísticas por organización
+     */
     getStatistics: async () => {
         const response = await api.get('/app/testimonios-totales/estadisticas/');
         return response.data;

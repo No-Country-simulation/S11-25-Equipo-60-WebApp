@@ -7,6 +7,12 @@ export const organizationService = {
         return response.data;
     },
 
+    // Obtener organizaciones del editor actual
+    getEditorOrganizations: async () => {
+        const response = await api.get('/app/organizacion/');
+        return response.data;
+    },
+
     // Obtener una organización específica
     getOrganization: async (id: number) => {
         const response = await api.get(`/app/organizacion/${id}/`);
@@ -31,21 +37,27 @@ export const organizationService = {
         return response.data;
     },
 
-    // Obtener testimonios aprobados de una organización
+    // Obtener testimonios aprobados de una organización (público)
     getApprovedTestimonials: async (id: number) => {
         const response = await api.get(`/app/organizacion/${id}/testimonios-aprobados/`);
         return response.data;
     },
 
-    // Obtener organizaciones del editor actual
-    getEditorOrganizations: async () => {
-        const response = await api.get('/app/organizacion/editores/');
+    // Agregar editores a una organización (solo editor de la org o admin)
+    addEditors: async (id: number, editores: number[]) => {
+        const response = await api.post(`/app/organizacion/${id}/agregar-editores/`, { editores });
         return response.data;
     },
 
-    // Agregar editores a una organización
-    addEditors: async (id: number, editores: number[]) => {
-        const response = await api.post(`/app/organizacion/${id}/agregar-editores/`, { editores });
+    // Agregar visitantes a una organización (solo editor de la org o admin)
+    addVisitantes: async (id: number, visitantes: number[]) => {
+        const response = await api.post(`/app/organizacion/${id}/agregar-visitantes/`, { visitantes });
+        return response.data;
+    },
+
+    // Obtener lista de todos los visitantes disponibles (para editores)
+    getVisitantes: async () => {
+        const response = await api.get('/app/visitantes/');
         return response.data;
     },
 };

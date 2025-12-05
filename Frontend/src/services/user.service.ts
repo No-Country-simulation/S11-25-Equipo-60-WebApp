@@ -70,8 +70,31 @@ export const userService = {
         return response.data;
     },
 
+    deleteAdmin: async (id: number) => {
+        const response = await api.delete(`/app/administradores/${id}/`);
+        return response.data;
+    },
+
     deleteAdministrador: async (id: number) => {
         const response = await api.delete(`/app/administradores/${id}/`);
+        return response.data;
+    },
+
+    // Obtener perfil del editor actual
+    getEditorProfile: async (id: number) => {
+        const response = await api.get(`/app/editores/${id}/`);
+        return response.data;
+    },
+
+    // Actualizar perfil del editor
+    updateEditorProfile: async (id: number, data: { username?: string; email?: string; password?: string; profile_picture?: string }) => {
+        const response = await api.patch(`/app/editores/${id}/`, data);
+        return response.data;
+    },
+
+    // Eliminar cuenta del editor
+    deleteEditorAccount: async (id: number) => {
+        const response = await api.delete(`/app/editores/${id}/`);
         return response.data;
     },
 };
