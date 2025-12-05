@@ -37,18 +37,34 @@ class UsuarioVisitanteSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,
         min_length=8,  # 👈 Validación adicional
+        required=False,  # 👈 IMPORTANTE: Hacerlo opcional para updates
         error_messages={
             'min_length': 'La contraseña debe tener al menos 8 caracteres.'
         }
     )
 
+    # 👇 NUEVO: Campo para la foto de perfil
+    profile_picture = serializers.ImageField(
+        required=False,
+        allow_null=True,
+        write_only=True
+    )
+    
+    # 👇 Campo de solo lectura para obtener la URL
+    profile_picture_url = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = User
 
         fields = [
-            'id', 'username', 'email', 'password', 'date_joined'
+            'id', 'username', 'email', 'password', 'date_joined',
+            'profile_picture', 'profile_picture_url'  # 👈 Agregados
         ]
         read_only_fields = ['date_joined']
+
+    def get_profile_picture_url(self, obj):
+        """Devuelve la URL de la foto de perfil"""
+        return obj.get_profile_picture_url()
 
     
     #Validacion para no colocar campos adicionales en peticion POST/PATCH en herramientas como Postman
@@ -64,6 +80,9 @@ class UsuarioVisitanteSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
+        # Extraer la foto de perfil si existe
+        profile_picture = validated_data.pop('profile_picture', None)
+
         # Crear usuario con grupo "visitante"
         user = User.objects.create_user(
             username=validated_data['username'],
@@ -76,25 +95,63 @@ class UsuarioVisitanteSerializer(serializers.ModelSerializer):
         # Asignar grupo "visitante"
         grupo_visitante = Group.objects.get(name='visitante')
         user.groups.add(grupo_visitante)
+
+        # Si se proporcionó una foto de perfil, guardarla
+        if profile_picture:
+            user.profile_picture = profile_picture
+            user.save()
         
         return user
+    
+    def update(self, instance, validated_data):
+        # 👇 Extraer la contraseña si está presente
+        password = validated_data.pop('password', None)
+        # Extraer la foto de perfil si existe
+        profile_picture = validated_data.pop('profile_picture', None)
+        
+        # Actualizar otros campos
+        instance = super().update(instance, validated_data)
+        
+        # Si se proporcionó una nueva contraseña, hashearla
+        if password:
+            instance.set_password(password)
+
+        # Si se proporcionó una nueva foto de perfil, actualizarla
+        if profile_picture is not None:  # Nota: puede ser None para eliminar la foto
+            instance.profile_picture = profile_picture
+
+        instance.save()
+        return instance
 
 ################################ USUARIOS EDITORES    
 class EditorSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,
         min_length=8,  # 👈 Validación adicional
+        required=False,  # 👈 IMPORTANTE: Hacerlo opcional para updates
         error_messages={
             'min_length': 'La contraseña debe tener al menos 8 caracteres.'
         }
     )
+    # 👇 Agregar campos de foto de perfil
+    profile_picture = serializers.ImageField(
+        required=False,
+        allow_null=True,
+        write_only=True
+    )
+    profile_picture_url = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'email', 'password','date_joined'
+            'id', 'username', 'email', 'password','date_joined',
+            'profile_picture', 'profile_picture_url'  # 👈 Agregados
         ]
         read_only_fields = ['date_joined']
+
+    
+    def get_profile_picture_url(self, obj):
+        return obj.get_profile_picture_url()
     
     def validate(self, data):
         model_fields = {field.name for field in User._meta.get_fields()}
@@ -106,6 +163,8 @@ class EditorSerializer(serializers.ModelSerializer):
                 f"Campos válidos: {', '.join(model_fields)}"
             )
         return data
+    
+    
     
     def create(self, validated_data):
         # Crear compañía con grupo "editor"
@@ -122,17 +181,53 @@ class EditorSerializer(serializers.ModelSerializer):
         user.groups.add(grupo_editor)
         
         return user
+    
+    def update(self, instance, validated_data):
+        # 👇 Extraer la contraseña si está presente
+        password = validated_data.pop('password', None)
+        profile_picture = validated_data.pop('profile_picture', None)
+        
+        # Actualizar otros campos
+        instance = super().update(instance, validated_data)
+        
+        # Si se proporcionó una nueva contraseña, hashearla
+        if password:
+            instance.set_password(password)
+
+        if profile_picture is not None:
+            instance.profile_picture = profile_picture
+
+        instance.save()
+        return instance
 
 ########################### USUARIOS ADMINS    
 class AdminUserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(
+        write_only=True,
+        min_length=8,
+        required=False,  # 👈 IMPORTANTE: Hacerlo opcional para updates
+        error_messages={
+            'min_length': 'La contraseña debe tener al menos 8 caracteres.'
+        }
+    )
+    # 👇 Agregar campos de foto de perfil
+    profile_picture = serializers.ImageField(
+        required=False,
+        allow_null=True,
+        write_only=True
+    )
+    profile_picture_url = serializers.SerializerMethodField(read_only=True)
     
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'email', 'password', 'date_joined'
+            'id', 'username', 'email', 'password', 'date_joined',
+            'profile_picture', 'profile_picture_url'  # 👈 Agregados
         ]
         read_only_fields = ['date_joined', 'is_staff', 'is_active', 'is_superuser']
+
+    def get_profile_picture_url(self, obj):
+        return obj.get_profile_picture_url()
     
     def validate(self, data):
         model_fields = {field.name for field in User._meta.get_fields()}
@@ -146,6 +241,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
+        profile_picture = validated_data.pop('profile_picture', None)
         # Crear usuario con todos los permisos de administrador
         user = User.objects.create_user(
             username=validated_data['username'],
@@ -158,10 +254,30 @@ class AdminUserSerializer(serializers.ModelSerializer):
             is_superuser=True     # 👈 Superusuario
         )
         
-        # Los administradores NO tienen grupos específicos
-        # user.groups.clear()  # Opcional: limpiar grupos si es necesario
+        if profile_picture:
+            user.profile_picture = profile_picture
+            user.save()
         
         return user
+    
+    def update(self, instance, validated_data):
+        # 👇 Extraer la contraseña si está presente
+        password = validated_data.pop('password', None)
+        profile_picture = validated_data.pop('profile_picture', None)
+        
+        # Actualizar otros campos
+        instance = super().update(instance, validated_data)
+        
+        # Si se proporcionó una nueva contraseña, hashearla
+        if password:
+            instance.set_password(password)
+            
+        if profile_picture is not None:
+            instance.profile_picture = profile_picture
+        
+        instance.save()
+        
+        return instance
 
 
 class CategoriaSerializer(serializers.ModelSerializer):

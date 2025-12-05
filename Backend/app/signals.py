@@ -1,4 +1,4 @@
-from django.db.models.signals import post_migrate, pre_delete, pre_save
+from django.db.models.signals import post_migrate, pre_delete, pre_save, post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
 from django.contrib.auth.management import create_permissions
@@ -6,6 +6,7 @@ from .models import *
 from cloudinary import uploader
 import re
 import os
+
 
 #########   Crea los grupos editor y visitante por defecto
 @receiver(post_migrate)
@@ -18,6 +19,151 @@ def create_default_groups(sender, **kwargs):
     for group_name in groups:
         Group.objects.get_or_create(name=group_name)
 
+# 👇 NUEVA SEÑAL: Manejar la eliminación de fotos ANTES de guardar
+@receiver(pre_save, sender=User)
+def handle_profile_picture_update(sender, instance, **kwargs):
+    """
+    Maneja la actualización de fotos de perfil.
+    """
+    if not instance.pk:
+        return  # Nuevo usuario, no hay foto antigua
+
+    try:
+        old_instance = User.objects.get(pk=instance.pk)
+        old_picture = old_instance.profile_picture
+        new_picture = instance.profile_picture
+        
+        # Si hay una foto antigua y está siendo reemplazada con una nueva
+        if old_picture and new_picture:
+            # Verificar si es realmente una nueva imagen (no solo la misma)
+            # CloudinaryField almacena el public_id, así que comparamos eso
+            old_public_id = get_cloudinary_public_id(old_picture)
+            new_public_id = get_cloudinary_public_id(new_picture)
+            
+            # Si no hay nuevo public_id aún, significa que se subió un archivo nuevo
+            # Cloudinary todavía no ha procesado la nueva imagen
+            if old_public_id and not new_public_id:
+                # Marcar la foto antigua para eliminación después del guardado
+                instance._old_profile_picture_to_delete = old_picture
+                print(f"📋 Marcada foto antigua para eliminación: {old_public_id}")
+        
+        # Si se está eliminando la foto (nuevo valor es None)
+        elif old_picture and not new_picture:
+            old_public_id = get_cloudinary_public_id(old_picture)
+            if old_public_id:
+                instance._old_profile_picture_to_delete = old_picture
+                print(f"📋 Marcada foto para eliminación (campo establecido a None): {old_public_id}")
+                
+    except User.DoesNotExist:
+        return
+    except Exception as e:
+        print(f"⚠️ Error en handle_profile_picture_update: {e}")
+
+# 👇 NUEVA SEÑAL: Eliminar fotos antiguas DESPUÉS de guardar
+@receiver(post_save, sender=User)
+def delete_old_profile_picture_after_save(sender, instance, created, **kwargs):
+    """
+    Elimina la foto de perfil antigua DESPUÉS de guardar exitosamente.
+    Esto asegura que la nueva imagen ya esté en Cloudinary.
+    """
+    if created:
+        return  # Usuario nuevo, no hay foto antigua
+    
+    # Verificar si hay una foto marcada para eliminación
+    if hasattr(instance, '_old_profile_picture_to_delete'):
+        old_picture = instance._old_profile_picture_to_delete
+        
+        try:
+            old_public_id = get_cloudinary_public_id(old_picture)
+            
+            if old_public_id:
+                # Verificar si esta foto todavía está en uso por algún usuario
+                # Solo eliminar si ningún otro usuario la está usando
+                other_users_with_same_picture = User.objects.filter(
+                    profile_picture=old_picture
+                ).exclude(pk=instance.pk).count()
+                
+                if other_users_with_same_picture == 0:
+                    # Eliminar de Cloudinary
+                    uploader.destroy(old_public_id, resource_type='image')
+                    print(f"✅ Foto de perfil antigua eliminada de Cloudinary: {old_public_id}")
+                else:
+                    print(f"⚠️ Foto {old_public_id} no eliminada: aún en uso por {other_users_with_same_picture} usuario(s)")
+            
+            # Limpiar el atributo temporal
+            delattr(instance, '_old_profile_picture_to_delete')
+            
+        except Exception as e:
+            print(f"⚠️ Error eliminando foto de perfil antigua después de guardar: {e}")
+            # Intentar limpiar el atributo temporal incluso si hay error
+            if hasattr(instance, '_old_profile_picture_to_delete'):
+                delattr(instance, '_old_profile_picture_to_delete')
+
+# 👇 NUEVA SEÑAL: Borra foto de perfil cuando se elimina un usuario
+@receiver(pre_delete, sender=User)
+def delete_user_profile_picture(sender, instance, **kwargs):
+    """
+    Elimina la foto de perfil de Cloudinary cuando se borra un usuario.
+    """
+    if instance.profile_picture:
+        try:
+            old_public_id = get_cloudinary_public_id(instance.profile_picture)
+            
+            if old_public_id:
+                # Verificar si otros usuarios están usando la misma foto
+                other_users_with_same_picture = User.objects.filter(
+                    profile_picture=instance.profile_picture
+                ).exclude(pk=instance.pk).count()
+                
+                if other_users_with_same_picture == 0:
+                    uploader.destroy(old_public_id, resource_type='image')
+                    print(f"✅ Foto de perfil eliminada de Cloudinary al borrar usuario: {old_public_id}")
+                else:
+                    print(f"⚠️ Foto {old_public_id} no eliminada: aún en uso por {other_users_with_same_picture} usuario(s)")
+            else:
+                print(f"⚠️ No se pudo extraer public_id de: {instance.profile_picture}")
+                
+        except Exception as e:
+            print(f"⚠️ Error al eliminar foto de perfil de Cloudinary: {e}")
+
+def get_cloudinary_public_id(cloudinary_field):
+    """
+    Obtiene el public_id de un campo CloudinaryField.
+    """
+    try:
+        # Si es un objeto CloudinaryField, obtener directamente el public_id
+        if hasattr(cloudinary_field, 'public_id'):
+            return cloudinary_field.public_id
+        
+        # Si es una cadena (URL), extraer el public_id
+        url_str = str(cloudinary_field)
+        
+        # Intentar extraer de la URL
+        patterns = [
+            r'/upload/(?:v\d+/)?([^/.]+)(?:\.[^/.]+)?$',
+            r'/image/upload/(?:v\d+/)?(.+?)(?:\.[^/.]+)?$',
+            r'/([^/]+)(?:\.[^/.]+)?$'
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, url_str)
+            if match:
+                public_id = match.group(1)
+                # Asegurarse de que tenga la carpeta 'profiles/'
+                if public_id and not public_id.startswith('profiles/'):
+                    return f'profiles/{public_id}'
+                return public_id
+        
+        # Si es solo un public_id (sin URL completa)
+        if '/' not in url_str or 'cloudinary.com' not in url_str:
+            if not url_str.startswith('profiles/'):
+                return f'profiles/{url_str}'
+            return url_str
+            
+    except Exception as e:
+        print(f"Error obteniendo public_id de {cloudinary_field}: {e}")
+    
+    return None
 # 👇 ACTUALIZADO: Borra múltiples archivos de Cloudinary cuando se elimina el testimonio
 @receiver(pre_delete, sender=Testimonios)
 def delete_cloudinary_files(sender, instance, **kwargs):

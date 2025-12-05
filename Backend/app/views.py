@@ -250,15 +250,12 @@ class UsuarioVisitanteViewSet(viewsets.ModelViewSet):
 
         # --- Fin Nueva Lógica ---
 
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         # Crear usuario con contraseña hasheada
-        user = User.objects.create_user(
-            username=serializer.validated_data['username'],
-            email=serializer.validated_data['email'],
-            password=serializer.validated_data['password'],
-        )
+        user = serializer.save()
         # Asignar automáticamente al grupo "visitante"
         try:
             grupo_visitante = Group.objects.get(name='visitante')
@@ -286,6 +283,7 @@ class UsuarioVisitanteViewSet(viewsets.ModelViewSet):
         response_data = {
             "message": "Usuario creado exitosamente y asignado al grupo 'visitante'",
             "user_id": user.id,
+            "profile_picture_url": user.get_profile_picture_url(),  # 👈 Agregar URL de la foto
         }
         if organizacion_asociar:
             response_data["asociado_a_organizacion"] = {
@@ -511,6 +509,47 @@ class AdminUserViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def create(self, request, *args, **kwargs):
+
+        # --- Nueva Lógica ---
+        origin = request.META.get('HTTP_ORIGIN', None)
+        organizacion_asociar = None
+
+        if origin:
+            try:
+                # Parsea la URL para obtener solo el dominio neto
+                parsed_origin = urlparse(origin)
+                origin_domain = f"{parsed_origin.scheme}://{parsed_origin.netloc}".lower()
+
+                # Busca la organización por el dominio exacto
+                organizacion_asociar = Organizacion.objects.get(dominio__iexact=origin_domain)
+                # logger.debug(f"Coincidencia de dominio encontrada: {origin_domain} -> {organizacion_asociar.organizacion_nombre}")
+            except Organizacion.DoesNotExist:
+                # 🔴 DOMINIO NO COINCIDE: NO CREAR USUARIO
+                return Response(
+                    {
+                        "detail": f"No se puede crear la cuenta. El dominio '{origin_domain}' no está autorizado para registrar usuarios."
+                    },
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            except Exception as e:
+                # 🔴 ERROR EN LA VALIDACIÓN: NO CREAR USUARIO
+                return Response(
+                    {
+                        "detail": "Error al validar el dominio de origen. No se puede crear la cuenta."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            # 🔴 NO HAY ORIGIN: NO CREAR USUARIO
+            return Response(
+                {
+                    "detail": "No se puede crear la cuenta. Se requiere un encabezado Origin válido."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # --- Fin Nueva Lógica ---
+
         # Verificar que el usuario que hace la petición sea administrador
         if not request.user.is_staff:
             return Response(

@@ -6,6 +6,7 @@ from django_otp import user_has_device
 from django_otp.plugins.otp_totp.models import TOTPDevice 
 from django.contrib.auth.models import Group
 import uuid
+from cloudinary.models import CloudinaryField
 
 class Roles(Group):
     class Meta:
@@ -23,6 +24,17 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     USERNAME_FIELD = 'email' 
     REQUIRED_FIELDS = ['username'] 
+
+    # 👇 NUEVO CAMPO: Foto de perfil con Cloudinary
+    profile_picture = CloudinaryField(
+        'profile_picture',
+        folder='profiles',  # 👈 Esto almacenará las fotos en la carpeta 'profiles' en Cloudinary
+        default=None,  # Puedes cambiar esto por una imagen por defecto si quieres
+        blank=True,
+        null=True,
+        help_text='Foto de perfil del usuario'
+    )
+
 
     # 📌 SOLUCIÓN: Sobrescribir groups y user_permissions con related_name
     groups = models.ManyToManyField(
@@ -63,6 +75,46 @@ class User(AbstractUser):
         # Asegurar validación al guardar
         self.clean()
         super().save(*args, **kwargs)
+
+    # 👇 Método para obtener la URL de la foto de perfil
+    def get_profile_picture_url(self):
+        """Devuelve la URL de la foto de perfil o None si no existe"""
+        if self.profile_picture:
+            return self.profile_picture.url
+        return None
+    
+    def delete_profile_picture_from_cloudinary(self):
+        """Elimina la foto de perfil de Cloudinary"""
+        if self.profile_picture:
+            try:
+                # CloudinaryField ya tiene public_id
+                if self.profile_picture.public_id:
+                    import cloudinary.uploader
+                    result = cloudinary.uploader.destroy(
+                        self.profile_picture.public_id,
+                        resource_type='image'
+                    )
+                    print(f"✅ Foto eliminada de Cloudinary: {self.profile_picture.public_id}")
+                    return result.get('result') == 'ok'
+            except Exception as e:
+                print(f"⚠️ Error eliminando foto de Cloudinary: {e}")
+            return False
+        return True
+    
+    def clear_profile_picture(self):
+        """Limpia la foto de perfil tanto de la BD como de Cloudinary"""
+        if self.profile_picture:
+            self.delete_profile_picture_from_cloudinary()
+            self.profile_picture = None
+            self.save()
+            return True
+        return False
+    
+    # 👇 Método para mostrar representación string con foto
+    def __str__(self):
+        if self.profile_picture:
+            return f"{self.username} (con foto)"
+        return self.username
 
 #Para dividir los usuarios en el admin de Django en dos secciones (visitantes y editores), 
 #necesito crear modelos proxy y configurar el admin apropiadamente

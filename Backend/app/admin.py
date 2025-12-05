@@ -9,9 +9,11 @@ from unfold.admin import ModelAdmin as UnfoldModelAdmin
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django_otp.plugins.otp_totp.admin import TOTPDeviceAdmin
 
+from django.utils.html import format_html
 # Desregistrar el admin por defecto de TOTPDevice
 admin.site.unregister(TOTPDevice)
 
+from cloudinary import uploader
 # Registrar TOTPDevice con nombre personalizado
 @admin.register(TOTPDevice)
 class CustomTOTPDeviceAdmin(TOTPDeviceAdmin):
@@ -26,6 +28,11 @@ class CustomTOTPDeviceAdmin(TOTPDeviceAdmin):
         self.model._meta.verbose_name = 'Usuario 2FA'
         self.model._meta.verbose_name_plural = 'Usuarios 2FA'
 class CustomUserCreationForm(UserCreationForm):
+    profile_picture = forms.ImageField(
+        required=False,
+        help_text='Selecciona una foto de perfil (opcional)'
+    )
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -40,11 +47,27 @@ class CustomUserCreationForm(UserCreationForm):
             'class': unfold_classes,
             'placeholder': 'Confirmar contraseña'
         })
+        self.fields['profile_picture'].widget.attrs.update({
+            'class': unfold_classes,
+            'accept': 'image/*'
+        })
+    
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+        
+        # Guardar la foto de perfil si se proporcionó
+        if 'profile_picture' in self.cleaned_data and self.cleaned_data['profile_picture']:
+            user.profile_picture = self.cleaned_data['profile_picture']
+            if commit:
+                user.save()
+        
+        return user
+# En tu admin.py, modifica la clase UserAdminForm:
 
-# PRIMERO: Se Define UserAdmin y ClienteAdmin ANTES de usarlos
-class UserAdminForm(forms.ModelForm, UnfoldModelAdmin):
+class UserAdminForm(forms.ModelForm):
     """
     Formulario personalizado para manejar la selección única de grupos
+    Y el manejo adecuado de fotos de perfil
     """
     group_choice = forms.ModelChoiceField(
         queryset=Group.objects.all(),
@@ -54,9 +77,22 @@ class UserAdminForm(forms.ModelForm, UnfoldModelAdmin):
         help_text="Selecciona un solo grupo. El usuario debe pertenecer a un grupo."
     )
     
+    # Campo para eliminar la foto existente
+    clear_profile_picture = forms.BooleanField(
+        required=False,
+        label="Eliminar foto actual",
+        help_text="Marca esta opción para eliminar la foto de perfil actual"
+    )
+    
+    # Campo para indicar si se está subiendo una nueva foto
+    _is_new_picture = False
+    
     class Meta:
         model = User
         fields = '__all__'
+        widgets = {
+            'profile_picture': forms.ClearableFileInput(attrs={'accept': 'image/*'}),
+        }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -65,6 +101,16 @@ class UserAdminForm(forms.ModelForm, UnfoldModelAdmin):
         # Establecer el valor inicial si existe
         if instance and instance.groups.exists():
             self.fields['group_choice'].initial = instance.groups.first()
+        
+        # Mostrar preview de la foto actual si existe
+        if instance and instance.profile_picture:
+            self.fields['profile_picture'].help_text = format_html(
+                '<div style="margin: 10px 0;">'
+                '<strong>Foto actual:</strong><br>'
+                '<img src="{}" width="100" height="100" style="border-radius: 50%; margin-top: 5px;" />'
+                '</div>',
+                instance.profile_picture.url
+            )
         
         # OCULTAR el campo groups original
         if 'groups' in self.fields:
@@ -83,6 +129,17 @@ class UserAdminForm(forms.ModelForm, UnfoldModelAdmin):
     def save(self, commit=True):
         user = super().save(commit=False)
         
+        # Marcar si se está subiendo una nueva foto
+        profile_picture = self.cleaned_data.get('profile_picture')
+        if profile_picture and hasattr(profile_picture, 'file'):
+            self._is_new_picture = True
+        
+        # Verificar si se solicitó eliminar la foto
+        if self.cleaned_data.get('clear_profile_picture'):
+            # Solo marcar para eliminación, las señales se encargarán
+            pass
+        
+        # Guardar el usuario
         if commit:
             user.save()
         
@@ -93,68 +150,60 @@ class UserAdminForm(forms.ModelForm, UnfoldModelAdmin):
         
         return user
 
-# PRIMERO: Se Define UserAdmin y ClienteAdmin ANTES de usarlos
 class UserAdmin(BaseUserAdmin, UnfoldModelAdmin):
-    list_display = ('username', 'email', 'is_staff', 'is_active', 'get_user_groups')
+    list_display = ('username', 'email', 'is_staff', 'is_active', 'get_user_groups', 'display_profile_picture')
     search_fields = ('username', 'email')
-
+    
     # Usar formularios personalizados
-    add_form = CustomUserCreationForm  # 👈 NUEVO FORMULARIO PARA CREACIÓN
+    add_form = CustomUserCreationForm
     form = UserAdminForm
-
-
+    
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'password1', 'password2')
+            'fields': ('username', 'email', 'password1', 'password2', 'profile_picture')
         }),
-        #('Información personal', {
-        #    'classes': ('wide',),
-        #    'fields': ('first_name', 'last_name', )
-        #}),
-        #('Permisos', {
-        #    'classes': ('wide',),
-        #    'fields': ('is_active',)
-        #}),
     )
-
+    
     fieldsets = (
         (None, {'fields': ('email', 'username', 'password')}),
-        ('Grupos', {'fields': ('group_choice',)}),  # 👈 Cambiar 'groups' por 'group_choice'
-        #('Información personal', {'fields': ('first_name', 'last_name',)}),
-        #('Permisos', {
-        #    'fields': ('is_active',),
-        #}),
+        ('Grupos', {'fields': ('group_choice',)}),
+        ('Foto de perfil', {
+            'fields': ('profile_picture', 'clear_profile_picture'),
+            'description': 'Sube una nueva foto o marca la opción para eliminar la actual'
+        }),
     )
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        
-        # Personalizar el widget de grupos para selección única
-        if 'groups' in form.base_fields:
-            form.base_fields['groups'].widget = forms.RadioSelect()
-            form.base_fields['groups'].help_text = "Selecciona un solo grupo. El usuario debe pertenecer a un grupo."
-            form.base_fields['groups'].required = True
-            
-        return form
+    
+    def display_profile_picture(self, obj):
+        if obj.profile_picture:
+            return format_html(
+                '<img src="{}" width="50" height="50" style="border-radius: 50%;" />',
+                obj.profile_picture.url
+            )
+        return "Sin foto"
+    display_profile_picture.short_description = 'Foto'
     
     # Método para mostrar los grupos del usuario
     def get_user_groups(self, obj):
         return ", ".join([group.name for group in obj.groups.all()])
     get_user_groups.short_description = 'Grupos'
-
-    # Validar que el usuario tenga exactamente un grupo
-    def clean_groups(self):
-        groups = self.cleaned_data.get('groups')
-        if groups.count() != 1:
-            raise ValidationError("El usuario debe pertenecer a exactamente UN grupo.")
-        return groups
-
+    
     def save_model(self, request, obj, form, change):
-        # Asegurar que el usuario tenga exactamente un grupo después de guardar
+        """
+        Sobrescribir save_model para manejar fotos correctamente
+        """
+        # Antes de guardar, obtener la instancia original si existe
+        old_instance = None
+        if change and obj.pk:
+            try:
+                old_instance = User.objects.get(pk=obj.pk)
+            except User.DoesNotExist:
+                old_instance = None
+        
+        # Llamar al método original
         super().save_model(request, obj, form, change)
         
-        # Si no tiene grupos, asignar uno por defecto
+        # Asegurar que el usuario tenga exactamente un grupo después de guardar
         if obj.groups.count() == 0:
             default_group, created = Group.objects.get_or_create(name='visitante')
             obj.groups.add(default_group)
@@ -163,12 +212,64 @@ class UserAdmin(BaseUserAdmin, UnfoldModelAdmin):
         elif obj.groups.count() > 1:
             first_group = obj.groups.first()
             obj.groups.set([first_group])
+    
+    def delete_model(self, request, obj):
+        """
+        Eliminar la foto de Cloudinary antes de borrar el usuario
+        """
+        # Eliminar foto de Cloudinary si existe
+        if obj.profile_picture:
+            try:
+                public_id = obj.profile_picture.public_id
+                if public_id:
+                    uploader.destroy(public_id, resource_type='image')
+                    print(f"✅ Foto eliminada de Cloudinary al borrar usuario: {public_id}")
+            except Exception as e:
+                print(f"⚠️ Error eliminando foto al borrar usuario: {e}")
+        
+        # Llamar al método original de eliminación
+        super().delete_model(request, obj)
 
+    
+    # Validar que el usuario tenga exactamente un grupo
+    def clean_groups(self):
+        groups = self.cleaned_data.get('groups')
+        if groups.count() != 1:
+            raise ValidationError("El usuario debe pertenecer a exactamente UN grupo.")
+        return groups
+    
+    def delete_queryset(self, request, queryset):
+        """
+        Eliminar fotos de Cloudinary cuando se borran múltiples usuarios
+        """
+        # Eliminar fotos de cada usuario
+        for user in queryset:
+            if user.profile_picture:
+                try:
+                    public_id = user.profile_picture.public_id
+                    if public_id:
+                        uploader.destroy(public_id, resource_type='image')
+                        print(f"✅ Foto eliminada de Cloudinary al borrar usuario {user.username}: {public_id}")
+                except Exception as e:
+                    print(f"⚠️ Error eliminando foto al borrar usuario {user.username}: {e}")
+        
+        # Llamar al método original
+        super().delete_queryset(request, queryset)
     class Media:
         js = ('admin/js/user_admin.js',)
 
+
 # SEGUNDO: Se Define ClienteAdmin
 class ClienteAdmin(UserAdmin, UnfoldModelAdmin):
+
+
+    def display_profile_picture(self, obj):
+        if obj.profile_picture:
+            return format_html('<img src="{}" width="50" height="50" style="border-radius: 50%;" />', obj.profile_picture.url)
+        return "Sin foto"
+    
+    display_profile_picture.short_description = 'Foto de perfil'
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.model._meta.verbose_name = 'Usuario'
@@ -178,7 +279,7 @@ class ClienteAdmin(UserAdmin, UnfoldModelAdmin):
         # Mostrar todos los usuarios
         return super().get_queryset(request)
 
-    list_display = ('id', 'username', 'email', 'get_date_joined', 
+    list_display = ('id', 'username', 'email', 'get_date_joined',  'display_profile_picture', 
     #'get_user_groups'
     )
     ordering = ('-date_joined',)
@@ -260,13 +361,18 @@ class AdminUserAdmin(ClienteAdmin, UnfoldModelAdmin):
     # Campos que aparecen en la edición
     fieldsets = (
         (None, {'fields': ('email', 'username', 'password')}),
+        ('Grupos', {'fields': ('group_choice',)}),
+        ('Foto de perfil', {
+            'fields': ('profile_picture', 'clear_profile_picture'),
+            'description': 'Sube una nueva foto o marca la opción para eliminar la actual'
+        }),
     )
 
     # Campos que aparecen al crear un admin
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'username', 'password1', 'password2')
+            'fields': ('username', 'email',  'password1', 'password2', 'profile_picture')
         }),
     )
 
@@ -327,7 +433,7 @@ class RolesAdmin(UnfoldModelAdmin):
 @admin.register(Organizacion)
 class OrganizacionAdmin(UnfoldModelAdmin):
 
-    list_display = ("id", "organizacion_nombre", "api_key", "get_editores_list", "get_visitantes_count")
+    list_display = ("id", "organizacion_nombre", "dominio", "get_editores_list", "get_visitantes_count")
     search_fields = ("organizacion_nombre",)
     list_filter = ("fecha_registro",)
     ordering = ("-id",)
