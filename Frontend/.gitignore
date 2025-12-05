@@ -65,11 +65,6 @@ web_modules/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variable files
-.env
-.env.*
-!.env.example
-
 # parcel-bundler cache (https://parceljs.com/)
 .cache
 .parcel-cache
@@ -144,7 +139,6 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-.vercel
 
 # testing
 /coverage
@@ -166,8 +160,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files
+.env
+*.env
+.env.*
+!.env.example
+
 
 # vercel
 .vercel

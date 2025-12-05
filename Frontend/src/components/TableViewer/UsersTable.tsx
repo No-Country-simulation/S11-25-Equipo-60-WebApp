@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import type { IUser, IRole } from "@/interfaces/AppInterfaces"
+import type { IUser, IRole } from "@/interfaces/app.interface"
 import GenericTable from "./GenericTable"
 import { ArrayFieldPopover } from "./ArrayFieldPopover"
 import { MOCK_ROLES } from "@/mock/DataUserMock"
@@ -11,10 +11,10 @@ interface UsersTableProps {
   readonly availableRoles?: IRole[]
 }
 
-export function UsersTable({ 
-  users = [], 
+export function UsersTable({
+  users = [],
   setUsers,
-  availableRoles = MOCK_ROLES 
+  availableRoles = MOCK_ROLES
 }: UsersTableProps) {
   const [localData, setLocalData] = useState<IUser[]>(users)
   const data = setUsers ? users : localData
@@ -33,8 +33,8 @@ export function UsersTable({
       )
     }
     return (
-      <img 
-        src={row.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=default'} 
+      <img
+        src={row.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=default'}
         alt={row.name}
         className="w-10 h-10 rounded-full"
       />
@@ -57,7 +57,7 @@ export function UsersTable({
         />
       )
     }
-    
+
     // Vista de solo lectura
     const roles = (row.role || []).filter(r => r != null)
     return (

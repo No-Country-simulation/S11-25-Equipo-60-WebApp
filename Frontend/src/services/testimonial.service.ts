@@ -1,49 +1,33 @@
-import api from '@/lib/api';
-
-export interface Testimonio {
-    id?: number;
-    organizacion: number;
-    organizacion_nombre?: string;
-    usuario_registrado?: string;
-    usuario_anonimo_email?: string;
-    usuario_anonimo_username?: string;
-    api_key?: string;
-    categoria: number;
-    categoria_nombre?: string;
-    comentario: string;
-    archivo?: string;
-    fecha_comentario?: string;
-    ranking: string; // Decimal como string, ej: "5.0"
-    estado?: string; // E, A, R, P, B, O
-}
+import { api } from '@/api';
+import type { Testimonio } from '@/interfaces';
 
 /**
  * Servicio de Testimonios
- * 
+ *
  * IMPORTANTE: El endpoint /app/testimonios-totales/ tiene DOBLE FUNCIONALIDAD según el rol del usuario:
- * 
+ *
  * - VISITANTE: Devuelve testimonios que EL USUARIO CREÓ (como cliente)
  * - EDITOR: Devuelve testimonios de LAS ORGANIZACIONES a las que pertenece (como staff)
  * - ADMIN: NO DEBE USAR ESTE ENDPOINT (usar getPublicTestimonials en su lugar)
- * 
+ *
  * El backend detecta automáticamente el rol desde el token JWT y devuelve los datos correspondientes.
  */
 export const testimonialService = {
     /**
      * GET /app/testimonios-totales/
-     * 
+     *
      * Función dual según el rol del usuario autenticado:
      * - VISITANTE: Obtiene testimonios que el usuario creó personalmente
      * - EDITOR: Obtiene testimonios de las organizaciones que gestiona
-     * 
+     *
      * @returns Array de testimonios (filtrado automáticamente por el backend según rol)
      */
     getMyTestimonials: async () => {
         try {
             console.log('📞 Llamando GET /app/testimonios-totales/');
-            
+
             // Verificar que hay token antes de hacer la petición
-            if (typeof window !== 'undefined') {
+            if (globalThis.window !== undefined) {
                 const storage = localStorage.getItem('auth-storage');
                 if (!storage) {
                     throw new Error('No hay sesión activa. Por favor inicia sesión.');
@@ -61,7 +45,7 @@ export const testimonialService = {
                     role: state.user.role
                 });
             }
-            
+
             const response = await api.get('/app/testimonios-totales/');
             console.log('✅ Testimonios obtenidos:', response.data.length, 'testimonios');
             return response.data;
@@ -79,10 +63,10 @@ export const testimonialService = {
                 console.error('   - Cierra sesión (botón en el dashboard)');
                 console.error('   - Vuelve a iniciar sesión');
                 console.error('   - Si persiste, contacta al equipo de backend');
-                
+
                 throw new Error('No tienes permisos para acceder a tus testimonios. Por favor cierra sesión y vuelve a iniciar sesión. Si el problema persiste, contacta al administrador.');
             }
-            
+
             // Para otros errores
             console.error('❌ Error obteniendo testimonios:', error.message);
             throw error;
@@ -151,14 +135,14 @@ export const testimonialService = {
 
     /**
      * GET /app/testimonios/
-     * 
+     *
      * Obtiene TODOS los testimonios APROBADOS de TODAS las organizaciones.
      * Este endpoint es PÚBLICO (no requiere autenticación).
-     * 
+     *
      * Usado por:
      * - Admin: Para ver todos los testimonios públicos del sistema
      * - Landing page: Para mostrar testimonios aprobados al público
-     * 
+     *
      * @returns Array de testimonios aprobados públicos
      */
     getPublicTestimonials: async () => {

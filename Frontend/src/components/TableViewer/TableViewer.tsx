@@ -2,7 +2,7 @@
 import React, { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CreditCard } from "lucide-react"
-import type { CardType } from "@/interfaces/AppInterfaces"
+import type { CardType } from "@/interfaces/app.interface"
 import GenericTable from "./GenericTable"
 import es from "@/lib/locales/es.json"
 

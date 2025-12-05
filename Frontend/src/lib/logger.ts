@@ -3,66 +3,91 @@
  * Los logs solo se muestran en modo desarrollo
  */
 
-const isDevelopment = process.env.NODE_ENV === 'development';
+import { CONFIG } from "@/config";
+import type { HttpMethod } from "@/shared/TYPES/httpMethod";
 
 type LogLevel = 'log' | 'warn' | 'error' | 'info' | 'debug';
 
-class Logger {
-  private enabled: boolean;
 
-  constructor(enabled: boolean = isDevelopment) {
-    this.enabled = enabled;
+interface LogConfig {
+  enabled: boolean;
+  ignoreRoleValidation403?: boolean;
+}
+
+class Logger {
+  private readonly config: LogConfig;
+
+  constructor(config: LogConfig = {
+    enabled: CONFIG.IS_DEVELOPMENT,
+    ignoreRoleValidation403: true
+  }) {
+    this.config = config;
   }
 
-  private formatMessage(level: LogLevel, message: string, ...args: any[]): void {
-    if (!this.enabled) return;
+  private shouldIgnoreLog(level: LogLevel, message: string): boolean {
+    // Ignorar errores 403 de validación de roles
+    if (
+      level === 'error' &&
+      this.config.ignoreRoleValidation403 &&
+      message.includes('403') &&
+      (message.includes('/administradores/') ||
+       message.includes('/editores/') ||
+       message.includes('/visitantes/'))
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  private formatMessage(level: LogLevel, message: string, ...args: unknown[]): void {
+    if (!this.config.enabled) return;
+    if (this.shouldIgnoreLog(level, message)) return;
 
     const timestamp = new Date().toISOString();
     const emoji = {
-      log: '📝',
-      warn: '⚠️',
-      error: '❌',
-      info: 'ℹ️',
-      debug: '🐛',
+      log: "📝",
+      warn: "⚠️",
+      error: "❌",
+      info: "ℹ️",
+      debug: "🐛"
     }[level];
 
     console[level](`${emoji} [${timestamp}] ${message}`, ...args);
   }
 
-  log(message: string, ...args: any[]): void {
-    this.formatMessage('log', message, ...args);
+  log(message: string, ...args: unknown[]): void {
+    this.formatMessage('log', message, args);
   }
 
-  warn(message: string, ...args: any[]): void {
-    this.formatMessage('warn', message, ...args);
+  warn(message: string, ...args: unknown[]): void {
+    this.formatMessage('warn', message, args);
   }
 
-  error(message: string, ...args: any[]): void {
-    this.formatMessage('error', message, ...args);
+  error(message: string, ...args: unknown[]): void {
+    this.formatMessage('error', message, args);
   }
 
-  info(message: string, ...args: any[]): void {
-    this.formatMessage('info', message, ...args);
+  info(message: string, ...args: unknown[]): void {
+    this.formatMessage('info', message, args);
   }
 
-  debug(message: string, ...args: any[]): void {
-    this.formatMessage('debug', message, ...args);
+  debug(message: string, ...args: unknown[]): void {
+    this.formatMessage('debug', message, args);
   }
 
   // Métodos específicos para la aplicación
-  api(method: string, url: string, status?: number): void {
-    if (status) {
-      this.log(`API ${method} ${url} - Status: ${status}`);
-    } else {
-      this.log(`API ${method} ${url}`);
-    }
+  api(method: HttpMethod, url: string, status?: number): void {
+    const message = status
+      ? `API ${method} ${url} - Status: ${status}`
+      : `API ${method} ${url}`;
+    this.log(message);
   }
 
-  auth(message: string, ...args: any[]): void {
+  auth(message: string, ...args: unknown[]): void {
     this.log(`🔐 AUTH: ${message}`, ...args);
   }
 
-  service(serviceName: string, action: string, ...args: any[]): void {
+  service(serviceName: string, action: string, ...args: unknown[]): void {
     this.log(`🔧 [${serviceName}] ${action}`, ...args);
   }
 }

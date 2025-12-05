@@ -21,7 +21,7 @@ import { toast } from "sonner"
 import Link from "next/link"
 
 const formSchema = z.object({
-    email: z.string().email({
+    email: z.email({
         message: "Please enter a valid email address.",
     }),
     password: z.string().min(1, {

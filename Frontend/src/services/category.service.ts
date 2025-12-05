@@ -1,12 +1,5 @@
-import api from '@/lib/api';
-
-export interface Categoria {
-    id: number;
-    nombre_categoria: string;
-    icono?: string;
-    color?: string;
-    fecha_registro?: string;
-}
+import { api } from "@/api";
+import type { Categoria } from "@/interfaces";
 
 export const categoryService = {
     // Obtener todas las categorías

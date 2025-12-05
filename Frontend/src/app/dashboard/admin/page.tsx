@@ -1,14 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { userService, Usuario } from "@/services/user.service"
+import { userService } from "@/services/user.service"
 import { organizationService, Organizacion } from "@/services/organization.service"
-import { categoryService, Categoria } from "@/services/category.service"
-import { testimonialService, Testimonio } from "@/services/testimonial.service"
+import { categoryService} from "@/services/category.service"
+import { testimonialService} from "@/services/testimonial.service"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatsCard } from "@/components/dashboard/stats-card"
 import { Users, Building2, FolderKanban, FileText, Shield } from "lucide-react"
 import { toast } from "sonner"
+import type { Categoria, Testimonio, Usuario } from "@/interfaces"
 
 export default function AdminDashboardPage() {
     const [visitantes, setVisitantes] = useState<Usuario[]>([])
@@ -41,7 +42,7 @@ export default function AdminDashboardPage() {
                 organizationService.getOrganizations(), // GET /app/organizacion/ - Admin ve TODAS las organizaciones
                 categoryService.getCategories(),
             ])
-            
+
             setVisitantes(visitantesData)
             setEditores(editoresData)
             setAdministradores(adminsData)
@@ -135,8 +136,8 @@ export default function AdminDashboardPage() {
                                 <div className="flex items-center gap-4">
                                     <span className="text-2xl font-bold">{visitantes.length}</span>
                                     <div className="w-32 bg-muted rounded-full h-2">
-                                        <div 
-                                            className="bg-blue-500 h-2 rounded-full" 
+                                        <div
+                                            className="bg-blue-500 h-2 rounded-full"
                                             style={{ width: `${(visitantes.length / totalUsers) * 100}%` }}
                                         />
                                     </div>
@@ -151,8 +152,8 @@ export default function AdminDashboardPage() {
                                 <div className="flex items-center gap-4">
                                     <span className="text-2xl font-bold">{editores.length}</span>
                                     <div className="w-32 bg-muted rounded-full h-2">
-                                        <div 
-                                            className="bg-green-500 h-2 rounded-full" 
+                                        <div
+                                            className="bg-green-500 h-2 rounded-full"
                                             style={{ width: `${(editores.length / totalUsers) * 100}%` }}
                                         />
                                     </div>
@@ -167,8 +168,8 @@ export default function AdminDashboardPage() {
                                 <div className="flex items-center gap-4">
                                     <span className="text-2xl font-bold">{administradores.length}</span>
                                     <div className="w-32 bg-muted rounded-full h-2">
-                                        <div 
-                                            className="bg-purple-500 h-2 rounded-full" 
+                                        <div
+                                            className="bg-purple-500 h-2 rounded-full"
                                             style={{ width: `${(administradores.length / totalUsers) * 100}%` }}
                                         />
                                     </div>

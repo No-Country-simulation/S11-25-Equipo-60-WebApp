@@ -1,4 +1,4 @@
-import { IPermission, IRole, IUser, ICategory, IStatus, ITab } from "@/interfaces/AppInterfaces";
+import { IPermission, IRole, IUser, ICategory, IStatus, ITab } from "@/interfaces/app.interface";
 
 export const MOCK_PERMISSIONS: IPermission[] = [
   {
@@ -75,7 +75,7 @@ export const MOCK_PERMISSIONS: IPermission[] = [
 export const MOCK_ROLES: IRole[] = [
   {
     id: "1",
-    name: "Admin",  
+    name: "Admin",
     description: "Administrator with full access",
     icon: "👑",
     color: "#7c3aed",
@@ -96,7 +96,7 @@ export const MOCK_ROLES: IRole[] = [
     icon: "✏️",
     color: "#059669",
     permissions: [MOCK_PERMISSIONS[0], MOCK_PERMISSIONS[1], MOCK_PERMISSIONS[2], MOCK_PERMISSIONS[3], MOCK_PERMISSIONS[4], MOCK_PERMISSIONS[5]]
-  },          
+  },
   {
     id: "4",
     name: "Viewer",

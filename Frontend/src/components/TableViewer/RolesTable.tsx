@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import type { IRole, IPermission } from "@/interfaces/AppInterfaces"
+import type { IRole, IPermission } from "@/interfaces/app.interface"
 import GenericTable from "./GenericTable"
 import { ArrayFieldPopover } from "./ArrayFieldPopover"
 import { MOCK_PERMISSIONS } from "@/mock/DataUserMock"
@@ -11,10 +11,10 @@ interface RolesTableProps {
   readonly availablePermissions?: IPermission[]
 }
 
-export function RolesTable({ 
-  roles = [], 
+export function RolesTable({
+  roles = [],
   setRoles,
-  availablePermissions = MOCK_PERMISSIONS 
+  availablePermissions = MOCK_PERMISSIONS
 }: RolesTableProps) {
   const [localData, setLocalData] = useState<IRole[]>(roles)
   const data = setRoles ? roles : localData
@@ -51,7 +51,7 @@ export function RolesTable({
         />
       )
     }
-    
+
     // Vista de solo lectura
     const permissions = (row.permissions || []).filter(p => p != null)
     return (

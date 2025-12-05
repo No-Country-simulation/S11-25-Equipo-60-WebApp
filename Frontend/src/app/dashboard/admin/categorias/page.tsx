@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useEffect, useState } from "react"
@@ -47,9 +48,10 @@ export default function AdminCategoriasPage() {
             setFormData({ nombre_categoria: '', icono: '', color: '#3b82f6' })
             setShowCreateDialog(false)
             loadData()
+
         } catch (error: any) {
             console.error('Error creating category:', error)
-            const errorMessage = error.response?.data?.detail || 
+            const errorMessage = error.response?.data?.detail ||
                 error.response?.data?.nombre_categoria?.[0] ||
                 "Error al crear la categoría"
             toast.error(errorMessage)
@@ -125,7 +127,7 @@ export default function AdminCategoriasPage() {
                     <Card key={cat.id} className="hover:shadow-lg transition-shadow">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <div 
+                                <div
                                     className="w-8 h-8 rounded-lg flex items-center justify-center text-white"
                                     style={{ backgroundColor: cat.color || '#3b82f6' }}
                                 >
@@ -142,7 +144,7 @@ export default function AdminCategoriasPage() {
                                     <p className="text-xs font-medium">Color</p>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <div 
+                                    <div
                                         className="w-6 h-6 rounded border"
                                         style={{ backgroundColor: cat.color || '#3b82f6' }}
                                     />

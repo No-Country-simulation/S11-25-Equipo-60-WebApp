@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import type { IStatus } from "@/interfaces/AppInterfaces"
+import type { IStatus } from "@/interfaces/app.interface"
 import GenericTable from "./GenericTable"
 
 interface StatusTableProps {
@@ -50,7 +50,7 @@ export function StatusTable({ status = [], setStatus }: StatusTableProps) {
     }
     return (
       <div className="flex items-center gap-2">
-        <div 
+        <div
           className="w-6 h-6 rounded border"
           style={{ backgroundColor: row.color || '#6b7280' }}
         />

@@ -1,12 +1,5 @@
-import api from '@/lib/api';
-
-export interface Usuario {
-    id: number;
-    username: string;
-    email: string;
-    date_joined: string;
-    password?: string;
-}
+import { api } from '@/api';
+import type { Usuario } from '@/interfaces';
 
 export const userService = {
     // VISITANTES

@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import type { IPermission } from "@/interfaces/AppInterfaces"
+import type { IPermission } from "@/interfaces/app.interface"
 import GenericTable from "./GenericTable"
 
 interface PermissionsTableProps {
@@ -50,7 +50,7 @@ export function PermissionsTable({ permissions = [], setPermissions }: Permissio
     }
     return (
       <div className="flex items-center gap-2">
-        <div 
+        <div
           className="w-6 h-6 rounded border"
           style={{ backgroundColor: row.color || '#6b7280' }}
         />

@@ -1,74 +1,68 @@
-import api from '@/lib/api';
+import { api } from "@/api";
+import type { LoginResponse, RegisterResponse, RoleConfig, UserCredentials, Usuario } from "@/interfaces";
 
-type UserRole = 'visitante' | 'editor' | 'admin';
+const ROLES: RoleConfig[] = [
+    { role: 'admin', router: 'administradores' },
+    { role: 'editor', router: 'editores' },
+    { role: 'visitante', router: 'visitantes' }
+];
 
-interface UserData {
-    id: number;
-    username: string;
-    email: string;
-    date_joined: string;
-    role: UserRole;
+const isValidRole = async ( userId: number, token: string ,router: string) => {
+    try{
+        const response = await api.get( `/app/${ router }/${ userId }/`,
+            { headers: { 'Authorization': `JWT ${ token }` } }
+        );
+        return response;
+    } catch {
+        return null;
+    }
 }
 
+const findUserRole = async (userId: number, token: string): Promise<RoleConfig | null> => {
+    for (const { role, router } of ROLES) {
+        const roleData = await isValidRole(userId, token, router);
+        if (roleData?.status === 200) {
+            return { ...roleData.data, role };
+        }
+    }
+    return null;
+};
+
+const logUserDetection = ( userId: number, userRole: RoleConfig | null ): void =>
+{
+    const msn = userRole
+        ? `✅ Usuario ${ userId } detectado como ${ userRole.role.toUpperCase() }`
+        : `❌ No se pudo determinar el rol del usuario ${ userId }`
+    console.log( msn );
+}
+
+const validateUserRole = (userRole: RoleConfig | null): void => {
+    if (!userRole) {
+        throw new Error('Usuario no encontrado en ningún endpoint');
+    }
+};
+
 export const authService = {
-    login: async (credentials: any) => {
-        const response = await api.post('/app/login/', credentials);
+    login: async ( credentials: UserCredentials ): Promise<LoginResponse> => {
+        const response = await api.post( '/app/login/', credentials );
         return response.data;
     },
 
-    register: async (data: any) => {
+    register: async (data: Usuario): Promise<RegisterResponse> => {
         const response = await api.post('/app/visitantes/', data);
         return response.data;
     },
 
-    refreshToken: async (refresh: string) => {
+    refreshToken: async (refresh: string): Promise<any> => {
         const response = await api.post('/app/token/refresh/', { refresh });
         return response.data;
     },
 
-    // Obtener datos del usuario y detectar su rol
-    getUserData: async (userId: number, token: string): Promise<UserData> => {
-        // Configurar headers con el token JWT para estas peticiones
-        const config = {
-            headers: {
-                'Authorization': `JWT ${token}` // Backend requiere prefijo "JWT", no "Bearer"
-            }
-        };
-
-        console.log('🔑 Detectando rol del usuario ID:', userId);
-
-        // Intentar obtener datos como visitante primero (el más común)
-        try {
-            const response = await api.get(`/app/visitantes/${userId}/`, config);
-            console.log('✅ Usuario detectado como VISITANTE');
-            return { ...response.data, role: 'visitante' as const };
-        } catch (visitanteError: any) {
-            console.log('❌ No es visitante, intentando editor...');
-            
-            // Si falla (403 o 404), intentar como editor
-            if (visitanteError.response?.status === 403 || visitanteError.response?.status === 404) {
-                try {
-                    const response = await api.get(`/app/editores/${userId}/`, config);
-                    console.log('✅ Usuario detectado como EDITOR');
-                    return { ...response.data, role: 'editor' as const };
-                } catch (editorError: any) {
-                    console.log('❌ No es editor, intentando admin...');
-                    
-                    // Si falla (403 o 404), intentar como admin
-                    if (editorError.response?.status === 403 || editorError.response?.status === 404) {
-                        try {
-                            const response = await api.get(`/app/administradores/${userId}/`, config);
-                            console.log('✅ Usuario detectado como ADMIN');
-                            return { ...response.data, role: 'admin' as const };
-                        } catch (adminError: any) {
-                            console.error('❌ No se pudo determinar el rol del usuario');
-                            throw new Error('No se pudo obtener información del usuario. El usuario no existe en ningún endpoint.');
-                        }
-                    }
-                    throw editorError;
-                }
-            }
-            throw visitanteError;
-        }
+    getUserData: async ( userId: number, token: string ): Promise<any> => {
+        console.log( '🔑 Detectando rol del usuario ID:', userId );
+        const userRole = await findUserRole(userId, token);
+        logUserDetection( userId, userRole );
+        validateUserRole(userRole);
+        return userRole;
     }
 };
