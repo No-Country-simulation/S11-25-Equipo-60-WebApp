@@ -394,7 +394,7 @@ export default function AdminUsuariosPage() {
             {/* Dialog Crear Editor */}
             <CreateEditorDialog
                 open={showCreateEditorDialog}
-                onOpenChange={setShowCreateEditorDialog}
+                onOpenChange={(open) => setShowCreateEditorDialog(open)}
                 onSuccess={async () => {
                     setShowCreateEditorDialog(false)
                     await loadData()
