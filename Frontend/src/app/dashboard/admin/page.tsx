@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { userService } from "@/services/user.service"
 import { organizationService } from "@/services/organization.service"
 import { categoryService} from "@/services/category.service"
+import { testimonialService } from "@/services/testimonial.service"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatsCard } from "@/components/dashboard/stats-card"
 import { Users, Building2, FolderKanban, FileText, Shield } from "lucide-react"
@@ -17,6 +18,7 @@ export default function AdminDashboardPage() {
     const [organizations, setOrganizations] = useState<Organizacion[]>([])
     const [categories, setCategories] = useState<Categoria[]>([])
     const [testimonials, setTestimonials] = useState<Testimonio[]>([])
+    const [statistics, setStatistics] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -25,21 +27,23 @@ export default function AdminDashboardPage() {
 
     const loadData = async () => {
         try {
-            // Admin NO puede usar /app/testimonios-totales/ (endpoint exclusivo de visitantes/editores)
-            // Admin usa /app/organizacion/ para ver todas las organizaciones
-            // Admin usa /app/testimonios/ para ver testimonios públicos aprobados (en la página de testimonios)
+            // ✅ Admin puede obtener TODAS las estadísticas y testimonios
             const [
                 visitantesData,
                 editoresData,
                 adminsData,
                 orgsData,
-                catsData
+                catsData,
+                testimonialsData,
+                statsData
             ] = await Promise.all([
                 userService.getVisitantes(),
                 userService.getEditores(),
                 userService.getAdministradores(),
-                organizationService.getOrganizations(), // GET /app/organizacion/ - Admin ve TODAS las organizaciones
+                organizationService.getOrganizations(), // GET /app/organizacion/
                 categoryService.getCategories(),
+                testimonialService.getAllTestimonials(), // GET /app/testimonios-totales/ - Admin ve TODOS
+                testimonialService.getStatistics(), // GET /app/testimonios-totales/estadisticas/
             ])
 
             setVisitantes(visitantesData)
@@ -47,9 +51,8 @@ export default function AdminDashboardPage() {
             setAdministradores(adminsData)
             setOrganizations(orgsData)
             setCategories(catsData)
-            // Admin NO tiene acceso a /app/testimonios-totales/ en el dashboard principal
-            // Para ver testimonios, admin debe ir a /dashboard/admin/testimonios
-            setTestimonials([])
+            setTestimonials(testimonialsData)
+            setStatistics(statsData)
         } catch (error) {
             console.error('Error loading admin data:', error)
             toast.error("Error al cargar los datos del dashboard")
@@ -216,6 +219,53 @@ export default function AdminDashboardPage() {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Estadísticas por Organización */}
+            {statistics.length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <FileText className="h-5 w-5" />
+                            Estadísticas de Testimonios por Organización
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            {statistics.map((stat: any) => (
+                                <div key={stat.organizacion_id} className="p-4 border rounded-lg">
+                                    <h3 className="font-semibold text-lg mb-3">{stat.organizacion_nombre}</h3>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <div className="text-center p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                                            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                                                {stat.estadisticas.total_testimonios}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">Total</p>
+                                        </div>
+                                        <div className="text-center p-3 bg-green-50 dark:bg-green-950 rounded-lg">
+                                            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                                                {stat.estadisticas.aprobados}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">Aprobados</p>
+                                        </div>
+                                        <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
+                                            <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                                                {stat.estadisticas.en_espera}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">En Espera</p>
+                                        </div>
+                                        <div className="text-center p-3 bg-red-50 dark:bg-red-950 rounded-lg">
+                                            <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                                                {stat.estadisticas.rechazados}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">Rechazados</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
         </div>
     )
 }

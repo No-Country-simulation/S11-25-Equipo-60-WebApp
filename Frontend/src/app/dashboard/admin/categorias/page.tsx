@@ -42,6 +42,14 @@ export default function AdminCategoriasPage() {
             toast.error("El nombre de la categoría es obligatorio")
             return
         }
+        if (!formData.icono) {
+            toast.error("El icono es obligatorio")
+            return
+        }
+        if (!formData.color) {
+            toast.error("El color es obligatorio")
+            return
+        }
 
         try {
             await categoryService.createCategory(formData)
@@ -61,6 +69,11 @@ export default function AdminCategoriasPage() {
 
     const handleEdit = async () => {
         if (!showEditDialog) return
+
+        if (!formData.nombre_categoria || !formData.icono || !formData.color) {
+            toast.error("Todos los campos son obligatorios")
+            return
+        }
 
         try {
             await categoryService.updateCategory(showEditDialog.id, formData)
@@ -197,20 +210,21 @@ export default function AdminCategoriasPage() {
                             />
                         </div>
                         <div>
-                            <Label htmlFor="icono">Icono (opcional)</Label>
+                            <Label htmlFor="icono">Icono *</Label>
                             <Input
                                 id="icono"
                                 value={formData.icono}
                                 onChange={(e) => setFormData({ ...formData, icono: e.target.value })}
                                 placeholder="💻"
                                 maxLength={2}
+                                required
                             />
                             <p className="text-xs text-muted-foreground mt-1">
                                 Ingresa un emoji o símbolo
                             </p>
                         </div>
                         <div>
-                            <Label htmlFor="color">Color</Label>
+                            <Label htmlFor="color">Color *</Label>
                             <div className="flex gap-2">
                                 <Input
                                     id="color"
@@ -218,12 +232,14 @@ export default function AdminCategoriasPage() {
                                     value={formData.color}
                                     onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                                     className="w-20 h-10"
+                                    required
                                 />
                                 <Input
                                     value={formData.color}
                                     onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                                     placeholder="#3b82f6"
                                     className="flex-1"
+                                    required
                                 />
                             </div>
                         </div>
@@ -253,16 +269,17 @@ export default function AdminCategoriasPage() {
                             />
                         </div>
                         <div>
-                            <Label htmlFor="edit-icono">Icono</Label>
+                            <Label htmlFor="edit-icono">Icono *</Label>
                             <Input
                                 id="edit-icono"
                                 value={formData.icono}
                                 onChange={(e) => setFormData({ ...formData, icono: e.target.value })}
                                 maxLength={2}
+                                required
                             />
                         </div>
                         <div>
-                            <Label htmlFor="edit-color">Color</Label>
+                            <Label htmlFor="edit-color">Color *</Label>
                             <div className="flex gap-2">
                                 <Input
                                     id="edit-color"
@@ -270,11 +287,13 @@ export default function AdminCategoriasPage() {
                                     value={formData.color}
                                     onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                                     className="w-20 h-10"
+                                    required
                                 />
                                 <Input
                                     value={formData.color}
                                     onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                                     className="flex-1"
+                                    required
                                 />
                             </div>
                         </div>

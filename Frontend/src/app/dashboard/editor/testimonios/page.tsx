@@ -59,7 +59,7 @@ export default function EditorTestimoniosPage() {
             // Solo editores pueden usar /app/organizacion/editores/
             const [testimonialsData, organizationsData] = await Promise.all([
                 testimonialService.getMyTestimonials(),
-                organizationService.getEditorOrganizations(),
+                organizationService.getOrganizations(),
             ])
             setTestimonials(testimonialsData)
             setOrganizations(organizationsData)

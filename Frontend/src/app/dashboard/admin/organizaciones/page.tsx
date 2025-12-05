@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { AssignUsersDialog } from "@/components"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { Building2, Plus, Edit, Trash2, Key, Users } from "lucide-react"
+import { Building2, Plus, Edit, Trash2, Key, Users, UserPlus } from "lucide-react"
 import { toast } from "sonner"
 import type { Organizacion } from "@/interfaces"
 
@@ -19,6 +20,7 @@ export default function AdminOrganizacionesPage() {
     const [showCreateDialog, setShowCreateDialog] = useState(false)
     const [showEditDialog, setShowEditDialog] = useState<Organizacion | null>(null)
     const [deleteOrg, setDeleteOrg] = useState<number | null>(null)
+    const [assignUsers, setAssignUsers] = useState<{ org: Organizacion; type: 'editores' | 'visitantes' } | null>(null)
     const [formData, setFormData] = useState({ organizacion_nombre: '', dominio: '', editores: '' })
 
     useEffect(() => {
@@ -167,24 +169,46 @@ export default function AdminOrganizacionesPage() {
                                 </div>
                             )}
 
-                            <div className="flex gap-2 pt-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => openEditDialog(org)}
-                                    className="flex-1"
-                                >
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    Editar
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setDeleteOrg(org.id)}
-                                    className="text-red-600 hover:text-red-700"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
+                            <div className="flex flex-col gap-2 pt-2">
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => openEditDialog(org)}
+                                        className="flex-1"
+                                    >
+                                        <Edit className="mr-2 h-4 w-4" />
+                                        Editar
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setDeleteOrg(org.id)}
+                                        className="text-red-600 hover:text-red-700"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => setAssignUsers({ org, type: 'editores' })}
+                                        className="flex-1"
+                                    >
+                                        <UserPlus className="mr-2 h-4 w-4" />
+                                        Agregar Editores
+                                    </Button>
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => setAssignUsers({ org, type: 'visitantes' })}
+                                        className="flex-1"
+                                    >
+                                        <UserPlus className="mr-2 h-4 w-4" />
+                                        Agregar Visitantes
+                                    </Button>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -288,6 +312,23 @@ export default function AdminOrganizacionesPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            {/* Dialog Asignar Usuarios */}
+            {assignUsers && (
+                <AssignUsersDialog
+                    organization={assignUsers.org}
+                    type={assignUsers.type}
+                    open={!!assignUsers}
+                    onOpenChange={(open) => {
+                        if (!open) setAssignUsers(null);
+                    }}
+                    onSuccess={async () => {
+                        setAssignUsers(null)
+                        await loadData()
+                        toast.success(`${assignUsers.type === 'editores' ? 'Editores' : 'Visitantes'} asignados correctamente`)
+                    }}
+                />
+            )}
         </div>
     )
 }

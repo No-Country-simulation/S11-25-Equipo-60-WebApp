@@ -6,27 +6,17 @@ import { testimonialService } from "@/services/testimonial.service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Building2, Users, FileText, ExternalLink } from "lucide-react"
+import { Building2, Users, FileText, ExternalLink, UserPlus } from "lucide-react"
 import { toast } from "sonner"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { AddVisitantesDialog, AddEditorsDialog } from "@/components"
 import type { Organizacion, Testimonio } from "@/interfaces"
 
 export default function EditorOrganizacionesPage() {
     const [organizations, setOrganizations] = useState<Organizacion[]>([])
     const [testimonials, setTestimonials] = useState<Testimonio[]>([])
     const [loading, setLoading] = useState(true)
-    const [selectedOrg, setSelectedOrg] = useState<Organizacion | null>(null)
-    const [editorIds, setEditorIds] = useState("")
-    const [addingEditors, setAddingEditors] = useState(false)
+    const [selectedOrgForEditores, setSelectedOrgForEditores] = useState<Organizacion | null>(null)
+    const [selectedOrgForVisitantes, setSelectedOrgForVisitantes] = useState<Organizacion | null>(null)
 
     useEffect(() => {
         loadData()
@@ -35,7 +25,7 @@ export default function EditorOrganizacionesPage() {
     const loadData = async () => {
         try {
             const [orgsData, testimonialsData] = await Promise.all([
-                organizationService.getEditorOrganizations(),
+                organizationService.getOrganizations(),
                 testimonialService.getMyTestimonials(),
             ])
             setOrganizations(orgsData)
@@ -45,38 +35,6 @@ export default function EditorOrganizacionesPage() {
             toast.error("Error al cargar las organizaciones")
         } finally {
             setLoading(false)
-        }
-    }
-
-    const handleAddEditors = async (orgId: number) => {
-        if (!editorIds.trim()) {
-            toast.error("Ingresa al menos un ID de editor")
-            return
-        }
-
-        setAddingEditors(true)
-        try {
-            // Convertir string "1,2,3" a array [1,2,3]
-            const ids = editorIds.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id))
-
-            if (ids.length === 0) {
-                toast.error("IDs inválidos. Usa formato: 1,2,3")
-                return
-            }
-
-            await organizationService.addEditors(orgId, ids)
-            toast.success("Editores agregados exitosamente")
-            setEditorIds("")
-            setSelectedOrg(null)
-            loadData()
-        } catch (error: any) {
-            console.error('Error adding editors:', error)
-            const errorMessage = error.response?.data?.detail ||
-                error.response?.data?.editores?.[0] ||
-                "Error al agregar editores"
-            toast.error(errorMessage)
-        } finally {
-            setAddingEditors(false)
         }
     }
 
@@ -176,59 +134,64 @@ export default function EditorOrganizacionesPage() {
                                             <p className="text-xs font-medium text-muted-foreground mb-1">
                                                 Editores
                                             </p>
-                                            <p className="text-sm">{org.editores}</p>
+                                            <p className="text-sm">
+                                                {Array.isArray(org.editores)
+                                                    ? org.editores.map((e: any) => e.username || e.email).join(', ')
+                                                    : org.editores}
+                                            </p>
                                         </div>
                                     )}
 
                                     {/* Botón para agregar editores */}
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="w-full"
-                                                onClick={() => setSelectedOrg(org)}
-                                            >
-                                                <Users className="mr-2 h-4 w-4" />
-                                                Agregar Editores
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle>Agregar Editores a {org.organizacion_nombre}</DialogTitle>
-                                                <DialogDescription>
-                                                    Ingresa los IDs de los editores separados por comas
-                                                </DialogDescription>
-                                            </DialogHeader>
-                                            <div className="space-y-4">
-                                                <div>
-                                                    <Label htmlFor="editor-ids">IDs de Editores</Label>
-                                                    <Input
-                                                        id="editor-ids"
-                                                        placeholder="Ej: 8, 9, 10"
-                                                        value={editorIds}
-                                                        onChange={(e) => setEditorIds(e.target.value)}
-                                                    />
-                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                        Los IDs deben ser de usuarios con rol de editor
-                                                    </p>
-                                                </div>
-                                                <Button
-                                                    onClick={() => handleAddEditors(org.id)}
-                                                    disabled={addingEditors}
-                                                    className="w-full"
-                                                >
-                                                    {addingEditors ? "Agregando..." : "Agregar Editores"}
-                                                </Button>
-                                            </div>
-                                        </DialogContent>
-                                    </Dialog>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full"
+                                        onClick={() => setSelectedOrgForEditores(org)}
+                                    >
+                                        <Users className="mr-2 h-4 w-4" />
+                                        Agregar Editores
+                                    </Button>
+
+                                    {/* Botón para agregar visitantes */}
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full"
+                                        onClick={() => setSelectedOrgForVisitantes(org)}
+                                    >
+                                        <UserPlus className="mr-2 h-4 w-4" />
+                                        Agregar Visitantes
+                                    </Button>
                                 </CardContent>
                             </Card>
                         )
                     })}
                 </div>
             )}
+
+            {/* Dialog para agregar editores */}
+            <AddEditorsDialog
+                open={!!selectedOrgForEditores}
+                onOpenChange={(open) => {
+                    if (!open) setSelectedOrgForEditores(null)
+                }}
+                organizacion={selectedOrgForEditores}
+                onSuccess={loadData}
+            />
+
+            {/* Dialog para agregar visitantes */}
+            <AddVisitantesDialog
+                open={!!selectedOrgForVisitantes}
+                onOpenChange={(open) => {
+                    if (!open) setSelectedOrgForVisitantes(null)
+                }}
+                organizacion={selectedOrgForVisitantes}
+                onSuccess={async () => {
+                    setSelectedOrgForVisitantes(null)
+                    await loadData()
+                }}
+            />
         </div>
     )
 }
