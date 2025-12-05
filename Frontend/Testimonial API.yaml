@@ -124,6 +124,60 @@ paths:
       responses:
         '204':
           description: No response body
+  /app/auth/reset/password/:
+    post:
+      operationId: auth_reset_password_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailReset'
+          description: ''
+  /app/auth/reset/password/confirm/:
+    post:
+      operationId: auth_reset_password_confirm_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetConfirm'
+          description: ''
   /app/categorias/:
     get:
       operationId: categorias_list
@@ -351,12 +405,14 @@ paths:
   /app/organizacion/:
     get:
       operationId: organizacion_list
-      description: Lista de todas las organizaciones
+      description: Los administradores obtienen todas las organizaciones, los editores
+        y visitantes obtienen solamente las organizaciones a las que pertenece, editores
+        y visitantes que no pertenezcan a ninguna organizacion les devuelve un JSON
+        vacio, y este endpoint necesita autenticacion
       tags:
       - Organizaciones
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -416,7 +472,6 @@ paths:
       - Organizaciones
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -507,6 +562,42 @@ paths:
           description: No tienes permisos para modificar esta organización
         '404':
           description: Organización no encontrada
+  /app/organizacion/{id}/agregar-visitantes/:
+    post:
+      operationId: organizacion_agregar_visitantes_create
+      description: Este endpoint es para que un editor pueda agregar visitantes a
+        su organización (Ejemplo, el editor de microsoft solo puede agregar otros
+        visitantes a microsoft)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Organizacion.
+        required: true
+      tags:
+      - Organizaciones
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgregarVisitantes'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgregarVisitantes'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgregarVisitantes'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: Visitantes agregados exitosamente
+        '403':
+          description: No tienes permisos para modificar esta organización
+        '404':
+          description: Organización no encontrada
   /app/organizacion/{id}/testimonios-aprobados/:
     get:
       operationId: organizacion_testimonios_aprobados_list
@@ -534,24 +625,6 @@ paths:
                 items:
                   $ref: '#/components/schemas/TestimonioAprobado'
           description: ''
-  /app/organizacion/editores/:
-    get:
-      operationId: organizacion_editores_list
-      description: Listar todas las organizaciones a las que pertenece el editor actual
-        (solo para usuarios con rol editor)
-      tags:
-      - Organizaciones
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OrganizacionSerializerStaff'
-          description: ''
   /app/testimonios/:
     get:
       operationId: testimonios_list
@@ -578,7 +651,11 @@ paths:
         defecto con el estado E(en espera de aprobacion), todos los usuarios logeados
         y no logeados pueden usarlo. Los unicos que tienen prohibido realizar testimonios
         son los usuarios con rol de editor, porque esos usuarios son considerados
-        una cuenta de una organizacion y no es considerado como un cliente
+        una cuenta de una organizacion y no es considerado como un cliente. Los usuarios
+        logeados como visitantes se les va a limitar que solamente realicen testimonios
+        a las organizaciones que pertenecen, ahora los no logeados se les va a permitir
+        que comenten todas las organizaciones que quieran. Esto es para cumplir con
+        el requisito de integracion en de API en Sitio Externo
       tags:
       - Testimonios
       requestBody:
@@ -805,6 +882,12 @@ paths:
   /app/visitantes/:
     get:
       operationId: visitantes_list
+      description: Los administradores y los editores que pertenezcan a una organizacion
+        obtienen todas la lista de usuarios visitantes(los editores pueden ver esta
+        vista para poder agregar los visitantes a las organizaciones), editores que
+        no pertenezcan a ninguna organizacion les devuelve un JSON vacio. Los usuarios
+        visitantes no pueden ver la lista de todos los usuarios y este endpoint necesita
+        autenticacion
       tags:
       - Visitantes
       security:
@@ -847,6 +930,7 @@ paths:
   /app/visitantes/{id}/:
     get:
       operationId: visitantes_retrieve
+      description: Este endpoint es libre y se usa para crear usuarios
       parameters:
       - in: path
         name: id
@@ -930,16 +1014,25 @@ components:
         password:
           type: string
           writeOnly: true
+          minLength: 8
         date_joined:
           type: string
           format: date-time
           readOnly: true
           title: Fecha de alta
+        profile_picture:
+          type: string
+          format: uri
+          writeOnly: true
+          nullable: true
+        profile_picture_url:
+          type: string
+          readOnly: true
       required:
       - date_joined
       - email
       - id
-      - password
+      - profile_picture_url
       - username
     AgregarEditores:
       type: object
@@ -952,6 +1045,17 @@ components:
             9]'
       required:
       - editores
+    AgregarVisitantes:
+      type: object
+      properties:
+        visitantes:
+          type: array
+          items:
+            type: integer
+          description: 'Lista de IDs de usuarios visitantes a agregar. Ejemplo: [8,
+            9]'
+      required:
+      - visitantes
     CambiarEstadoTestimonio:
       type: object
       properties:
@@ -1004,11 +1108,19 @@ components:
           format: date-time
           readOnly: true
           title: Fecha de alta
+        profile_picture:
+          type: string
+          format: uri
+          writeOnly: true
+          nullable: true
+        profile_picture_url:
+          type: string
+          readOnly: true
       required:
       - date_joined
       - email
       - id
-      - password
+      - profile_picture_url
       - username
     EstadoEnum:
       enum:
@@ -1059,30 +1171,19 @@ components:
       - dominio
       - id
       - organizacion_nombre
-    OrganizacionSerializerStaff:
+    PasswordResetConfirm:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
-        organizacion_nombre:
+        uid:
           type: string
-          maxLength: 50
-        dominio:
+        token:
           type: string
-          maxLength: 50
-        api_key:
+        new_password:
           type: string
-          nullable: true
-          maxLength: 50
-        editores:
-          type: string
-          readOnly: true
       required:
-      - dominio
-      - editores
-      - id
-      - organizacion_nombre
+      - new_password
+      - token
+      - uid
     PatchedAdminUser:
       type: object
       properties:
@@ -1099,11 +1200,20 @@ components:
         password:
           type: string
           writeOnly: true
+          minLength: 8
         date_joined:
           type: string
           format: date-time
           readOnly: true
           title: Fecha de alta
+        profile_picture:
+          type: string
+          format: uri
+          writeOnly: true
+          nullable: true
+        profile_picture_url:
+          type: string
+          readOnly: true
     PatchedCambiarEstadoTestimonio:
       type: object
       properties:
@@ -1150,6 +1260,14 @@ components:
           format: date-time
           readOnly: true
           title: Fecha de alta
+        profile_picture:
+          type: string
+          format: uri
+          writeOnly: true
+          nullable: true
+        profile_picture_url:
+          type: string
+          readOnly: true
     PatchedOrganizacionSerializerPublico:
       type: object
       properties:
@@ -1197,11 +1315,25 @@ components:
           readOnly: true
         comentario:
           type: string
-          maxLength: 100
-        archivo:
-          type: string
-          format: uri
           nullable: true
+          maxLength: 100
+        enlace:
+          type: string
+          nullable: true
+          maxLength: 100
+        archivos:
+          type: array
+          items:
+            type: string
+          writeOnly: true
+          maxItems: 4
+        archivos_urls:
+          type: array
+          items:
+            type: string
+            format: uri
+            readOnly: true
+          readOnly: true
         fecha_comentario:
           type: string
           format: date-time
@@ -1236,6 +1368,14 @@ components:
           format: date-time
           readOnly: true
           title: Fecha de alta
+        profile_picture:
+          type: string
+          format: uri
+          writeOnly: true
+          nullable: true
+        profile_picture_url:
+          type: string
+          readOnly: true
     RefreshToken:
       type: object
       properties:
@@ -1243,6 +1383,14 @@ components:
           type: string
       required:
       - refresh
+    SendEmailReset:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
     Testimonio:
       type: object
       properties:
@@ -1274,11 +1422,25 @@ components:
           readOnly: true
         comentario:
           type: string
-          maxLength: 100
-        archivo:
-          type: string
-          format: uri
           nullable: true
+          maxLength: 100
+        enlace:
+          type: string
+          nullable: true
+          maxLength: 100
+        archivos:
+          type: array
+          items:
+            type: string
+          writeOnly: true
+          maxItems: 4
+        archivos_urls:
+          type: array
+          items:
+            type: string
+            format: uri
+            readOnly: true
+          readOnly: true
         fecha_comentario:
           type: string
           format: date-time
@@ -1292,9 +1454,9 @@ components:
           readOnly: true
           default: E
       required:
+      - archivos_urls
       - categoria
       - categoria_nombre
-      - comentario
       - estado
       - fecha_comentario
       - id
@@ -1330,6 +1492,7 @@ components:
           readOnly: true
         comentario:
           type: string
+          nullable: true
           maxLength: 100
         fecha_comentario:
           type: string
@@ -1343,7 +1506,6 @@ components:
       - api_key
       - categoria
       - categoria_nombre
-      - comentario
       - fecha_comentario
       - id
       - usuario_registrado
@@ -1369,11 +1531,19 @@ components:
           format: date-time
           readOnly: true
           title: Fecha de alta
+        profile_picture:
+          type: string
+          format: uri
+          writeOnly: true
+          nullable: true
+        profile_picture_url:
+          type: string
+          readOnly: true
       required:
       - date_joined
       - email
       - id
-      - password
+      - profile_picture_url
       - username
   securitySchemes:
     jwtAuth:
@@ -1386,6 +1556,8 @@ tags:
   description: Operaciones de autenticación
 - name: Token
   description: Operaciones relacionadas con los tokens JWT
+- name: auth
+  description: Operaciones relacionadas con la recuperacion de contraseñas
 - name: Visitantes
   description: Operaciones relacionadas con los Usuarios visitantes
 - name: Editores

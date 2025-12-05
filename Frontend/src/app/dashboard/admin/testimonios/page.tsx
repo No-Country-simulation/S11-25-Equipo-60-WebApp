@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { ChangeStatusDialog } from "@/components"
 import {
     Select,
     SelectContent,
@@ -15,10 +16,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { FileText, Filter, Eye, Star } from "lucide-react"
+import { FileText, Filter, Eye, Star, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import type { Categoria, Organizacion, Testimonio } from "@/interfaces"
+import { getTestimonialUsername } from "@/lib/testimonial-utils"
 
 export default function AdminTestimoniosPage() {
     const [testimonials, setTestimonials] = useState<Testimonio[]>([])
@@ -27,6 +29,7 @@ export default function AdminTestimoniosPage() {
     const [categories, setCategories] = useState<Categoria[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedTestimonio, setSelectedTestimonio] = useState<Testimonio | null>(null)
+    const [changeStatusTestimonio, setChangeStatusTestimonio] = useState<Testimonio | null>(null)
 
     // Filtros
     const [filterOrg, setFilterOrg] = useState<string>("all")
@@ -44,9 +47,10 @@ export default function AdminTestimoniosPage() {
 
     const loadData = async () => {
         try {
-            // Admin ve TODOS los testimonios públicos aprobados
+            // ✅ CORRECCIÓN: Admin ve TODOS los testimonios (cualquier estado) usando getAllTestimonials
+            // Este endpoint usa GET /app/testimonios-totales/ que devuelve TODOS los testimonios para admin
             const [testimonialsData, orgsData, catsData] = await Promise.all([
-                testimonialService.getPublicTestimonials(), // GET /app/testimonios/
+                testimonialService.getAllTestimonials(), // GET /app/testimonios-totales/
                 organizationService.getOrganizations(),
                 categoryService.getCategories(),
             ])
@@ -85,7 +89,7 @@ export default function AdminTestimoniosPage() {
             filtered = filtered.filter(t =>
                 t.comentario.toLowerCase().includes(search) ||
                 t.organizacion_nombre?.toLowerCase().includes(search) ||
-                t.usuario_registrado?.toLowerCase().includes(search)
+                getTestimonialUsername(t).toLowerCase().includes(search)
             )
         }
 
@@ -265,7 +269,7 @@ export default function AdminTestimoniosPage() {
                                             {testimonial.comentario}
                                         </p>
                                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                            <span>Por: {testimonial.usuario_registrado || testimonial.usuario_anonimo_username || 'Anónimo'}</span>
+                                            <span>Por: {getTestimonialUsername(testimonial)}</span>
                                             <span>•</span>
                                             <span>{new Date(testimonial.fecha_comentario || '').toLocaleDateString('es-ES')}</span>
                                             <span>•</span>
@@ -275,13 +279,22 @@ export default function AdminTestimoniosPage() {
                                             </span>
                                         </div>
                                     </div>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => setSelectedTestimonio(testimonial)}
-                                    >
-                                        <Eye className="h-4 w-4" />
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setSelectedTestimonio(testimonial)}
+                                        >
+                                            <Eye className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setChangeStatusTestimonio(testimonial)}
+                                        >
+                                            <RefreshCw className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -312,9 +325,7 @@ export default function AdminTestimoniosPage() {
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Usuario</p>
                                     <p className="text-sm">
-                                        {selectedTestimonio.usuario_registrado ||
-                                         selectedTestimonio.usuario_anonimo_username ||
-                                         'Anónimo'}
+                                        {getTestimonialUsername(selectedTestimonio)}
                                     </p>
                                 </div>
                                 <div>
@@ -341,23 +352,41 @@ export default function AdminTestimoniosPage() {
                                     {selectedTestimonio.comentario}
                                 </p>
                             </div>
-                            {selectedTestimonio.archivo && (
+                            {selectedTestimonio.archivos_urls && selectedTestimonio.archivos_urls.length > 0 && (
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground mb-2">Archivo</p>
-                                    <a
-                                        href={selectedTestimonio.archivo}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-sm text-primary hover:underline"
-                                    >
-                                        Ver archivo adjunto
-                                    </a>
+                                    <p className="text-sm font-medium text-muted-foreground mb-2">Archivos</p>
+                                    <div className="space-y-2">
+                                        {selectedTestimonio.archivos_urls.map((url, index) => (
+                                            <a
+                                                key={index}
+                                                href={url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm text-primary hover:underline block"
+                                            >
+                                                Ver archivo {index + 1}
+                                            </a>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
                     )}
                 </DialogContent>
             </Dialog>
+
+            {/* Dialog Cambiar Estado */}
+            <ChangeStatusDialog
+                open={!!changeStatusTestimonio}
+                onOpenChange={(open) => {
+                    if (!open) setChangeStatusTestimonio(null);
+                }}
+                testimonio={changeStatusTestimonio}
+                onSuccess={async () => {
+                    setChangeStatusTestimonio(null);
+                    await loadData();
+                }}
+            />
         </div>
     )
 }

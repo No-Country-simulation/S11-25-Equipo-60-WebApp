@@ -30,7 +30,7 @@ export default function EditorEstadisticasPage() {
         try {
             const [testimonialsData, organizationsData] = await Promise.all([
                 testimonialService.getMyTestimonials(),
-                organizationService.getEditorOrganizations(),
+                organizationService.getOrganizations(),
             ])
             setTestimonials(testimonialsData)
             setOrganizations(organizationsData)

@@ -10,6 +10,7 @@ import { categoryService } from "@/services/category.service"
 import { organizationService } from "@/services/organization.service"
 import { useAuthStore } from "@/store/auth.store"
 import { useTranslation } from "@/lib/i18n-provider"
+import { useFileUpload } from "@/shared/hooks/useFileUpload"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -31,7 +32,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { toast } from "sonner"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, X, Upload } from "lucide-react"
 import type { Categoria, Organizacion } from "@/interfaces"
 
 const formSchema = z.object({
@@ -49,7 +50,6 @@ const formSchema = z.object({
     ranking: z.string().min(1, {
         message: "Debes seleccionar una calificación",
     }),
-    archivo: z.any().optional(), // file upload
 })
 
 export default function CrearTestimonioPage() {
@@ -58,6 +58,7 @@ export default function CrearTestimonioPage() {
     const [organizations, setOrganizations] = useState<Organizacion[]>([])
     const router = useRouter()
     const { t } = useTranslation()
+    const { files, previews, addFiles, removeFile, canAddMore, hasFiles } = useFileUpload()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -66,7 +67,6 @@ export default function CrearTestimonioPage() {
             comentario: "",
             categoria: "",
             ranking: "",
-            archivo: undefined,
         },
     })
 
@@ -113,9 +113,13 @@ export default function CrearTestimonioPage() {
             // NO enviar usuario_anonimo_* cuando el usuario está autenticado
             // El backend debe extraer el usuario_registrado del token JWT
 
-            if (values.archivo) {
-                console.log('Vk [Page] Adding file to FormData:', values.archivo.name);
-                formData.append('archivo', values.archivo);
+            // ✅ NUEVO: Agregar múltiples archivos (máx 4) con nombre 'archivos' (plural)
+            if (hasFiles) {
+                console.log(`📎 [Page] Adding ${files.length} file(s) to FormData`);
+                files.forEach((file, index) => {
+                    formData.append('archivos', file);
+                    console.log(`   ${index + 1}. ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+                });
             }
 
             console.log('📤 [Page] Sending FormData to service...');
@@ -126,7 +130,7 @@ export default function CrearTestimonioPage() {
         } catch (error: any) {
             console.error('❌ [Page] Error in onSubmit:', error);
             const errorMessage = error.response?.data?.detail ||
-                error.response?.data?.archivo?.[0] ||
+                error.response?.data?.archivos?.[0] ||
                 error.response?.data?.api_key?.[0] ||
                 "Error al crear el testimonio"
             toast.error(errorMessage)
@@ -283,30 +287,77 @@ export default function CrearTestimonioPage() {
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="archivo"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel htmlFor="archivo-input">Archivo (Opcional)</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                id="archivo-input"
-                                                type="file"
-                                                accept="image/*,video/*"
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    field.onChange(file);
-                                                }}
-                                            />
-                                        </FormControl>
-                                        <FormDescription>
-                                            Adjunta una imagen o video para complementar tu testimonio
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            {/* Campo de archivos (no parte del formulario react-hook-form) */}
+                            <div className="space-y-2">
+                                <label htmlFor="archivo-input" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Archivos (Opcional - Máx. 4)
+                                </label>
+                                {canAddMore && (
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            id="archivo-input"
+                                            type="file"
+                                            accept="image/*,video/mp4"
+                                            multiple
+                                            onChange={(e) => {
+                                                if (e.target.files) {
+                                                    addFiles(e.target.files);
+                                                    e.target.value = ''; // Reset input
+                                                                }
+                                                            }}
+                                                            disabled={!canAddMore}
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="icon"
+                                                            disabled={!canAddMore}
+                                                        >
+                                                            <Upload className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                                
+                                                {hasFiles && (
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        {previews.map((preview, index) => (
+                                                            <div 
+                                                                key={index}
+                                                                className="relative group rounded-lg border p-2 bg-muted/50"
+                                                            >
+                                                                {preview !== 'video-placeholder' && preview !== 'error-preview' ? (
+                                                                    <img 
+                                                                        src={preview} 
+                                                                        alt={`Preview ${index + 1}`}
+                                                                        className="w-full h-24 object-cover rounded"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-full h-24 flex items-center justify-center bg-muted rounded">
+                                                                        <span className="text-xs text-muted-foreground">
+                                                                            {files[index].name}
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="destructive"
+                                                                    size="icon"
+                                                                    className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                    onClick={() => removeFile(index)}
+                                                                >
+                                                                    <X className="h-3 w-3" />
+                                                                </Button>
+                                                                <p className="text-xs text-muted-foreground mt-1 truncate">
+                                                                    {files[index].name}
+                                                                </p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                                <p className="text-sm text-muted-foreground mt-4">
+                                                    Adjunta hasta 4 imágenes o videos (máx. 5MB cada uno)
+                                                </p>
+                                            </div>
 
                             <div className="flex gap-4">
                                 <Button

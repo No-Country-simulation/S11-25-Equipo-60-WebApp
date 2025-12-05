@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { CreateEditorDialog } from "@/components"
 import {
     Dialog,
     DialogContent,
@@ -51,6 +52,7 @@ export default function AdminUsuariosPage() {
     const [selectedUser, setSelectedUser] = useState<{ user: Usuario; type: 'visitante' | 'editor' | 'admin' } | null>(null)
     const [deleteUser, setDeleteUser] = useState<{ id: number; type: 'visitante' | 'editor' | 'admin' } | null>(null)
     const [showCreateDialog, setShowCreateDialog] = useState<'visitante' | 'admin' | null>(null)
+    const [showCreateEditorDialog, setShowCreateEditorDialog] = useState(false)
     const [formData, setFormData] = useState({ username: '', email: '', password: '' })
 
     useEffect(() => {
@@ -243,17 +245,20 @@ export default function AdminUsuariosPage() {
 
                 <TabsContent value="editores">
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Editores</CardTitle>
-                            <CardDescription>
-                                Usuarios que gestionan testimonios de organizaciones
-                            </CardDescription>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <div>
+                                <CardTitle>Editores</CardTitle>
+                                <CardDescription>
+                                    Usuarios que gestionan testimonios de organizaciones
+                                </CardDescription>
+                            </div>
+                            <Button onClick={() => setShowCreateEditorDialog(true)}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Crear Editor
+                            </Button>
                         </CardHeader>
                         <CardContent>
                             <UserTable users={editores} type="editor" />
-                            <p className="text-sm text-muted-foreground mt-4">
-                                💡 Los editores se crean manualmente en el backend. Contacta al equipo técnico.
-                            </p>
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -385,6 +390,17 @@ export default function AdminUsuariosPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            {/* Dialog Crear Editor */}
+            <CreateEditorDialog
+                open={showCreateEditorDialog}
+                onOpenChange={(open) => setShowCreateEditorDialog(open)}
+                onSuccess={async () => {
+                    setShowCreateEditorDialog(false)
+                    await loadData()
+                    toast.success("Editor creado correctamente")
+                }}
+            />
         </div>
     )
 }

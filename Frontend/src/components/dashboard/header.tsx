@@ -70,11 +70,11 @@ export function Header() {
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.push('/dashboard/perfil')}>
                                 <User className="mr-2 h-4 w-4" />
                                 <span>{t('common.profile')}</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.push('/dashboard/configuracion')}>
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>{t('common.settings')}</span>
                             </DropdownMenuItem>
