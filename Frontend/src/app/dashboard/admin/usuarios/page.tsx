@@ -154,11 +154,11 @@ export default function AdminUsuariosPage() {
                             <TableCell>{user.username}</TableCell>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>
-                                {new Date(user.date_joined).toLocaleDateString('es-ES', {
+                                {user.date_joined ? new Date(user.date_joined).toLocaleDateString('es-ES', {
                                     year: 'numeric',
                                     month: 'short',
                                     day: 'numeric'
-                                })}
+                                }) : 'N/A'}
                             </TableCell>
                             <TableCell className="text-right">
                                 <div className="flex justify-end gap-2">
@@ -172,7 +172,7 @@ export default function AdminUsuariosPage() {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => setDeleteUser({ id: user.id, type })}
+                                        onClick={() => user.id && setDeleteUser({ id: user.id, type })}
                                         className="text-red-600 hover:text-red-700"
                                     >
                                         <Trash2 className="h-4 w-4" />
@@ -359,7 +359,7 @@ export default function AdminUsuariosPage() {
                                 <div className="col-span-2">
                                     <p className="text-sm font-medium text-muted-foreground">Fecha de Registro</p>
                                     <p className="text-base">
-                                        {new Date(selectedUser.user.date_joined).toLocaleString('es-ES')}
+                                        {selectedUser.user.date_joined ? new Date(selectedUser.user.date_joined).toLocaleString('es-ES') : 'N/A'}
                                     </p>
                                 </div>
                             </div>
