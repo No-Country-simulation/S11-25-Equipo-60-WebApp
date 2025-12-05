@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { testimonialService, Testimonio } from "@/services/testimonial.service"
-import { organizationService, Organizacion } from "@/services/organization.service"
+import { testimonialService } from "@/services/testimonial.service"
+import { organizationService } from "@/services/organization.service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -33,6 +33,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import type { Organizacion, Testimonio } from "@/interfaces"
 
 export default function EditorTestimoniosPage() {
     const [testimonials, setTestimonials] = useState<Testimonio[]>([])
@@ -72,15 +73,15 @@ export default function EditorTestimoniosPage() {
 
     const applyFilters = () => {
         let filtered = [...testimonials]
-        
+
         if (filterStatus !== "all") {
             filtered = filtered.filter(t => t.estado === filterStatus)
         }
-        
+
         if (filterOrg !== "all") {
             filtered = filtered.filter(t => t.organizacion === parseInt(filterOrg))
         }
-        
+
         setFilteredTestimonials(filtered)
     }
 
@@ -264,7 +265,7 @@ export default function EditorTestimoniosPage() {
                                 <h4 className="text-sm font-medium mb-2">Comentario</h4>
                                 <p className="text-sm">{selectedTestimonial.comentario}</p>
                             </div>
-                            
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <h4 className="text-sm font-medium mb-2">Organización</h4>
