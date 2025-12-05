@@ -165,7 +165,11 @@ export default function AdminOrganizacionesPage() {
                                         <Users className="h-3 w-3" />
                                         <p className="text-xs font-medium">Editores</p>
                                     </div>
-                                    <p className="text-xs">{org.editores}</p>
+                                    <p className="text-xs">
+                                        {Array.isArray(org.editores)
+                                            ? org.editores.map((e: any) => e.username || e.email).join(', ')
+                                            : org.editores}
+                                    </p>
                                 </div>
                             )}
 

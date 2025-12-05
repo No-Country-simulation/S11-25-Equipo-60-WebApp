@@ -202,27 +202,31 @@ export default function VerTestimonioPage() {
                         </div>
                     )}
 
-                    {/* Archivo */}
-                    {testimonial.archivo && (
+                    {/* Archivos */}
+                    {testimonial.archivos_urls && testimonial.archivos_urls.length > 0 && (
                         <div>
-                            <h3 className="text-sm font-medium text-muted-foreground mb-2">Archivo adjunto</h3>
-                            <div className="border rounded-lg p-4">
-                                {testimonial.archivo.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                                    <img
-                                        src={testimonial.archivo}
-                                        alt="Testimonio"
-                                        className="max-w-full h-auto rounded-lg"
-                                    />
-                                ) : (
-                                    <a
-                                        href={testimonial.archivo}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-primary hover:underline"
-                                    >
-                                        Ver archivo adjunto
-                                    </a>
-                                )}
+                            <h3 className="text-sm font-medium text-muted-foreground mb-2">Archivos adjuntos</h3>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                {testimonial.archivos_urls.map((url, index) => (
+                                    <div key={index} className="border rounded-lg p-4">
+                                        {url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                                            <img
+                                                src={url}
+                                                alt={`Archivo ${index + 1}`}
+                                                className="max-w-full h-auto rounded-lg"
+                                            />
+                                        ) : (
+                                            <a
+                                                href={url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-primary hover:underline"
+                                            >
+                                                Ver archivo {index + 1}
+                                            </a>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     )}
