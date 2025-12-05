@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { userService, Usuario } from "@/services/user.service"
+import { userService } from "@/services/user.service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/tabs"
 import { Users, Plus, Edit, Trash2, Shield, Eye } from "lucide-react"
 import { toast } from "sonner"
+import type { Usuario } from "@/interfaces"
 
 export default function AdminUsuariosPage() {
     const [visitantes, setVisitantes] = useState<Usuario[]>([])
