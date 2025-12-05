@@ -1,7 +1,7 @@
 export interface Usuario {
-  id: number;
+  id?: number;
   username: string;
   email: string;
-  date_joined: string;
+  date_joined?: string;
   password?: string;
 }
