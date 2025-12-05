@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { testimonialService, Testimonio } from "@/services/testimonial.service"
-import { organizationService, Organizacion } from "@/services/organization.service"
-import { categoryService, Categoria } from "@/services/category.service"
+import { testimonialService } from "@/services/testimonial.service"
+import { organizationService } from "@/services/organization.service"
+import { categoryService } from "@/services/category.service"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -18,6 +18,7 @@ import {
 import { FileText, Filter, Eye, Star } from "lucide-react"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import type { Categoria, Organizacion, Testimonio } from "@/interfaces"
 
 export default function AdminTestimoniosPage() {
     const [testimonials, setTestimonials] = useState<Testimonio[]>([])
@@ -26,7 +27,7 @@ export default function AdminTestimoniosPage() {
     const [categories, setCategories] = useState<Categoria[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedTestimonio, setSelectedTestimonio] = useState<Testimonio | null>(null)
-    
+
     // Filtros
     const [filterOrg, setFilterOrg] = useState<string>("all")
     const [filterCategory, setFilterCategory] = useState<string>("all")
@@ -81,7 +82,7 @@ export default function AdminTestimoniosPage() {
         // Buscar por texto
         if (searchTerm) {
             const search = searchTerm.toLowerCase()
-            filtered = filtered.filter(t => 
+            filtered = filtered.filter(t =>
                 t.comentario.toLowerCase().includes(search) ||
                 t.organizacion_nombre?.toLowerCase().includes(search) ||
                 t.usuario_registrado?.toLowerCase().includes(search)
@@ -311,8 +312,8 @@ export default function AdminTestimoniosPage() {
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Usuario</p>
                                     <p className="text-sm">
-                                        {selectedTestimonio.usuario_registrado || 
-                                         selectedTestimonio.usuario_anonimo_username || 
+                                        {selectedTestimonio.usuario_registrado ||
+                                         selectedTestimonio.usuario_anonimo_username ||
                                          'Anónimo'}
                                     </p>
                                 </div>
@@ -343,9 +344,9 @@ export default function AdminTestimoniosPage() {
                             {selectedTestimonio.archivo && (
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground mb-2">Archivo</p>
-                                    <a 
-                                        href={selectedTestimonio.archivo} 
-                                        target="_blank" 
+                                    <a
+                                        href={selectedTestimonio.archivo}
+                                        target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-sm text-primary hover:underline"
                                     >

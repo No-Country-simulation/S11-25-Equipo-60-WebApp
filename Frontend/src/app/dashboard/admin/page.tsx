@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { userService } from "@/services/user.service"
-import { organizationService, Organizacion } from "@/services/organization.service"
+import { organizationService } from "@/services/organization.service"
 import { categoryService} from "@/services/category.service"
 import { testimonialService} from "@/services/testimonial.service"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatsCard } from "@/components/dashboard/stats-card"
 import { Users, Building2, FolderKanban, FileText, Shield } from "lucide-react"
 import { toast } from "sonner"
-import type { Categoria, Testimonio, Usuario } from "@/interfaces"
+import type { Categoria, Organizacion, Testimonio, Usuario } from "@/interfaces"
 
 export default function AdminDashboardPage() {
     const [visitantes, setVisitantes] = useState<Usuario[]>([])

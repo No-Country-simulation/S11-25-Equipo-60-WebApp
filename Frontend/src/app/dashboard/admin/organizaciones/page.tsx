@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { organizationService, Organizacion } from "@/services/organization.service"
+import { organizationService } from "@/services/organization.service"
 import { userService } from "@/services/user.service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Building2, Plus, Edit, Trash2, Key, Users } from "lucide-react"
 import { toast } from "sonner"
+import type { Organizacion } from "@/interfaces"
 
 export default function AdminOrganizacionesPage() {
     const [organizations, setOrganizations] = useState<Organizacion[]>([])
@@ -43,7 +44,7 @@ export default function AdminOrganizacionesPage() {
         }
 
         try {
-            const editoresArray = formData.editores 
+            const editoresArray = formData.editores
                 ? formData.editores.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id))
                 : []
 
@@ -52,14 +53,14 @@ export default function AdminOrganizacionesPage() {
                 dominio: formData.dominio,
                 editores: editoresArray.length > 0 ? editoresArray : undefined
             })
-            
+
             toast.success("Organización creada exitosamente")
             setFormData({ organizacion_nombre: '', dominio: '', editores: '' })
             setShowCreateDialog(false)
             loadData()
         } catch (error: any) {
             console.error('Error creating organization:', error)
-            const errorMessage = error.response?.data?.detail || 
+            const errorMessage = error.response?.data?.detail ||
                 error.response?.data?.organizacion_nombre?.[0] ||
                 error.response?.data?.dominio?.[0] ||
                 "Error al crear la organización"
@@ -75,7 +76,7 @@ export default function AdminOrganizacionesPage() {
                 organizacion_nombre: formData.organizacion_nombre,
                 dominio: formData.dominio
             })
-            
+
             toast.success("Organización actualizada exitosamente")
             setShowEditDialog(null)
             setFormData({ organizacion_nombre: '', dominio: '', editores: '' })
@@ -155,7 +156,7 @@ export default function AdminOrganizacionesPage() {
                                     <code className="text-xs break-all">{org.api_key}</code>
                                 </div>
                             )}
-                            
+
                             {org.editores && (
                                 <div className="p-3 bg-muted rounded-lg">
                                     <div className="flex items-center gap-2 mb-1">

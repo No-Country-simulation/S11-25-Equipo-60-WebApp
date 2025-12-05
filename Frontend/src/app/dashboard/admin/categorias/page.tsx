@@ -2,7 +2,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { categoryService, Categoria } from "@/services/category.service"
+import { categoryService } from "@/services/category.service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Tag, Plus, Edit, Trash2, Palette } from "lucide-react"
 import { toast } from "sonner"
+import type { Categoria } from "@/interfaces"
 
 export default function AdminCategoriasPage() {
     const [categories, setCategories] = useState<Categoria[]>([])
