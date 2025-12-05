@@ -5,8 +5,8 @@ import { useRouter, useParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { testimonialService, Testimonio } from "@/services/testimonial.service"
-import { categoryService, Categoria } from "@/services/category.service"
+import { testimonialService} from "@/services/testimonial.service"
+import { categoryService } from "@/services/category.service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select"
 import { toast } from "sonner"
 import { ArrowLeft } from "lucide-react"
+import type { Categoria, Testimonio } from "@/interfaces"
 
 const formSchema = z.object({
     comentario: z.string().min(10, {
@@ -71,10 +72,10 @@ export default function EditarTestimonioPage() {
                 testimonialService.getTestimonial(id),
                 categoryService.getCategories(),
             ])
-            
+
             setTestimonial(testimonialData)
             setCategories(categoriesData)
-            
+
             // Populate form with existing data
             form.reset({
                 comentario: testimonialData.comentario,

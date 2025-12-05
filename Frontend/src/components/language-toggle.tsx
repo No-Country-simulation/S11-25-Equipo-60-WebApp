@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import { Languages } from "lucide-react"
 import { useTranslation } from "@/lib/i18n-provider"
 import { Button } from "@/components/ui/button"

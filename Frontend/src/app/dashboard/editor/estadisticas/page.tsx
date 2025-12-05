@@ -1,20 +1,21 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { testimonialService, Testimonio } from "@/services/testimonial.service"
-import { organizationService, Organizacion } from "@/services/organization.service"
+import { testimonialService } from "@/services/testimonial.service"
+import { organizationService } from "@/services/organization.service"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { 
-    BarChart3, 
-    TrendingUp, 
-    Star, 
-    FileText, 
-    Clock, 
-    CheckCircle, 
+import {
+    BarChart3,
+    TrendingUp,
+    Star,
+    FileText,
+    Clock,
+    CheckCircle,
     XCircle,
-    Building2 
+    Building2
 } from "lucide-react"
 import { toast } from "sonner"
+import type { Organizacion, Testimonio } from "@/interfaces"
 
 export default function EditorEstadisticasPage() {
     const [testimonials, setTestimonials] = useState<Testimonio[]>([])
@@ -179,8 +180,8 @@ export default function EditorEstadisticasPage() {
                             <div className="flex items-center gap-4">
                                 <span className="text-2xl font-bold">{generalStats.pending}</span>
                                 <div className="w-32 bg-muted rounded-full h-2">
-                                    <div 
-                                        className="bg-yellow-500 h-2 rounded-full" 
+                                    <div
+                                        className="bg-yellow-500 h-2 rounded-full"
                                         style={{ width: `${(generalStats.pending / generalStats.total) * 100}%` }}
                                     />
                                 </div>
@@ -195,8 +196,8 @@ export default function EditorEstadisticasPage() {
                             <div className="flex items-center gap-4">
                                 <span className="text-2xl font-bold">{generalStats.approved}</span>
                                 <div className="w-32 bg-muted rounded-full h-2">
-                                    <div 
-                                        className="bg-green-500 h-2 rounded-full" 
+                                    <div
+                                        className="bg-green-500 h-2 rounded-full"
                                         style={{ width: `${(generalStats.approved / generalStats.total) * 100}%` }}
                                     />
                                 </div>
@@ -211,8 +212,8 @@ export default function EditorEstadisticasPage() {
                             <div className="flex items-center gap-4">
                                 <span className="text-2xl font-bold">{generalStats.rejected}</span>
                                 <div className="w-32 bg-muted rounded-full h-2">
-                                    <div 
-                                        className="bg-red-500 h-2 rounded-full" 
+                                    <div
+                                        className="bg-red-500 h-2 rounded-full"
                                         style={{ width: `${(generalStats.rejected / generalStats.total) * 100}%` }}
                                     />
                                 </div>
@@ -227,8 +228,8 @@ export default function EditorEstadisticasPage() {
                             <div className="flex items-center gap-4">
                                 <span className="text-2xl font-bold">{generalStats.draft}</span>
                                 <div className="w-32 bg-muted rounded-full h-2">
-                                    <div 
-                                        className="bg-gray-500 h-2 rounded-full" 
+                                    <div
+                                        className="bg-gray-500 h-2 rounded-full"
                                         style={{ width: `${(generalStats.draft / generalStats.total) * 100}%` }}
                                     />
                                 </div>
@@ -295,8 +296,8 @@ export default function EditorEstadisticasPage() {
                                         <div className="flex items-center gap-4">
                                             <span className="text-xl font-bold">{count}</span>
                                             <div className="w-24 bg-muted rounded-full h-2">
-                                                <div 
-                                                    className="bg-primary h-2 rounded-full" 
+                                                <div
+                                                    className="bg-primary h-2 rounded-full"
                                                     style={{ width: `${(count / generalStats.total) * 100}%` }}
                                                 />
                                             </div>

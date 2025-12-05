@@ -21,7 +21,7 @@ import { toast } from "sonner"
 import Link from "next/link"
 
 const formSchema = z.object({
-    email: z.email({
+    email: z.string().email({
         message: "Please enter a valid email address.",
     }),
     password: z.string().min(1, {
@@ -68,12 +68,12 @@ export function LoginForm() {
             setUser(userData)
 
             // 5. Mensaje de bienvenida según rol
-            const roleMessages = {
+            const roleMessages: Record<string, string> = {
                 visitante: '¡Bienvenido! 🎉',
                 editor: '¡Bienvenido, Editor! 📝',
                 admin: '¡Bienvenido, Administrador! 👑'
             }
-            toast.success(roleMessages[userData.role])
+            toast.success(roleMessages[userData.role] || '¡Bienvenido! 🎉')
 
             // 6. Redirigir al dashboard
             router.push("/dashboard")

@@ -1,10 +1,11 @@
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
+import type { ReactNode } from "react"
 
 export default function DashboardLayout({
     children,
 }: {
-    children: React.ReactNode
+    readonly children: ReactNode
 }) {
     return (
         <div className="flex min-h-screen flex-col md:flex-row">

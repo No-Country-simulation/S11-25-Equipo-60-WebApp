@@ -6,8 +6,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { testimonialService } from "@/services/testimonial.service"
-import { categoryService, Categoria } from "@/services/category.service"
-import { organizationService, Organizacion } from "@/services/organization.service"
+import { categoryService } from "@/services/category.service"
+import { organizationService } from "@/services/organization.service"
 import { useAuthStore } from "@/store/auth.store"
 import { useTranslation } from "@/lib/i18n-provider"
 import { Button } from "@/components/ui/button"
@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select"
 import { toast } from "sonner"
 import { ArrowLeft } from "lucide-react"
+import type { Categoria, Organizacion } from "@/interfaces"
 
 const formSchema = z.object({
     organizacion: z.string().min(1, {

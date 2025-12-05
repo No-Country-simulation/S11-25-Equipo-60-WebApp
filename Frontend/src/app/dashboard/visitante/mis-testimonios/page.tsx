@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { testimonialService, Testimonio } from "@/services/testimonial.service"
+import { testimonialService } from "@/services/testimonial.service"
 import { useTranslation } from "@/lib/i18n-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,6 +20,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import type { Testimonio } from "@/interfaces"
 
 export default function MisTestimoniosPage() {
     const [testimonials, setTestimonials] = useState<Testimonio[]>([])
