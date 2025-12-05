@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { testimonialService, Testimonio } from "@/services/testimonial.service"
+import { testimonialService } from "@/services/testimonial.service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -18,6 +18,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import type { Testimonio } from "@/interfaces"
 
 export default function VerTestimonioPage() {
     const [testimonial, setTestimonial] = useState<Testimonio | null>(null)

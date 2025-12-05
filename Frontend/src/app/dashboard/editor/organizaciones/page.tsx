@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { organizationService, Organizacion } from "@/services/organization.service"
-import { testimonialService, Testimonio } from "@/services/testimonial.service"
+import { organizationService } from "@/services/organization.service"
+import { testimonialService } from "@/services/testimonial.service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import type { Organizacion, Testimonio } from "@/interfaces"
 
 export default function EditorOrganizacionesPage() {
     const [organizations, setOrganizations] = useState<Organizacion[]>([])
@@ -57,7 +58,7 @@ export default function EditorOrganizacionesPage() {
         try {
             // Convertir string "1,2,3" a array [1,2,3]
             const ids = editorIds.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id))
-            
+
             if (ids.length === 0) {
                 toast.error("IDs inválidos. Usa formato: 1,2,3")
                 return
@@ -70,7 +71,7 @@ export default function EditorOrganizacionesPage() {
             loadData()
         } catch (error: any) {
             console.error('Error adding editors:', error)
-            const errorMessage = error.response?.data?.detail || 
+            const errorMessage = error.response?.data?.detail ||
                 error.response?.data?.editores?.[0] ||
                 "Error al agregar editores"
             toast.error(errorMessage)
@@ -182,9 +183,9 @@ export default function EditorOrganizacionesPage() {
                                     {/* Botón para agregar editores */}
                                     <Dialog>
                                         <DialogTrigger asChild>
-                                            <Button 
-                                                variant="outline" 
-                                                size="sm" 
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
                                                 className="w-full"
                                                 onClick={() => setSelectedOrg(org)}
                                             >
@@ -212,7 +213,7 @@ export default function EditorOrganizacionesPage() {
                                                         Los IDs deben ser de usuarios con rol de editor
                                                     </p>
                                                 </div>
-                                                <Button 
+                                                <Button
                                                     onClick={() => handleAddEditors(org.id)}
                                                     disabled={addingEditors}
                                                     className="w-full"

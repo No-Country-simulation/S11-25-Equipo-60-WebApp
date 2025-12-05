@@ -1,14 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { testimonialService, Testimonio } from "@/services/testimonial.service"
-import { organizationService, Organizacion } from "@/services/organization.service"
+import { testimonialService } from "@/services/testimonial.service"
+import { organizationService } from "@/services/organization.service"
 import { useTranslation } from "@/lib/i18n-provider"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatsCard } from "@/components/dashboard/stats-card"
 import { Badge } from "@/components/ui/badge"
 import { FileText, CheckCircle, Clock, XCircle, Building2 } from "lucide-react"
 import { toast } from "sonner"
+import type { Organizacion, Testimonio } from "@/interfaces"
 
 export default function EditorDashboardPage() {
     const [testimonials, setTestimonials] = useState<Testimonio[]>([])
