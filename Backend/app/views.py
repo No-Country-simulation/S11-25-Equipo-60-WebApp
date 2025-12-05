@@ -89,6 +89,7 @@ class TokenRefreshView(generics.GenericAPIView):
 @extend_schema(tags=['Login'])
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
+    
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -97,8 +98,24 @@ class LoginView(generics.GenericAPIView):
         # Generar tokens
         refresh = RefreshToken.for_user(user)
         
+        # Determinar el rol/grupo del usuario
+        user_role = None
+        
+        # Verificar si es administrador (is_staff=True)
+        if user.is_staff:
+            user_role = "administrador"
+        else:
+            # Verificar grupos del usuario
+            groups = user.groups.all()
+            if groups.exists():
+                # Tomar el primer grupo (asumiendo que un usuario solo pertenece a un grupo)
+                user_role = groups.first().name
+            else:
+                user_role = "sin_grupo"
+        
         return Response({
             'user_id': user.id,  # 👈 Agregar el ID del usuario
+            'rol': user_role, 
             'access': str(refresh.access_token),
         }, status=status.HTTP_200_OK)
     
