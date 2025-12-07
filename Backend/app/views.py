@@ -226,27 +226,35 @@ class UsuarioVisitanteViewSet(viewsets.ModelViewSet):
                 # Parsea la URL para obtener solo el dominio neto
                 parsed_origin = urlparse(origin)
                 origin_domain = f"{parsed_origin.scheme}://{parsed_origin.netloc}".lower()
-                # O si solo almacenas 'microsoft.com' sin 'https://', usa:
-                # origin_domain = parsed_origin.netloc.lower()
 
                 # Busca la organización por el dominio exacto
-                # Asegúrate de que el campo 'dominio' en tu modelo esté almacenado consistentemente
-                # (con o sin 'https://') para que coincida correctamente.
-                # Si almacenas solo 'microsoft.com', usa:
-                # origin_domain = parsed_origin.netloc.lower()
-                # Si almacenas 'https://microsoft.com', usa la línea comentada arriba.
-                # Suponiendo que almacenas 'https://microsoft.com':
                 organizacion_asociar = Organizacion.objects.get(dominio__iexact=origin_domain)
                 # logger.debug(f"Coincidencia de dominio encontrada: {origin_domain} -> {organizacion_asociar.organizacion_nombre}")
             except Organizacion.DoesNotExist:
-                # logger.debug(f"No se encontró organización para el dominio: {origin_domain}")
-                pass # No hacer nada si no hay coincidencia
+                # 🔴 DOMINIO NO COINCIDE: NO CREAR USUARIO
+                return Response(
+                    {
+                        "detail": f"No se puede crear la cuenta. El dominio '{origin_domain}' no está autorizado para registrar usuarios."
+                    },
+                    status=status.HTTP_403_FORBIDDEN
+                )
             except Exception as e:
-                # logger.error(f"Error buscando organización por dominio: {e}")
-                pass # Manejo de error genérico, opcional
+                # 🔴 ERROR EN LA VALIDACIÓN: NO CREAR USUARIO
+                return Response(
+                    {
+                        "detail": "Error al validar el dominio de origen. No se puede crear la cuenta."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         else:
-            # logger.debug("No se encontró encabezado Origin en la solicitud.")
-            pass # Origin no está presente, no se puede asociar
+            # 🔴 NO HAY ORIGIN: NO CREAR USUARIO
+            return Response(
+                {
+                    "detail": "No se puede crear la cuenta. Se requiere un encabezado Origin válido."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
 
         # --- Fin Nueva Lógica ---
 

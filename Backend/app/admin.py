@@ -8,6 +8,7 @@ from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django_otp.plugins.otp_totp.admin import TOTPDeviceAdmin
+from django.contrib import messages
 
 from django.utils.html import format_html
 # Desregistrar el admin por defecto de TOTPDevice
@@ -16,7 +17,7 @@ admin.site.unregister(TOTPDevice)
 from cloudinary import uploader
 # Registrar TOTPDevice con nombre personalizado
 @admin.register(TOTPDevice)
-class CustomTOTPDeviceAdmin(TOTPDeviceAdmin):
+class CustomTOTPDeviceAdmin(TOTPDeviceAdmin, UnfoldModelAdmin):
     # Cambiar el verbose_name del modelo
     class Meta:
         verbose_name = 'Usuario 2FA'
@@ -27,6 +28,103 @@ class CustomTOTPDeviceAdmin(TOTPDeviceAdmin):
         # Cambiar el nombre en la lista de modelos
         self.model._meta.verbose_name = 'Usuario 2FA'
         self.model._meta.verbose_name_plural = 'Usuarios 2FA'
+    
+    # Definir list_display como atributo de clase para evitar el error
+    list_display = ('user', 'name', 'confirmed', 'user_is_staff')
+    
+    def get_queryset(self, request):
+        """
+        Mostrar solo TOTPDevices de usuarios staff
+        """
+        qs = super().get_queryset(request)
+        return qs.filter(user__is_staff=True)
+    
+    def user_is_staff(self, obj):
+        """
+        Mostrar si el usuario es staff
+        """
+        return obj.user.is_staff if obj.user else False
+    user_is_staff.short_description = 'Es Staff'
+    user_is_staff.boolean = True
+    user_is_staff.admin_order_field = 'user__is_staff'
+    
+    def get_readonly_fields(self, request, obj=None):
+        """
+        Hacer el campo user de solo lectura si ya existe el dispositivo
+        """
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj and obj.pk:
+            readonly_fields.append('user')
+        return readonly_fields
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """
+        Filtrar usuarios para mostrar solo los que son staff
+        """
+        if db_field.name == "user":
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            kwargs["queryset"] = User.objects.filter(is_staff=True)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    
+    def has_add_permission(self, request):
+        """
+        Permitir agregar solo si hay usuarios staff disponibles
+        """
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        staff_users = User.objects.filter(is_staff=True)
+        return staff_users.exists() and super().has_add_permission(request)
+    
+    def save_model(self, request, obj, form, change):
+        """
+        Validar que el usuario sea staff antes de guardar
+        """
+        # Verificar si el usuario es staff
+        if not obj.user.is_staff:
+            messages.error(
+                request, 
+                'Solo los usuarios con permisos de staff pueden tener autenticación en 2 pasos.'
+            )
+            return
+        
+        # Verificar si ya existe un dispositivo para este usuario
+        existing_device = TOTPDevice.objects.filter(user=obj.user).exclude(pk=obj.pk).first()
+        if existing_device:
+            messages.warning(
+                request,
+                f'El usuario {obj.user.username} ya tiene un dispositivo 2FA configurado.'
+            )
+        
+        super().save_model(request, obj, form, change)
+    
+    def get_actions(self, request):
+        """
+        Limitar acciones para dispositivos de usuarios no staff
+        """
+        actions = super().get_actions(request)
+        
+        # Obtener dispositivos de usuarios no staff
+        non_staff_devices = TOTPDevice.objects.filter(user__is_staff=False)
+        
+        # Si hay dispositivos de usuarios no staff, mostrar advertencia
+        if non_staff_devices.exists():
+            messages.warning(
+                request,
+                f'Existen {non_staff_devices.count()} dispositivos 2FA de usuarios no staff. '
+                'Estos serán eliminados automáticamente.'
+            )
+            
+            # Eliminar automáticamente dispositivos de usuarios no staff
+            deleted_count = non_staff_devices.delete()[0]
+            if deleted_count > 0:
+                messages.info(
+                    request,
+                    f'Se eliminaron {deleted_count} dispositivos 2FA de usuarios no staff.'
+                )
+        
+        return actions
+    
 class CustomUserCreationForm(UserCreationForm):
     profile_picture = forms.ImageField(
         required=False,
@@ -62,7 +160,6 @@ class CustomUserCreationForm(UserCreationForm):
                 user.save()
         
         return user
-# En tu admin.py, modifica la clase UserAdminForm:
 
 class UserAdminForm(forms.ModelForm):
     """
@@ -72,7 +169,7 @@ class UserAdminForm(forms.ModelForm):
     group_choice = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         widget=forms.RadioSelect,
-        required=True,
+        required=False,
         label="Grupo",
         help_text="Selecciona un solo grupo. El usuario debe pertenecer a un grupo."
     )
@@ -97,10 +194,17 @@ class UserAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         instance = kwargs.get('instance')
+
+        # Si es un admin (staff y superuser), no mostrar grupos
+        if instance and instance.is_staff and instance.is_superuser:
+            self.fields['group_choice'].widget = forms.HiddenInput()
+            self.fields['group_choice'].required = False
+            self.fields['group_choice'].help_text = "Los administradores no pertenecen a grupos"
+        else:
+            # Establecer el valor inicial si existe para no-admins
+            if instance and instance.groups.exists():
+                self.fields['group_choice'].initial = instance.groups.first()
         
-        # Establecer el valor inicial si existe
-        if instance and instance.groups.exists():
-            self.fields['group_choice'].initial = instance.groups.first()
         
         # Mostrar preview de la foto actual si existe
         if instance and instance.profile_picture:
@@ -119,11 +223,24 @@ class UserAdminForm(forms.ModelForm):
     
     def clean(self):
         cleaned_data = super().clean()
-        # Validar que se seleccionó un grupo
-        if not cleaned_data.get('group_choice'):
+        
+        # Validar que NO se asigne grupo a admins
+        instance_user = self.instance
+        group_choice = cleaned_data.get('group_choice')
+        
+        # Si el usuario es o será admin, no debe tener grupo
+        if (instance_user and instance_user.is_staff and instance_user.is_superuser) or \
+           (cleaned_data.get('is_staff') and cleaned_data.get('is_superuser')):
+            if group_choice:
+                raise ValidationError({
+                    'group_choice': 'Los administradores no deben pertenecer a ningún grupo.'
+                })
+        # Si no es admin, debe tener un grupo
+        elif not group_choice:
             raise ValidationError({
-                'group_choice': 'Debe seleccionar un grupo para el usuario.'
+                'group_choice': 'Los usuarios no administradores deben seleccionar un grupo.'
             })
+        
         return cleaned_data
     
     def save(self, commit=True):
@@ -143,10 +260,19 @@ class UserAdminForm(forms.ModelForm):
         if commit:
             user.save()
         
-        # Asignar el grupo seleccionado
+        # Manejar grupos según el tipo de usuario
         selected_group = self.cleaned_data.get('group_choice')
-        if selected_group:
+        
+        # Si es admin: eliminar todos los grupos
+        if user.is_staff and user.is_superuser:
+            user.groups.clear()  # 👈 Limpiar todos los grupos
+        # Si no es admin y hay grupo seleccionado: asignarlo
+        elif selected_group:
             user.groups.set([selected_group])
+        # Si no es admin y no hay grupo: asignar grupo por defecto
+        else:
+            default_group, created = Group.objects.get_or_create(name='visitante')
+            user.groups.set([default_group])
         
         return user
 
@@ -345,7 +471,7 @@ class EditorAdmin(ClienteAdmin, UnfoldModelAdmin):
 class AdminUserAdmin(ClienteAdmin, UnfoldModelAdmin):
 
     add_form = CustomUserCreationForm  # 👈 CAMBIAR AQUÍ
-    form = forms.ModelForm
+    form = UserAdminForm  # 👈 CAMBIAR A UserAdminForm para la edición
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -361,7 +487,6 @@ class AdminUserAdmin(ClienteAdmin, UnfoldModelAdmin):
     # Campos que aparecen en la edición
     fieldsets = (
         (None, {'fields': ('email', 'username', 'password')}),
-        ('Grupos', {'fields': ('group_choice',)}),
         ('Foto de perfil', {
             'fields': ('profile_picture', 'clear_profile_picture'),
             'description': 'Sube una nueva foto o marca la opción para eliminar la actual'
@@ -379,13 +504,27 @@ class AdminUserAdmin(ClienteAdmin, UnfoldModelAdmin):
     exclude = ('groups',)
 
     def save_model(self, request, obj, form, change):
-
+        """
+        Sobrescribir para forzar que los admins:
+        1. Sean staff y superuser
+        2. NO tengan grupos asignados
+        """
         # FORZAR SIEMPRE A SER ADMIN
         obj.is_superuser = True
         obj.is_staff = True
-        obj.is_active = True
-
-        super().save_model(request, obj, form, change)
+        
+        # Guardar primero
+        super(ClienteAdmin, self).save_model(request, obj, form, change)
+        
+        # GARANTIZAR QUE NO TENGA GRUPOS
+        obj.groups.clear()  # 👈 Esto es CRÍTICO
+        
+        # Mensaje informativo
+        from django.contrib import messages
+        messages.info(
+            request,
+            'Usuario admin creado/actualizado. Los administradores no pertenecen a grupos.'
+        )
 
 
 # CUARTO: Desregistrar y registrar modelos
