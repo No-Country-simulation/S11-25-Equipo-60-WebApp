@@ -1,7 +1,7 @@
 # 📘 Backend for App ✨
 
 - [`📚 Root`](../README.md)/[`📕 Frontend`](../Frontend/README.md)/
-- [`📚 Root`](../README.md)/`📘 Backend`/
+- [`📚 Root`](../README.md)/`📖 Backend`/
 
 ## 📖 Table of Contents
 
@@ -29,7 +29,6 @@ The backend of Testimonial CMS is built with Django and PostgreSQL, providing a 
 
 [![Python Link](https://img.shields.io/badge/Python-3776AB.svg?style=for-the-badge&logo=Python&logoColor=white 'Python link')](https://www.python.org/)
 [![Django link](https://img.shields.io/badge/Django-092E20.svg?style=for-the-badge&logo=Django&logoColor=white, 'Django Link')](https://www.djangoproject.com/)
-[![Render link](https://img.shields.io/badge/Render-000000.svg?style=for-the-badge&logo=Render&logoColor=white 'Render link')](https://render.com/)
 [![Swagger Link](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=Swagger&logoColor=black 'Swagger Link')](https://swagger.io/)
 [![Markdown Link](https://img.shields.io/badge/Markdown-03a7dd?style=for-the-badge&logo=markdown&logoColor=white 'Markdown Link')](https://img.shields.io/badge/Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white)
 [![Cloudinary Link](https://img.shields.io/badge/cloudinary-%233448C5?style=for-the-badge&logo=cloudinary&logoColor=ffffff 'Cloudinary Link')](https://cloudinary.com/)
