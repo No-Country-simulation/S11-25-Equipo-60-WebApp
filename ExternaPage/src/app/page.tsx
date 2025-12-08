@@ -1,7 +1,6 @@
+import { redirect } from "next/navigation";
+
 export default function Home() {
-  return (
-    <div >
-      <h1>Externa site</h1>
-    </div>
-  );
+  redirect("/under-construction");
+  //redirect("/landing");
 }
