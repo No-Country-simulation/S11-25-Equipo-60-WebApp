@@ -189,6 +189,7 @@ class Testimonios(models.Model):
     usuario_anonimo_username = models.CharField(max_length=50, blank=True, null=True)
     usuario_anonimo_email = models.EmailField(blank=True, null=True) 
     api_key = models.CharField(max_length=50, blank=False, null=False)
+    feedback = models.CharField(max_length=512, blank=True, null=True)
     comentario = models.CharField(max_length=100, blank=True, null=True)
     enlace = models.CharField(max_length=100, blank=True, null=True)
     archivos = models.JSONField(default=list, blank=True, null=True)  # Array de URLs de archivos
@@ -233,14 +234,33 @@ class Testimonios(models.Model):
             raise ValidationError(
                 "Para testimonios anónimos, tanto usuario_anonimo_username como usuario_anonimo_email son requeridos."
             )
-
         
+        # 👇 NUEVA VALIDACIÓN: Si hay feedback, el estado debe ser RECHAZADO
+        if self.feedback and self.estado != 'R':
+            raise ValidationError({
+                'estado': 'Solo los testimonios RECHAZADOS pueden tener feedback.',
+                'feedback': 'El feedback solo puede asignarse cuando el estado es RECHAZADO.'
+            })
+        
+        # 👇 NUEVA VALIDACIÓN: Si el estado es RECHAZADO, debe tener feedback
+        if self.estado == 'R' and not self.feedback:
+            raise ValidationError({
+                'feedback': 'Los testimonios RECHAZADOS deben incluir un feedback explicando el motivo.'
+            })
 
     def save(self, *args, **kwargs):
         # Si hay usuario registrado, limpiar campos anónimos automáticamente
         if self.usuario_registrado:
             self.usuario_anonimo_username = None
             self.usuario_anonimo_email = None
+        
+        # 👇 NUEVA LÓGICA: Si se agrega feedback a un testimonio en ESPERA, cambiar estado a RECHAZADO
+        if (self.pk and 
+            self.feedback and 
+            self.feedback.strip() and 
+            self.estado == 'E'):
+            self.estado = 'R'
+            print(f"⚠️ Testimonio {self.id} automáticamente cambiado a RECHAZADO porque tiene feedback")
         
         self.clean()
         super().save(*args, **kwargs)

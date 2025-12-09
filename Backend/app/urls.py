@@ -17,6 +17,7 @@ router.register(r'testimonios', TestimonioViewSet, basename='testimonios')
 router.register(r'testimonios-totales', TestimonioOrganizacionViewSet, basename='testimonios-totales')
 #La ruta de cambiar-estado-testimonio solamente puede ser usado por los editores de la organizacion a la que se le realizo el testimonio
 router.register(r'testimonios-cambiar-estado', CambiarEstadoTestimonioViewSet, basename='cambiar-estado-testimonio')
+router.register(r'testimonios-feedback', FeedbackTestimonioViewSet, basename='testimonio-feedback')
 
 urlpatterns=[
     path('', include(router.urls)),

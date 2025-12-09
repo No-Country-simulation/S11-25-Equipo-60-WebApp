@@ -1215,7 +1215,7 @@ class TestimonioOrganizacionViewSet(viewsets.ReadOnlyModelViewSet):
 @extend_schema_view(
     partial_update=extend_schema(
         tags=['Testimonios'],
-        description="Este endpoint permite que el dueño de la organización cambie el estado de los testimonios de SU organización (A: Aprobado, E: Espera, R: Rechazado)"
+        description="Este endpoint permite que el dueño de la organización cambie el estado de los testimonios de SU organización (A: Aprobado, E: Espera, R: Rechazado). Solamente se puede agregar feedback a los estados rechazados, si cambio a cualquier otro estado no puedo agregar el feedback... y ningun estado rechazado puede cambiar su feedback, si tengo un estado rechazado y le cambio el estado automaticamente se borra el campo feedback y queda null"
     )
 )
 class CambiarEstadoTestimonioViewSet(viewsets.ModelViewSet):
@@ -1250,6 +1250,30 @@ class CambiarEstadoTestimonioViewSet(viewsets.ModelViewSet):
         
         # 2a. Verificar que el usuario pertenece al grupo 'editor'
         es_editor = user.groups.filter(name='editor').exists()
+
+        # 👇 NUEVA LÓGICA: Validar que no se pueda cambiar a RECHAZADO sin feedback
+        nuevo_estado = request.data.get('estado')
+        
+        if nuevo_estado == 'R':
+            feedback = request.data.get('feedback', '').strip()
+            
+            # Si no se proporciona feedback en la petición, verificar si ya tiene
+            if not feedback and not testimonio.feedback:
+                return Response(
+                    {
+                        "detail": "No se puede cambiar el estado a RECHAZADO sin proporcionar feedback. "
+                        "Use el endpoint específico para feedback o incluya el campo 'feedback' en la petición."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        # Si se está cambiando a RECHAZADO y se proporciona feedback, procesarlo
+        if nuevo_estado == 'R' and 'feedback' in request.data:
+            testimonio.feedback = request.data['feedback']
+        
+        # Si se está cambiando de RECHAZADO a otro estado, limpiar feedback
+        if testimonio.estado == 'R' and nuevo_estado != 'R' and nuevo_estado is not None:
+            testimonio.feedback = None
         
         if es_editor:
             # 2b. OBTENER la organización del testimonio
@@ -1279,3 +1303,114 @@ class CambiarEstadoTestimonioViewSet(viewsets.ModelViewSet):
         
         # Si tiene permisos, procede con la actualización
         return super().partial_update(request, *args, **kwargs)
+    
+
+@extend_schema_view(
+    partial_update=extend_schema(
+        tags=['Testimonios'],
+        description="""Este endpoint permite que editores/administradores agreguen feedback 
+        a testimonios en estado ESPERA. Automáticamente cambia el estado a RECHAZADO.
+        
+        Reglas:
+        1. Solo testimonios en estado ESPERA
+        2. Feedback no puede estar vacío
+        3. Automáticamente cambia estado a RECHAZADO
+        4. Solo editores de la organización o administradores""",
+        request=FeedbackSerializer,
+        responses={
+            200: OpenApiResponse(description="Feedback agregado exitosamente. Testimonio ahora está RECHAZADO"),
+            400: OpenApiResponse(description="Testimonio no está en estado ESPERA o feedback vacío"),
+            403: OpenApiResponse(description="No tienes permisos")
+        }
+    )
+)
+class FeedbackTestimonioViewSet(viewsets.GenericViewSet):
+    """
+    Endpoint para agregar feedback a testimonios en ESPERA
+    """
+    serializer_class = FeedbackSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = Testimonios.objects.all()
+    http_method_names = ['patch']  # Solo permitir PATCH
+
+    def partial_update(self, request, *args, **kwargs):
+        testimonio = self.get_object()
+        user = request.user
+        
+        # Verificar permisos:
+        # 1. Es administrador (is_staff=True) O
+        # 2. Es editor de la organización del testimonio
+        puede_modificar = (
+            user.is_staff or 
+            (user.groups.filter(name='editor').exists() and 
+             testimonio.organizacion.editores.filter(id=user.id).exists())
+        )
+        
+        if not puede_modificar:
+            return Response(
+                {
+                    "detail": "No tienes permisos para agregar feedback a este testimonio. "
+                    "Solo el administrador o un editor de la organización asociada puede hacerlo."
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Verificar que el testimonio esté en ESPERA
+        if testimonio.estado != 'E':
+            return Response(
+                {
+                    "detail": f"No se puede agregar feedback. "
+                    f"El testimonio está en estado {testimonio.get_estado_display()}. "
+                    f"Solo se puede agregar feedback a testimonios en estado ESPERA."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validar que solo se envíe el campo feedback
+        campos_permitidos = ['feedback']
+        campos_recibidos = set(request.data.keys())
+        campos_no_permitidos = campos_recibidos - set(campos_permitidos)
+        
+        if campos_no_permitidos:
+            return Response(
+                {
+                    "detail": f"No puedes modificar los siguientes campos: {', '.join(campos_no_permitidos)}. "
+                    f"Solo puedes agregar feedback."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Serializar y actualizar
+        serializer = self.get_serializer(testimonio, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        
+        # Guardar el feedback (automáticamente cambiará estado a RECHAZADO)
+        self.perform_update(serializer)
+        
+        # Obtener información actualizada
+        testimonio.refresh_from_db()
+        
+        return Response({
+            "detail": "Feedback agregado exitosamente. El testimonio ha sido RECHAZADO.",
+            "testimonio": {
+                "id": testimonio.id,
+                "usuario": testimonio.usuario_registrado.username if testimonio.usuario_registrado else testimonio.usuario_anonimo_username,
+                "organizacion": testimonio.organizacion.organizacion_nombre,
+                "comentario": testimonio.comentario,
+                "feedback": testimonio.feedback,
+                "estado": testimonio.get_estado_display(),
+                "estado_codigo": testimonio.estado,
+                "fecha_comentario": testimonio.fecha_comentario,
+                "fecha_rechazo": testimonio.fecha_comentario  # Podrías agregar un campo específico
+            },
+            "actualizado_por": {
+                "id": user.id,
+                "username": user.username,
+                "rol": "administrador" if user.is_staff else "editor",
+                "organizacion": testimonio.organizacion.organizacion_nombre if not user.is_staff else None
+            },
+            "nota": "El feedback fue enviado al usuario automáticamente."
+        }, status=status.HTTP_200_OK)
+    
+    def perform_update(self, serializer):
+        serializer.save()

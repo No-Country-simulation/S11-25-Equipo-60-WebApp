@@ -526,6 +526,63 @@ class TestimonioAprobadoSerializer(serializers.ModelSerializer):
 
 #######################ACA EMPIEZA LOS TESTIMONIOS COMO TAL
 
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Testimonios
+        fields = ['feedback']
+        read_only_fields = ['organizacion', 'usuario_registrado', 'usuario_anonimo_username', 
+                           'usuario_anonimo_email', 'api_key', 'comentario', 'enlace', 
+                           'archivos', 'fecha_comentario', 'categoria', 'ranking', 'estado']
+    
+    def validate_feedback(self, value):
+        """Validar que el feedback no esté vacío"""
+        if value and len(value.strip()) == 0:
+            raise serializers.ValidationError("El feedback no puede estar vacío.")
+        return value
+    
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Testimonios
+        fields = ['feedback', 'estado']  # 👈 Incluimos estado para poder cambiarlo
+        read_only_fields = ['estado']  # 👈 El estado será controlado automáticamente
+    
+    def validate(self, data):
+        """
+        Validar que solo se pueda agregar feedback a testimonios en estado ESPERA
+        y que automáticamente cambie el estado a RECHAZADO
+        """
+        instance = self.instance
+        
+        # Verificar que el testimonio esté en estado ESPERA
+        if instance.estado != 'E':
+            raise serializers.ValidationError(
+                f"Solo se puede agregar feedback a testimonios en estado ESPERA. "
+                f"Este testimonio está en estado {instance.get_estado_display()}."
+            )
+        
+        # Validar que el feedback no esté vacío
+        feedback = data.get('feedback', '').strip()
+        if not feedback:
+            raise serializers.ValidationError({
+                "feedback": "El feedback no puede estar vacío."
+            })
+        
+        # Cambiar automáticamente el estado a RECHAZADO
+        data['estado'] = 'R'
+        
+        return data
+    
+    def update(self, instance, validated_data):
+        # Actualizar el feedback
+        instance.feedback = validated_data.get('feedback', instance.feedback)
+        instance.estado = 'R'  # 👈 Cambiar automáticamente a RECHAZADO
+        
+        # Guardar el testimonio (activará las validaciones del modelo)
+        instance.save()
+        
+        return instance
+
 # Función auxiliar para extraer public_id y resource_type
 def extract_public_id_and_type_from_url(url):
     """
@@ -605,6 +662,7 @@ class TestimonioSerializer(serializers.ModelSerializer):
     usuario_anonimo_username = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     usuario_anonimo_email = serializers.EmailField(required=False, allow_blank=True, allow_null=True) 
     api_key = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    feedback = serializers.SerializerMethodField()  # 👈 Cambiar a SerializerMethodField
 
     def validate_archivos(self, archivos):
         """
@@ -654,9 +712,27 @@ class TestimonioSerializer(serializers.ModelSerializer):
             'id', 'organizacion', 'organizacion_nombre',  'usuario_registrado',  'usuario_anonimo_email', 
             'usuario_anonimo_username', 
             'api_key', 'categoria',  'categoria_nombre', 'comentario', 'enlace', 'archivos',  'archivos_urls', 'fecha_comentario', 
-            'ranking', 'estado'
+            'ranking', 'estado', 'feedback'  
         ]
         read_only_fields = ['usuario_registrado', 'fecha_comentario', 'organizacion_nombre', 'categoria_nombre', 'estado']
+
+    def get_feedback(self, obj):
+        """
+        Mostrar feedback SOLO si el estado es RECHAZADO (R)
+        """
+        if obj.estado == 'R':
+            return obj.feedback
+        return None  # 👈 Devuelve None para otros estados
+
+    def validate_feedback(self, value):
+        """Validar que el feedback no se pueda establecer desde la creación"""
+        # Cuando se crea un testimonio, el feedback debe ser None
+        if self.instance is None and value is not None:
+            raise serializers.ValidationError(
+                "El feedback no puede ser establecido al crear un testimonio. "
+                "Solo puede ser agregado posteriormente por un editor o administrador."
+            )
+        return value
 
     def validate(self, data):
     
@@ -852,24 +928,109 @@ class TestimonioSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """
         Personalizar la representación para mostrar las URLs de los archivos
+        y controlar la visibilidad del feedback
         """
         representation = super().to_representation(instance)
         
-        # Asegurar que archivos siempre sea una lista
+        # 1. Asegurar que archivos siempre sea una lista
         representation['archivos_urls'] = instance.archivos if instance.archivos else []
+        
+        ## 2. Eliminar feedback si el estado no es RECHAZADO
+        #if instance.estado != 'R':
+        #    representation.pop('feedback', None)
         
         return representation
     
 class CambiarEstadoTestimonioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Testimonios
-        fields = ['estado']
+        fields = ['estado', 'feedback']
+        read_only_fields = []  # Ambos campos son editables en principio
     
-    def validate_estado(self, value):
-        """Validar que el estado sea uno de los permitidos"""
-        estados_permitidos = ['A', 'E', 'R']  # Aprobado, Espera, Rechazado
-        if value not in estados_permitidos:
-            raise serializers.ValidationError(
-                f"Estado no válido. Los estados permitidos son: {', '.join(estados_permitidos)}"
-            )
-        return value
+    def validate(self, data):
+        """
+        Validar reglas de negocio para cambio de estado y feedback
+        """
+        instance = self.instance
+        nuevo_estado = data.get('estado', instance.estado)
+        nuevo_feedback = data.get('feedback', None)  # Usar None si no se envía
+        feedback_actual = instance.feedback if instance else None
+        
+        # REGLA 1: Solo se puede agregar/modificar feedback cuando estado es RECHAZADO
+        if 'feedback' in data and nuevo_feedback is not None:
+            # Si se está intentando modificar el feedback
+            if nuevo_estado != 'R':
+                # No permitir modificar feedback si no es RECHAZADO
+                raise serializers.ValidationError({
+                    "feedback": "Solo se puede agregar o modificar feedback cuando el estado es RECHAZADO."
+                })
+            
+            # REGLA 2: Si YA es RECHAZADO y YA tiene feedback, no permitir modificarlo
+            if instance.estado == 'R' and feedback_actual and feedback_actual.strip():
+                # Verificar si el feedback está cambiando (no es lo mismo)
+                if nuevo_feedback != feedback_actual:
+                    raise serializers.ValidationError({
+                        "feedback": "No se puede modificar el feedback de un testimonio RECHAZADO. "
+                                  "Una vez asignado, el feedback es inmutable."
+                    })
+        
+        # REGLA 3: Si se cambia a RECHAZADO, DEBE tener feedback
+        if nuevo_estado == 'R':
+            # Verificar si hay feedback en los datos o si ya existe
+            feedback_proporcionado = data.get('feedback')
+            feedback_existente = feedback_actual
+            
+            if not feedback_proporcionado and not feedback_existente:
+                raise serializers.ValidationError({
+                    "feedback": "Debe proporcionar un feedback cuando cambia el estado a RECHAZADO."
+                })
+        
+        # REGLA 4: Si se cambia de RECHAZADO a otro estado, limpiar feedback automáticamente
+        if instance.estado == 'R' and nuevo_estado != 'R':
+            # Limpiar feedback automáticamente
+            data['feedback'] = None
+            
+            # Mostrar advertencia
+            if self.context.get('request'):
+                # Puedes agregar un mensaje al contexto si lo necesitas
+                pass
+        
+        return data
+    
+    def update(self, instance, validated_data):
+        """
+        Actualizar la instancia con las reglas aplicadas
+        """
+        nuevo_estado = validated_data.get('estado', instance.estado)
+        nuevo_feedback = validated_data.get('feedback', instance.feedback)
+        
+        # Aplicar REGLA 4 explícitamente: Si cambia de R a otro estado, feedback = None
+        if instance.estado == 'R' and nuevo_estado != 'R':
+            instance.feedback = None
+        
+        # Actualizar otros campos
+        instance.estado = nuevo_estado
+        
+        # Solo actualizar feedback si el nuevo estado es R
+        if nuevo_estado == 'R' and 'feedback' in validated_data:
+            instance.feedback = nuevo_feedback
+        
+        # Guardar la instancia (activará las validaciones del modelo)
+        instance.save()
+        
+        return instance
+    
+# Serializador para testimonios aprobados (públicos) - NUNCA mostrar feedback
+class TestimonioAprobadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Testimonios
+        fields = ['id', 'usuario_registrado', 'usuario_anonimo_username', 
+                 'comentario', 'enlace', 'archivos', 'fecha_comentario', 
+                 'categoria', 'ranking']
+        read_only_fields = fields
+    
+    def to_representation(self, instance):
+        # Nunca mostrar feedback en testimonios públicos
+        data = super().to_representation(instance)
+        data.pop('feedback', None)
+        return data
