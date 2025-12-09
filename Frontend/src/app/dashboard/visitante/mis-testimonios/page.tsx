@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { EmptyState } from "@/components/dashboard/empty-state"
-import { FileText, Plus, Edit, Trash2, Eye } from "lucide-react"
+import { FileText, Plus, Edit, Trash2, Eye, AlertCircle } from "lucide-react"
 import { toast } from "sonner"
 import {
     AlertDialog,
@@ -133,6 +133,22 @@ export default function MisTestimoniosPage() {
                                 <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
                                     {testimonial.comentario}
                                 </p>
+
+                                {/* Mostrar feedback si el testimonio está rechazado */}
+                                {testimonial.estado === 'R' && testimonial.feedback && (
+                                    <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                                        <div className="flex items-start gap-2">
+                                            <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                                            <div className="space-y-1">
+                                                <p className="text-xs font-medium text-destructive">Feedback del Editor</p>
+                                                <p className="text-xs text-muted-foreground line-clamp-2">
+                                                    {testimonial.feedback}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className="flex gap-2">
                                     <Button
                                         variant="outline"

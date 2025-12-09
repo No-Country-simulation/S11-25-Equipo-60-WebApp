@@ -684,7 +684,11 @@ paths:
     patch:
       operationId: testimonios_cambiar_estado_partial_update
       description: 'Este endpoint permite que el dueño de la organización cambie el
-        estado de los testimonios de SU organización (A: Aprobado, E: Espera, R: Rechazado)'
+        estado de los testimonios de SU organización (A: Aprobado, E: Espera, R: Rechazado).
+        Solamente se puede agregar feedback a los estados rechazados, si cambio a
+        cualquier otro estado no puedo agregar el feedback... y ningun estado rechazado
+        puede cambiar su feedback, si tengo un estado rechazado y le cambio el estado
+        automaticamente se borra el campo feedback y queda null'
       parameters:
       - in: path
         name: id
@@ -714,6 +718,43 @@ paths:
               schema:
                 $ref: '#/components/schemas/CambiarEstadoTestimonio'
           description: ''
+  /app/testimonios-feedback/{id}/:
+    patch:
+      operationId: testimonios_feedback_partial_update
+      description: "Este endpoint permite que editores/administradores agreguen feedback
+        \n        a testimonios en estado ESPERA. Automáticamente cambia el estado
+        a RECHAZADO.\n        \n        Reglas:\n        1. Solo testimonios en estado
+        ESPERA\n        2. Feedback no puede estar vacío\n        3. Automáticamente
+        cambia estado a RECHAZADO\n        4. Solo editores de la organización o administradores"
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este Testimonio.
+        required: true
+      tags:
+      - Testimonios
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFeedback'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFeedback'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFeedback'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: Feedback agregado exitosamente. Testimonio ahora está RECHAZADO
+        '400':
+          description: Testimonio no está en estado ESPERA o feedback vacío
+        '403':
+          description: No tienes permisos
   /app/testimonios-totales/:
     get:
       operationId: testimonios_totales_list
@@ -1061,6 +1102,10 @@ components:
       properties:
         estado:
           $ref: '#/components/schemas/EstadoEnum'
+        feedback:
+          type: string
+          nullable: true
+          maxLength: 512
     Categoria:
       type: object
       properties:
@@ -1219,6 +1264,10 @@ components:
       properties:
         estado:
           $ref: '#/components/schemas/EstadoEnum'
+        feedback:
+          type: string
+          nullable: true
+          maxLength: 512
     PatchedCategoria:
       type: object
       properties:
@@ -1267,6 +1316,17 @@ components:
           nullable: true
         profile_picture_url:
           type: string
+          readOnly: true
+    PatchedFeedback:
+      type: object
+      properties:
+        feedback:
+          type: string
+          nullable: true
+          maxLength: 512
+        estado:
+          allOf:
+          - $ref: '#/components/schemas/EstadoEnum'
           readOnly: true
     PatchedOrganizacionSerializerPublico:
       type: object
@@ -1346,6 +1406,9 @@ components:
           type: string
           readOnly: true
           default: E
+        feedback:
+          type: string
+          readOnly: true
     PatchedUsuarioVisitante:
       type: object
       properties:
@@ -1453,12 +1516,16 @@ components:
           type: string
           readOnly: true
           default: E
+        feedback:
+          type: string
+          readOnly: true
       required:
       - archivos_urls
       - categoria
       - categoria_nombre
       - estado
       - fecha_comentario
+      - feedback
       - id
       - organizacion
       - organizacion_nombre
@@ -1471,43 +1538,45 @@ components:
           type: integer
           readOnly: true
         usuario_registrado:
-          type: string
+          type: integer
           readOnly: true
-        usuario_anonimo_email:
-          type: string
-          format: email
           nullable: true
-          maxLength: 254
         usuario_anonimo_username:
           type: string
-          nullable: true
-          maxLength: 50
-        api_key:
-          type: string
-          maxLength: 50
-        categoria:
-          type: integer
-        categoria_nombre:
-          type: string
           readOnly: true
+          nullable: true
         comentario:
           type: string
+          readOnly: true
           nullable: true
-          maxLength: 100
+        enlace:
+          type: string
+          readOnly: true
+          nullable: true
+        archivos:
+          readOnly: true
+          nullable: true
         fecha_comentario:
           type: string
           format: date-time
+          readOnly: true
+        categoria:
+          type: integer
           readOnly: true
         ranking:
           type: string
           format: decimal
           pattern: ^-?\d{0,2}(?:\.\d{0,1})?$
+          readOnly: true
       required:
-      - api_key
+      - archivos
       - categoria
-      - categoria_nombre
+      - comentario
+      - enlace
       - fecha_comentario
       - id
+      - ranking
+      - usuario_anonimo_username
       - usuario_registrado
     UsuarioVisitante:
       type: object
