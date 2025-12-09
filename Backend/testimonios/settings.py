@@ -95,9 +95,9 @@ UNFOLD = {
     "SITE_FAVICONS": [
         {
             "rel": "icon",
-            "sizes": "32x32",
-            "type": "image/png",
-            "href":lambda request: static ("images/logo1.png"),
+            #"sizes": "32x32",
+            "type": "image/x-icon",
+            "href":lambda request: static ("favicon.ico"),
         },
     ],
     "SHOW_HISTORY": False, # show/hide "History" button, default: True
