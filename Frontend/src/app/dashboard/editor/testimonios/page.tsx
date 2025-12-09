@@ -64,7 +64,9 @@ export default function EditorTestimoniosPage() {
                 testimonialService.getMyTestimonials(),
                 organizationService.getOrganizations(),
             ])
-            setTestimonials(testimonialsData)
+            // Filtrar testimonios con estado BORRADOR (B) - solo visitantes deben verlos
+            const filteredTestimonials = testimonialsData.filter((t: Testimonio) => t.estado !== 'B')
+            setTestimonials(filteredTestimonials)
             setOrganizations(organizationsData)
         } catch (error: any) {
             console.error('Error loading testimonials:', error)
@@ -188,7 +190,6 @@ export default function EditorTestimoniosPage() {
                                 <SelectItem value="A">Aprobado</SelectItem>
                                 <SelectItem value="R">Rechazado</SelectItem>
                                 <SelectItem value="P">Publicado</SelectItem>
-                                <SelectItem value="B">Borrador</SelectItem>
                                 <SelectItem value="O">Oculto</SelectItem>
                             </SelectContent>
                         </Select>
