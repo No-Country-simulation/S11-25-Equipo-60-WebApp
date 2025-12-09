@@ -107,5 +107,12 @@
             "edit": "Edit",
             "delete": "Delete"
         }
+    },
+    "notFound": {
+        "code": "404",
+        "title": "Page Not Found",
+        "description": "Sorry, the page you are looking for does not exist.",
+        "backHome": "Back to Home",
+        "goDashboard": "Go to Dashboard"
     }
 }

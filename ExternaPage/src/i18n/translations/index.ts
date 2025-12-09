@@ -7,4 +7,4 @@ export const translations = {
 };
 
 export type Locale = 'es' | 'en';
-export type TranslationKeys = typeof esTranslations;
+export type TranslationKeys = typeof enTranslations;

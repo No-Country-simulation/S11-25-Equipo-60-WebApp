@@ -1,0 +1,32 @@
+"use client"
+import { useTranslation } from "@/i18n/i18n-provider"
+import { FileQuestion} from "lucide-react"
+import { Button } from "../ui/button"
+import Link from "next/link"
+
+export function NotFoundContent() {
+    const { t } = useTranslation()
+  
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center space-y-6 max-w-md">
+          <div className="flex justify-center">
+            <FileQuestion className="h-24 w-24 text-muted-foreground/70" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-6xl font-bold text-foreground/90">{t("notFound.code")}</h1>
+            <h2 className="text-2xl font-semibold text-foreground/80">{t("notFound.title")}</h2>
+            <p className="text-muted-foreground">{t("notFound.description")}</p>
+          </div>
+          <div className="flex gap-4 justify-center">
+            <Link href="/">
+              <Button>{t("notFound.backHome")}</Button>
+            </Link>
+            <Link href="/dashboard">
+              <Button variant="outline">{t("notFound.goDashboard")}</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }

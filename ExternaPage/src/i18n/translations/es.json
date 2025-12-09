@@ -59,7 +59,7 @@
       "description": "Comienza creando tu primer testimonio"
     }
   },
-  "page": {
+  "under_construction": {
     "title": "Página en Construcción",
     "description": "Estamos trabajando duro para traerte esta funcionalidad. ¡Vuelve pronto!"
   },
@@ -109,5 +109,12 @@
       "edit": "Editar",
       "delete": "Eliminar"
     }
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Página No Encontrada",
+    "description": "Lo sentimos, la página que estás buscando no existe.",
+    "backHome": "Volver al Inicio",
+    "goDashboard": "Ir al Dashboard"
   }
 }

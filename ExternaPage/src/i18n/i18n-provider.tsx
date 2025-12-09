@@ -5,27 +5,30 @@ import { translations, Locale } from './translations';
 
 interface I18nContextType {
     locale: Locale;
+    lang: Locale;
     setLocale: (locale: Locale) => void;
     t: (key: string) => string;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
-export function I18nProvider({ children }: { readonly children: ReactNode }) {
-    const [locale, setLocaleState] = useState<Locale>('es');
+export function I18nProvider({ children, lang: initialLang }: { readonly children: ReactNode, readonly lang?: Locale }) {
+    const [locale, setLocaleState] = useState<Locale>(initialLang || 'es');
 
     useEffect(() => {
-        // Cargar idioma guardado en localStorage
-        const savedLocale = localStorage.getItem('locale') as Locale;
-        
-        if (savedLocale && (savedLocale === 'es' || savedLocale === 'en')) {
-            setLocaleState(savedLocale);
+        if (initialLang) {
+            setLocaleState(initialLang);
+        } else {
+            const savedLocale = localStorage.getItem('LOCALE_SWITCHER_LANGUAGE') as Locale;
+            if (savedLocale && (savedLocale === 'es' || savedLocale === 'en')) {
+                setLocaleState(savedLocale);
+            }
         }
-    }, []);
+    }, [initialLang]);
 
     const setLocale = (newLocale: Locale) => {
         setLocaleState(newLocale);
-        localStorage.setItem('locale', newLocale);
+        localStorage.setItem('LOCALE_SWITCHER_LANGUAGE', newLocale);
     };
 
     const t = (key: string): string => {
@@ -43,7 +46,7 @@ export function I18nProvider({ children }: { readonly children: ReactNode }) {
         return typeof value === 'string' ? value : key;
     };
 
-    const value = useMemo(() => ({ locale, setLocale, t }), [locale, t]);
+    const value = useMemo(() => ({ locale, lang: locale, setLocale, t }), [locale, t]);
 
     return (
         <I18nContext.Provider value={value}>
@@ -52,10 +55,12 @@ export function I18nProvider({ children }: { readonly children: ReactNode }) {
     );
 }
 
-export function useTranslation() {
+export function useI18n() {
     const context = useContext(I18nContext);
     if (!context) {
-        throw new Error('useTranslation must be used within I18nProvider');
+        throw new Error('useI18n must be used within an I18nProvider');
     }
     return context;
 }
+
+export const useTranslation = useI18n;

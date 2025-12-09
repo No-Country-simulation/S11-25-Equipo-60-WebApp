@@ -9,8 +9,8 @@ interface UnderConstructionProps {
 }
 
 export function PageConstruction({
-  title = texts.page.title,
-  description = texts.page.description,
+  title = texts.under_construction.title,
+  description = texts.under_construction.description,
   showBackButton = false,
 }: UnderConstructionProps) {
   return (
