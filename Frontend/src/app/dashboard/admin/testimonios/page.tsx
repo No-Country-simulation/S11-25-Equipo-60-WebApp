@@ -54,7 +54,9 @@ export default function AdminTestimoniosPage() {
                 organizationService.getOrganizations(),
                 categoryService.getCategories(),
             ])
-            setTestimonials(testimonialsData)
+            // Filtrar testimonios con estado BORRADOR (B) - solo visitantes deben verlos
+            const filteredTestimonials = testimonialsData.filter((t: Testimonio) => t.estado !== 'B')
+            setTestimonials(filteredTestimonials)
             setOrganizations(orgsData)
             setCategories(catsData)
         } catch (error) {
@@ -230,7 +232,6 @@ export default function AdminTestimoniosPage() {
                                     <SelectItem value="A">Aprobado</SelectItem>
                                     <SelectItem value="R">Rechazado</SelectItem>
                                     <SelectItem value="P">Publicado</SelectItem>
-                                    <SelectItem value="B">Borrador</SelectItem>
                                     <SelectItem value="O">Oculto</SelectItem>
                                 </SelectContent>
                             </Select>

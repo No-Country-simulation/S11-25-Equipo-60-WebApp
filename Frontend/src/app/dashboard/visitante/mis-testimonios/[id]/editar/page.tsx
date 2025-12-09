@@ -46,6 +46,7 @@ const formSchema = z.object({
 
 export default function EditarTestimonioPage() {
     const [loading, setLoading] = useState(false)
+    const [loadingDraft, setLoadingDraft] = useState(false)
     const [loadingData, setLoadingData] = useState(true)
     const [categories, setCategories] = useState<Categoria[]>([])
     const [testimonial, setTestimonial] = useState<Testimonio | null>(null)
@@ -111,6 +112,40 @@ export default function EditarTestimonioPage() {
             toast.error(errorMessage)
         } finally {
             setLoading(false)
+        }
+    }
+
+    async function saveAsDraft() {
+        setLoadingDraft(true)
+        try {
+            const values = form.getValues()
+            // Intentar actualizar con estado incluido
+            // Si el backend no lo permite (readOnly), al menos guardamos los cambios
+            const updateData: any = {
+                comentario: values.comentario,
+                categoria: parseInt(values.categoria),
+                ranking: values.ranking,
+                estado: 'B' // Intentamos cambiar a Borrador
+            }
+            
+            await testimonialService.updateTestimonial(id, updateData)
+            toast.success("¡Cambios guardados!")
+            
+            // NOTA: Si el backend rechaza el cambio de estado (campo readOnly),
+            // el visitante debe contactar al backend para que permita cambiar
+            // su propio testimonio a estado Borrador
+            toast.info("Si el estado no cambió a Borrador, contacta al administrador. El backend debe permitir a visitantes cambiar sus testimonios a Borrador.", {
+                duration: 5000
+            })
+            
+            router.push('/dashboard/visitante/mis-testimonios')
+        } catch (error: any) {
+            console.error('Error saving as draft:', error)
+            const errorMessage = error.response?.data?.detail ||
+                "Error al guardar. El backend no permite cambiar el estado a Borrador desde el visitante."
+            toast.error(errorMessage)
+        } finally {
+            setLoadingDraft(false)
         }
     }
 
@@ -258,11 +293,19 @@ export default function EditarTestimonioPage() {
                                     type="button"
                                     variant="outline"
                                     onClick={() => router.back()}
-                                    disabled={loading}
+                                    disabled={loading || loadingDraft}
                                 >
                                     Cancelar
                                 </Button>
-                                <Button type="submit" disabled={loading}>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={saveAsDraft}
+                                    disabled={loading || loadingDraft}
+                                >
+                                    {loadingDraft ? "Guardando..." : "Guardar como Borrador"}
+                                </Button>
+                                <Button type="submit" disabled={loading || loadingDraft}>
                                     {loading ? "Guardando..." : "Guardar cambios"}
                                 </Button>
                             </div>

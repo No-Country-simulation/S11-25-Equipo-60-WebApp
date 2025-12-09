@@ -14,7 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Eye, Trash2, Filter } from "lucide-react"
+import { Eye, Trash2, Filter, MessageSquare } from "lucide-react"
 import { toast } from "sonner"
 import {
     AlertDialog,
@@ -33,6 +33,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import { FeedbackDialog } from "@/components/dashboard/FeedbackDialog"
 import type { Organizacion, Testimonio } from "@/interfaces"
 
 export default function EditorTestimoniosPage() {
@@ -44,6 +45,8 @@ export default function EditorTestimoniosPage() {
     const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonio | null>(null)
     const [filterStatus, setFilterStatus] = useState<string>("all")
     const [filterOrg, setFilterOrg] = useState<string>("all")
+    const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false)
+    const [feedbackTestimonial, setFeedbackTestimonial] = useState<Testimonio | null>(null)
     const router = useRouter()
 
     useEffect(() => {
@@ -61,7 +64,9 @@ export default function EditorTestimoniosPage() {
                 testimonialService.getMyTestimonials(),
                 organizationService.getOrganizations(),
             ])
-            setTestimonials(testimonialsData)
+            // Filtrar testimonios con estado BORRADOR (B) - solo visitantes deben verlos
+            const filteredTestimonials = testimonialsData.filter((t: Testimonio) => t.estado !== 'B')
+            setTestimonials(filteredTestimonials)
             setOrganizations(organizationsData)
         } catch (error: any) {
             console.error('Error loading testimonials:', error)
@@ -110,6 +115,27 @@ export default function EditorTestimoniosPage() {
             toast.error("Error al eliminar el testimonio")
         } finally {
             setDeleteId(null)
+        }
+    }
+
+    const handleOpenFeedbackDialog = (testimonial: Testimonio) => {
+        setFeedbackTestimonial(testimonial)
+        setFeedbackDialogOpen(true)
+    }
+
+    const handleSubmitFeedback = async (feedback: string) => {
+        if (!feedbackTestimonial?.id) return
+
+        try {
+            await testimonialService.addFeedback(feedbackTestimonial.id, feedback)
+            toast.success("Feedback enviado y testimonio rechazado exitosamente")
+            loadData()
+            setFeedbackDialogOpen(false)
+            setFeedbackTestimonial(null)
+        } catch (error: any) {
+            console.error('Error adding feedback:', error)
+            const errorMessage = error.response?.data?.detail || "Error al enviar feedback"
+            throw new Error(errorMessage)
         }
     }
 
@@ -164,7 +190,6 @@ export default function EditorTestimoniosPage() {
                                 <SelectItem value="A">Aprobado</SelectItem>
                                 <SelectItem value="R">Rechazado</SelectItem>
                                 <SelectItem value="P">Publicado</SelectItem>
-                                <SelectItem value="B">Borrador</SelectItem>
                                 <SelectItem value="O">Oculto</SelectItem>
                             </SelectContent>
                         </Select>
@@ -225,14 +250,26 @@ export default function EditorTestimoniosPage() {
                                         <span>{new Date(testimonial.fecha_comentario || '').toLocaleDateString('es-ES')}</span>
                                     </div>
                                     <div className="flex gap-2">
+                                        {/* Botón Agregar Feedback - Solo para testimonios en ESPERA */}
+                                        {testimonial.estado === 'E' && (
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleOpenFeedbackDialog(testimonial)}
+                                                className="flex-1"
+                                            >
+                                                <MessageSquare className="mr-2 h-4 w-4" />
+                                                Feedback
+                                            </Button>
+                                        )}
                                         <Button
                                             variant="outline"
                                             size="sm"
                                             onClick={() => setSelectedTestimonial(testimonial)}
-                                            className="flex-1"
+                                            className={testimonial.estado === 'E' ? '' : 'flex-1'}
                                         >
                                             <Eye className="mr-2 h-4 w-4" />
-                                            Ver y Gestionar
+                                            {testimonial.estado === 'E' ? 'Ver' : 'Ver y Gestionar'}
                                         </Button>
                                         <Button
                                             variant="outline"
@@ -290,6 +327,36 @@ export default function EditorTestimoniosPage() {
                                     </p>
                                 </div>
                             </div>
+
+                            {/* Archivos adjuntos */}
+                            {selectedTestimonial.archivos_urls && selectedTestimonial.archivos_urls.length > 0 && (
+                                <div>
+                                    <h4 className="text-sm font-medium mb-2">Archivos adjuntos ({selectedTestimonial.archivos_urls.length})</h4>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {selectedTestimonial.archivos_urls.map((url, index) => (
+                                            <div key={index} className="border rounded-lg overflow-hidden bg-muted/30">
+                                                {url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                                                    <img
+                                                        src={url}
+                                                        alt={`Archivo ${index + 1}`}
+                                                        className="w-full h-32 object-cover hover:scale-105 transition-transform cursor-pointer"
+                                                        onClick={() => window.open(url, '_blank')}
+                                                    />
+                                                ) : (
+                                                    <a
+                                                        href={url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center justify-center h-32 text-primary hover:underline p-4 text-center"
+                                                    >
+                                                        📎 Ver archivo {index + 1}
+                                                    </a>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             <div>
                                 <h4 className="text-sm font-medium mb-2">Cambiar Estado</h4>
@@ -360,6 +427,16 @@ export default function EditorTestimoniosPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            {/* Dialog para agregar feedback */}
+            <FeedbackDialog
+                open={feedbackDialogOpen}
+                onOpenChange={setFeedbackDialogOpen}
+                testimonialId={feedbackTestimonial?.id || 0}
+                testimonialTitle={feedbackTestimonial?.comentario}
+                testimonialImages={feedbackTestimonial?.archivos_urls}
+                onSubmit={handleSubmitFeedback}
+            />
         </div>
     )
 }

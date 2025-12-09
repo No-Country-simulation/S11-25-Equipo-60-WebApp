@@ -6,7 +6,7 @@ import { testimonialService } from "@/services/testimonial.service"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Edit, Trash2, Calendar, Building2, Tag, Star } from "lucide-react"
+import { ArrowLeft, Edit, Trash2, Calendar, Building2, Tag, Star, AlertCircle } from "lucide-react"
 import { toast } from "sonner"
 import {
     AlertDialog,
@@ -149,6 +149,46 @@ export default function VerTestimonioPage() {
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                    {/* Feedback de rechazo */}
+                    {testimonial.estado === 'R' && testimonial.feedback && (
+                        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+                            <div className="flex items-start gap-3">
+                                <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                                <div className="space-y-2 flex-1">
+                                    <h3 className="text-sm font-semibold text-destructive">
+                                        Feedback del Editor
+                                    </h3>
+                                    <p className="text-sm text-foreground/80">
+                                        {testimonial.feedback}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground italic">
+                                        💡 Puedes editar tu testimonio considerando esta retroalimentación y volver a enviarlo.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Feedback del editor si está rechazado */}
+                    {testimonial.estado === 'R' && testimonial.feedback && (
+                        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+                            <div className="flex items-start gap-3">
+                                <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                                <div className="space-y-1 flex-1">
+                                    <h3 className="text-sm font-semibold text-destructive">
+                                        Feedback del Editor
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        {testimonial.feedback}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground italic mt-2">
+                                        💡 Puedes editar tu testimonio considerando este feedback y volver a enviarlo.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Comentario */}
                     <div>
                         <h3 className="text-sm font-medium text-muted-foreground mb-2">Comentario</h3>
@@ -205,25 +245,29 @@ export default function VerTestimonioPage() {
                     {/* Archivos */}
                     {testimonial.archivos_urls && testimonial.archivos_urls.length > 0 && (
                         <div>
-                            <h3 className="text-sm font-medium text-muted-foreground mb-2">Archivos adjuntos</h3>
-                            <div className="grid gap-4 sm:grid-cols-2">
+                            <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                                Archivos adjuntos ({testimonial.archivos_urls.length})
+                            </h3>
+                            <div className="grid gap-3 sm:grid-cols-2">
                                 {testimonial.archivos_urls.map((url, index) => (
-                                    <div key={index} className="border rounded-lg p-4">
+                                    <div key={index} className="border rounded-lg overflow-hidden bg-muted/30 group cursor-pointer" onClick={() => window.open(url, '_blank')}>
                                         {url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                                             <img
                                                 src={url}
                                                 alt={`Archivo ${index + 1}`}
-                                                className="max-w-full h-auto rounded-lg"
+                                                className="w-full h-48 object-cover group-hover:scale-105 transition-transform"
                                             />
                                         ) : (
-                                            <a
-                                                href={url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-primary hover:underline"
-                                            >
-                                                Ver archivo {index + 1}
-                                            </a>
+                                            <div className="flex items-center justify-center h-48 bg-muted">
+                                                <a
+                                                    href={url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-primary hover:underline text-center p-4"
+                                                >
+                                                    📎 Ver archivo {index + 1}
+                                                </a>
+                                            </div>
                                         )}
                                     </div>
                                 ))}
