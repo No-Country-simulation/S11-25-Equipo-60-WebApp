@@ -1,6 +1,8 @@
+'use client'
+
 import { Construction, ArrowLeft, Clock, Wrench } from "lucide-react"
 import { Button, Card } from "@/components"
-import texts from "@/i18n/translations/es.json"
+import { useTranslation } from "@/provider"
 
 interface UnderConstructionProps {
   readonly title?: string
@@ -9,10 +11,10 @@ interface UnderConstructionProps {
 }
 
 export function PageConstruction({
-  title = texts.under_construction.title,
-  description = texts.under_construction.description,
+  title, description,
   showBackButton = false,
 }: UnderConstructionProps) {
+  const { t } = useTranslation()
   return (
     <div className="min-h-screen bg-linear-to-br from-orange-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center p-4">
       <Card className="max-w-2xl w-full p-8 md:p-12 text-center space-y-6 shadow-xl">
@@ -27,10 +29,10 @@ export function PageConstruction({
 
           <div className="space-y-3">
             <h1 className="text-4xl md:text-5xl font-bold text-balance bg-linear-to-r from-orange-600 to-yellow-600 dark:from-orange-400 dark:to-yellow-400 bg-clip-text text-transparent">
-              {title}
+              {t("underConstruction.title")}
             </h1>
             <p className="text-lg text-muted-foreground text-balance">
-              {description}
+              {t("underConstruction.description")}
             </p>
           </div>
 
@@ -38,30 +40,30 @@ export function PageConstruction({
             <div className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted/50">
               <Wrench className="h-8 w-8 text-orange-500" />
             <p className="text-sm font-medium">
-              {texts.statusCards.dev.title}
+              {t("statusCards.dev.title")}
             </p>
             <p className="text-xs text-muted-foreground text-center">
-              {texts.statusCards.dev.desc}
+              {t("statusCards.dev.desc")}
             </p>
           </div>
           
           <div className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted/50">
             <Clock className="h-8 w-8 text-blue-500" />
             <p className="text-sm font-medium">
-              {texts.statusCards.soon.title}
+              {t("statusCards.soon.title")}
             </p>
             <p className="text-xs text-muted-foreground text-center">
-              {texts.statusCards.soon.desc}
+              {t("statusCards.soon.desc")}
             </p>
           </div>
 
           <div className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted/50">
             <Construction className="h-8 w-8 text-yellow-500" />
             <p className="text-sm font-medium">
-              {texts.statusCards.improve.title}
+              {t("statusCards.improve.title")}
             </p>
             <p className="text-xs text-muted-foreground text-center">
-              {texts.statusCards.improve.desc}
+              {t("statusCards.improve.desc")}
             </p>
           </div>
         </div>
@@ -69,18 +71,18 @@ export function PageConstruction({
         {showBackButton && (
           <Button onClick={() => globalThis.history.back()} variant="outline" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
-            {texts.buttons.back}
+            {t("buttons.back")}
           </Button>
         )}
 
         <div className="pt-6 border-t">
           <p className="text-sm text-muted-foreground">
-            {texts.contact.prompt} {" "}
+            {t("contact.prompt")} {" "}
             <a
-              href={`mailto:${texts.contact.email}`}
+              href={`mailto:${ t("contact.email")}`}
               className="text-orange-600 dark:text-orange-400 hover:underline font-medium"
             >
-              {texts.contact.email}
+              {t("contact.email")}
             </a>
           </p>
         </div>

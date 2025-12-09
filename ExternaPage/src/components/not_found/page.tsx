@@ -1,8 +1,9 @@
 "use client"
-import { useTranslation } from "@/i18n/i18n-provider"
-import { FileQuestion} from "lucide-react"
-import { Button } from "../ui/button"
+
 import Link from "next/link"
+import { FileQuestion } from "lucide-react"
+import { Button } from "@/components"
+import { useTranslation } from "@/provider"
 
 export function NotFoundContent() {
     const { t } = useTranslation()
