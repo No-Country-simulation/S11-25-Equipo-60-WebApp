@@ -1,5 +1,7 @@
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
+import { DynamicBreadcrumbs } from "@/components/dashboard/breadcrumbs"
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import type { ReactNode } from "react"
 
 export default function DashboardLayout({
@@ -8,14 +10,15 @@ export default function DashboardLayout({
     readonly children: ReactNode
 }) {
     return (
-        <div className="flex min-h-screen flex-col md:flex-row">
+        <SidebarProvider>
             <Sidebar />
-            <div className="flex-1 flex flex-col">
+            <SidebarInset>
                 <Header />
-                <main className="flex-1 p-6">
+                <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                    <DynamicBreadcrumbs />
                     {children}
                 </main>
-            </div>
-        </div>
+            </SidebarInset>
+        </SidebarProvider>
     )
 }

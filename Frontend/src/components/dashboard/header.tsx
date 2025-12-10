@@ -15,6 +15,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { LogOut, Settings, User } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LanguageToggle } from "@/components/language-toggle"
+import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Separator } from "@/components/ui/separator"
 import { useTranslation } from "@/lib/i18n-provider"
 
 export function Header() {
@@ -38,54 +40,12 @@ export function Header() {
     }
 
     return (
-        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="flex h-16 items-center justify-between px-6">
-                <div className="flex items-center gap-4">
-                    <h2 className="text-lg font-semibold">{t('dashboard.overview')}</h2>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <ThemeToggle />
-                    <LanguageToggle />
-
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                                <Avatar className="h-9 w-9">
-                                    <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-500 text-white">
-                                        {getInitials()}
-                                    </AvatarFallback>
-                                </Avatar>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56" align="end" forceMount>
-                            <DropdownMenuLabel className="font-normal">
-                                <div className="flex flex-col space-y-1">
-                                    <p className="text-sm font-medium leading-none">
-                                        {user?.username || user?.email}
-                                    </p>
-                                    <p className="text-xs leading-none text-muted-foreground">
-                                        {user?.role && t(`roles.${user.role}`)}
-                                    </p>
-                                </div>
-                            </DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => router.push('/dashboard/perfil')}>
-                                <User className="mr-2 h-4 w-4" />
-                                <span>{t('common.profile')}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => router.push('/dashboard/configuracion')}>
-                                <Settings className="mr-2 h-4 w-4" />
-                                <span>{t('common.settings')}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleLogout} className="text-red-600 dark:text-red-400">
-                                <LogOut className="mr-2 h-4 w-4" />
-                                <span>{t('common.logout')}</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
+        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            
+            <div className="flex flex-1 items-center justify-between">
+                <h2 className="text-lg font-semibold">{t('dashboard.overview')}</h2>
             </div>
         </header>
     )

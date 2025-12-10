@@ -191,4 +191,52 @@ export const testimonialService = {
         const response = await api.get('/app/testimonios-totales/estadisticas/');
         return response.data;
     },
+
+    /**
+     * PATCH /app/testimonios-feedback/{id}/
+     *
+     * Agrega feedback a un testimonio en estado ESPERA.
+     * Automáticamente cambia el estado a RECHAZADO.
+     *
+     * Reglas:
+     * 1. Solo testimonios en estado ESPERA
+     * 2. Feedback no puede estar vacío
+     * 3. Automáticamente cambia estado a RECHAZADO
+     * 4. Solo editores de la organización o administradores
+     *
+     * @param id - ID del testimonio
+     * @param feedback - Retroalimentación (max 512 caracteres)
+     * @returns Testimonio actualizado con estado RECHAZADO y feedback
+     */
+    addFeedback: async (id: number, feedback: string) => {
+        const response = await api.patch(`/app/testimonios-feedback/${id}/`, { feedback });
+        return response.data;
+    },
+
+    /**
+     * PATCH /app/testimonios-cambiar-estado/{id}/
+     *
+     * Cambia el estado de un testimonio y opcionalmente agrega feedback.
+     *
+     * Reglas:
+     * - Solo se puede agregar feedback cuando el estado es RECHAZADO (R)
+     * - Si cambias de estado RECHAZADO a otro, el feedback se borra automáticamente
+     *
+     * @param id - ID del testimonio
+     * @param estado - Nuevo estado (E, A, R, P, B, O)
+     * @param feedback - Opcional: Retroalimentación (solo válido con estado R)
+     * @returns Testimonio actualizado
+     */
+    updateTestimonialStatus: async (
+        id: number,
+        estado: 'E' | 'A' | 'R' | 'P' | 'B' | 'O',
+        feedback?: string
+    ) => {
+        const data: any = { estado };
+        if (feedback && estado === 'R') {
+            data.feedback = feedback;
+        }
+        const response = await api.patch(`/app/testimonios-cambiar-estado/${id}/`, data);
+        return response.data;
+    },
 };

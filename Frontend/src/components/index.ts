@@ -8,6 +8,7 @@ export * from './dashboard/assign-users-dialog';
 export * from './dashboard/change-status-dialog';
 export * from './dashboard/add-visitantes-dialog';
 export * from './dashboard/add-editors-dialog';
+export * from './dashboard/FeedbackDialog';
 export * from './ui/button';
 export * from './ui/calendar';
 export * from './ui/card';

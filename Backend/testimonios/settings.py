@@ -95,9 +95,9 @@ UNFOLD = {
     "SITE_FAVICONS": [
         {
             "rel": "icon",
-            "sizes": "32x32",
-            "type": "image/png",
-            "href":lambda request: static ("images/logo1.png"),
+            #"sizes": "32x32",
+            "type": "image/x-icon",
+            "href":lambda request: static ("favicon.ico"),
         },
     ],
     "SHOW_HISTORY": False, # show/hide "History" button, default: True
@@ -364,8 +364,8 @@ SPECTACULAR_SETTINGS = {
 
 PWA_APP_NAME = 'Testimonial'
 PWA_APP_DESCRIPTION = "Testimonial"
-PWA_APP_THEME_COLOR = '#0A0302'
-PWA_APP_BACKGROUND_COLOR = "#1c4216"
+PWA_APP_THEME_COLOR = '#101828'
+PWA_APP_BACKGROUND_COLOR = "#101828"
 PWA_APP_DISPLAY = 'standalone'
 PWA_APP_SCOPE = '/'
 PWA_APP_ORIENTATION = 'any'

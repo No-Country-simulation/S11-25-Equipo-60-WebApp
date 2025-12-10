@@ -1101,11 +1101,11 @@ class TestimonioViewSet(viewsets.ModelViewSet):
 @extend_schema_view(
     list=extend_schema(tags=['Testimonios'],
         description="""Este endpoint tiene doble funcionalidad:
-        - Para EDITORES: Muestra todos los testimonios de SUS organizaciones (sin importar estado)
+        - Para EDITORES: Muestra todos los testimonios de SUS organizaciones (menos los que tienen el estado en borrador)
         - Para VISITANTES: Muestra todos los testimonios que HAN CREADO (sin importar estado)"""),
     retrieve=extend_schema(tags=['Testimonios'],
         description="""Este endpoint tiene doble funcionalidad:
-        - Para EDITORES: Muestra testimonios específicos de SUS organizaciones
+        - Para EDITORES: Muestra testimonios específicos de SUS organizaciones(menos los que tienen el estado en borrador)
         - Para VISITANTES: Muestra testimonios específicos que HAN CREADO"""),
 )
 class TestimonioOrganizacionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -1120,15 +1120,16 @@ class TestimonioOrganizacionViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         user = self.request.user
         
-        # Admin ve todos los testimonios
+        # Admin ve todos los testimonios, PERO EXCLUYENDO el estado 'B' (Borrador)
         if user.is_staff:
-            return Testimonios.objects.all()
+            return Testimonios.objects.all().exclude(estado='B')
         
-        # Editor ve SOLO los testimonios de SUS organizaciones (en cualquier estado)
+        # Editor ve SOLO los testimonios de SUS organizaciones, 
+        # PERO EXCLUYENDO el estado 'B' (Borrador).
         if user.groups.filter(name='editor').exists():
             return Testimonios.objects.filter(
                 organizacion__editores=user
-            )
+            ).exclude(estado='B')
         
         # Visitante ve SOLO SUS testimonios (en cualquier estado)
         if user.groups.filter(name='visitante').exists():
@@ -1215,7 +1216,7 @@ class TestimonioOrganizacionViewSet(viewsets.ReadOnlyModelViewSet):
 @extend_schema_view(
     partial_update=extend_schema(
         tags=['Testimonios'],
-        description="Este endpoint permite que el dueño de la organización cambie el estado de los testimonios de SU organización (A: Aprobado, E: Espera, R: Rechazado). Solamente se puede agregar feedback a los estados rechazados, si cambio a cualquier otro estado no puedo agregar el feedback... y ningun estado rechazado puede cambiar su feedback, si tengo un estado rechazado y le cambio el estado automaticamente se borra el campo feedback y queda null"
+        description="Este endpoint permite que el dueño de la organización cambie el estado de los testimonios de SU organización (A: Aprobado, E: Espera, R: Rechazado). Los editores o administradores no pueden cambiar estados de testimonios a borrador, solamente el usuario visitante que creo el testimonio puede cambiar testimonios a Borrador. El autor del testimonio no puede cambiar un estado Aprobado a otro estado... Solamente se puede agregar feedback a los estados rechazados, si cambio a cualquier otro estado no puedo agregar el feedback... y ningun estado rechazado puede cambiar su feedback, si tengo un estado rechazado y le cambio el estado automaticamente se borra el campo feedback y queda null"
     )
 )
 class CambiarEstadoTestimonioViewSet(viewsets.ModelViewSet):
@@ -1241,68 +1242,70 @@ class CambiarEstadoTestimonioViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         testimonio = self.get_object()
         user = request.user
-        
-        # 1. Verificar si es Administrador (Staff)
-        es_admin = user.is_staff
-        
-        # 2. Verificar si es Editor CON PERMISOS
-        es_editor_con_permisos = False
-        
-        # 2a. Verificar que el usuario pertenece al grupo 'editor'
-        es_editor = user.groups.filter(name='editor').exists()
-
-        # 👇 NUEVA LÓGICA: Validar que no se pueda cambiar a RECHAZADO sin feedback
         nuevo_estado = request.data.get('estado')
         
-        if nuevo_estado == 'R':
-            feedback = request.data.get('feedback', '').strip()
+        # 1. Crear una copia mutable de los datos de la petición (request.data)
+        mutable_data = request.data.copy() 
+        
+        # 1. Verificar permisos (Se mantiene tu lógica de permisos)
+        es_admin = user.is_staff
+        es_editor = user.groups.filter(name='editor').exists()
+        es_autor = (testimonio.usuario_registrado and testimonio.usuario_registrado == user)
+        es_editor_con_permisos = False
+        
+        # Lógica de permisos de Autor (actualizada en la respuesta anterior para B <-> E)
+        if es_autor:
+            # Revalidación de movimientos de autor (B <-> E, E/R -> B)
+            if nuevo_estado and nuevo_estado != testimonio.estado:
+                es_valido_b_a_e = (testimonio.estado == 'B' and nuevo_estado == 'E')
+                es_valido_e_r_a_b = (nuevo_estado == 'B' and testimonio.estado in ['E', 'R'])
+                
+                if not (es_valido_b_a_e or es_valido_e_r_a_b):
+                     return Response(
+                        {"detail": f"Usted, como autor, solo puede cambiar el estado de su testimonio de 'B' a 'E', o de 'E' o 'R' a 'B'."},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
             
-            # Si no se proporciona feedback en la petición, verificar si ya tiene
+        # Lógica de permisos de Editor/Admin
+        elif es_editor:
+            organizacion_del_testimonio = testimonio.organizacion
+            if organizacion_del_testimonio.editores.filter(id=user.id).exists():
+                es_editor_con_permisos = True
+        
+        if not (es_autor or es_admin or es_editor_con_permisos):
+            return Response(
+                {"detail": "Usted no tiene permisos para cambiar el estado de testimonios. Solo el autor, el administrador o un editor de la organización asociada puede hacerlo."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
+        # 2. Manejo de Limpieza de Feedback (¡SOLUCIÓN AL ERROR!)
+        # Si se está cambiando de RECHAZADO a otro estado (que no sea R ni None), limpiar feedback
+        if testimonio.estado == 'R' and nuevo_estado != 'R' and nuevo_estado is not None:
+             # Aquí modificamos la copia mutable, NO request.data
+            mutable_data['feedback'] = None 
+        
+        # 3. Validación de Feedback (Mantienes tu lógica: R requiere feedback)
+        if nuevo_estado == 'R':
+            feedback = mutable_data.get('feedback', '').strip()
+            # Si no se proporciona feedback en la petición, verificar si ya tiene uno en el modelo
             if not feedback and not testimonio.feedback:
                 return Response(
                     {
-                        "detail": "No se puede cambiar el estado a RECHAZADO sin proporcionar feedback. "
-                        "Use el endpoint específico para feedback o incluya el campo 'feedback' en la petición."
+                        "detail": "No se puede cambiar el estado a RECHAZADO sin proporcionar feedback."
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
-        
-        # Si se está cambiando a RECHAZADO y se proporciona feedback, procesarlo
-        if nuevo_estado == 'R' and 'feedback' in request.data:
-            testimonio.feedback = request.data['feedback']
-        
-        # Si se está cambiando de RECHAZADO a otro estado, limpiar feedback
-        if testimonio.estado == 'R' and nuevo_estado != 'R' and nuevo_estado is not None:
-            testimonio.feedback = None
-        
-        if es_editor:
-            # 2b. OBTENER la organización del testimonio
-            organizacion_del_testimonio = testimonio.organizacion
-            
-            # 2c. Verificar si el usuario 'user' es un editor asociado a esa organización.
-            # ASUMIENDO que tu modelo Organizacion tiene un campo ManyToMany llamado 'editores'
-            # que apunta a User, o que la relación inversa se llama 'organizacion_set'.
-            
-            # Opción 1 (Más probable si el JSON lo muestra como 'editores: [...]'):
-            # Verifica si el usuario actual es uno de los editores de esa organización
-            if organizacion_del_testimonio.editores.filter(id=user.id).exists():
-                es_editor_con_permisos = True
-            
-            # Nota: Si tu relación en el modelo Organizacion tiene related_name='organizaciones', 
-            # la línea sería: if organizacion_del_testimonio.organizacion_set.filter(id=user.id).exists():
-            # Pero basándonos en tu JSON, 'editores' parece ser el nombre correcto.
 
+        # 4. Llamar al serializador con los datos modificados (mutable_data)
+        serializer = self.get_serializer(
+            testimonio, 
+            data=mutable_data, # <--- ¡USAMOS LOS DATOS MUTABLES/CORREGIDOS!
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
 
-        # 3. La verificación final del permiso
-        # El permiso se concede si es Administrador O si es un Editor con permisos sobre esa Organización.
-        if not (es_admin or es_editor_con_permisos):
-            return Response(
-                {"detail": "Usted no tiene permisos para cambiar el estado de testimonios. Solo el administrador o un editor de la organización asociada puede hacerlo."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        # Si tiene permisos, procede con la actualización
-        return super().partial_update(request, *args, **kwargs)
+        return Response(serializer.data)
     
 
 @extend_schema_view(

@@ -1,3 +1,4 @@
+
 import re
 import cloudinary
 from rest_framework import serializers
@@ -655,14 +656,28 @@ class TestimonioSerializer(serializers.ModelSerializer):
             'max_value': 'El ranking no puede ser mayor a 5.'
         }
     )
-    # Hacer el estado como campo oculto con valor por defecto
-    estado = serializers.CharField(default='E', read_only=True)
+    estado = serializers.CharField(
+        default='E', 
+        required=False, # No es estrictamente requerido, usará 'E' si falta
+        max_length=1,
+        help_text="Estado inicial del testimonio. Válido solo 'B' (Borrador) o 'E' (Espera)."
+    )
 
     # Hacer estos campos opcionales para entrada
     usuario_anonimo_username = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     usuario_anonimo_email = serializers.EmailField(required=False, allow_blank=True, allow_null=True) 
     api_key = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     feedback = serializers.SerializerMethodField()  # 👈 Cambiar a SerializerMethodField
+
+    class Meta:
+        model = Testimonios
+        fields = [
+            'id', 'organizacion', 'organizacion_nombre',  'usuario_registrado',  'usuario_anonimo_email', 
+            'usuario_anonimo_username', 
+            'api_key', 'categoria',  'categoria_nombre', 'comentario', 'enlace', 'archivos',  'archivos_urls', 'fecha_comentario', 
+            'ranking', 'estado', 'feedback'  
+        ]
+        read_only_fields = ['usuario_registrado', 'fecha_comentario', 'organizacion_nombre', 'categoria_nombre']
 
     def validate_archivos(self, archivos):
         """
@@ -705,16 +720,18 @@ class TestimonioSerializer(serializers.ModelSerializer):
                 )
         
         return archivos
-
-    class Meta:
-        model = Testimonios
-        fields = [
-            'id', 'organizacion', 'organizacion_nombre',  'usuario_registrado',  'usuario_anonimo_email', 
-            'usuario_anonimo_username', 
-            'api_key', 'categoria',  'categoria_nombre', 'comentario', 'enlace', 'archivos',  'archivos_urls', 'fecha_comentario', 
-            'ranking', 'estado', 'feedback'  
-        ]
-        read_only_fields = ['usuario_registrado', 'fecha_comentario', 'organizacion_nombre', 'categoria_nombre', 'estado']
+    
+    def validate_estado(self, value):
+        """
+        Validar que en la creación solo se pueda usar 'B' (Borrador) o 'E' (Espera).
+        """
+        # Esta validación solo se aplica al crear (instance is None)
+        if self.instance is None:
+            if value not in ['B', 'E']:
+                raise serializers.ValidationError(
+                    "Solo se permite crear testimonios con el estado 'B' (Borrador) o 'E' (Espera)."
+                )
+        return value
 
     def get_feedback(self, obj):
         """
@@ -955,6 +972,43 @@ class CambiarEstadoTestimonioSerializer(serializers.ModelSerializer):
         nuevo_estado = data.get('estado', instance.estado)
         nuevo_feedback = data.get('feedback', None)  # Usar None si no se envía
         feedback_actual = instance.feedback if instance else None
+        user = self.context.get('request').user # Obtener el usuario
+
+        es_autor = (instance.usuario_registrado and instance.usuario_registrado == user)
+
+        if es_autor:
+            # Regla de autor: Solo permitir pasar de E o R a B
+            if nuevo_estado and nuevo_estado != instance.estado:
+                if nuevo_estado == 'B' and instance.estado in ['E', 'R']:
+                    # El autor puede cambiar de E a B o de R a B. Permitido.
+                    pass
+                else:
+                    raise serializers.ValidationError({
+                        "estado": f"Usted, como autor, solo puede cambiar el estado de su testimonio de 'E' o 'R' a 'B' (Borrador)."
+                    })
+            # Si el autor envía feedback, forzar su anulación, ya que solo los editores/admin pueden asignarlo.
+            if 'feedback' in data:
+                 raise serializers.ValidationError({
+                    "feedback": "Usted no tiene permisos para asignar o modificar el feedback ni cambiar el estado de un testimonio rechazado."
+                })
+        
+        # --- REGLAS para Editores/Admin (solo se aplican si NO es el autor) ---
+        else:
+            # REGLA 1: Solo se puede agregar/modificar feedback cuando estado es RECHAZADO
+            # ... (Lógica existente de REGLA 1 y 2)
+
+            # REGLA 3: Si se cambia a RECHAZADO, DEBE tener feedback
+            # ... (Lógica existente de REGLA 3)
+
+            # REGLA 4: Si se cambia de RECHAZADO a otro estado, limpiar feedback automáticamente
+            if instance.estado == 'R' and nuevo_estado != 'R':
+                data['feedback'] = None
+                
+            # Validar que el nuevo estado sea uno permitido para Editores/Admin (todos menos B)
+            if nuevo_estado in ['B']:
+                 raise serializers.ValidationError({
+                    "estado": "El estado 'B' (Borrador) no es un estado al que los editores o administradores puedan cambiar un testimonio."
+                })
         
         # REGLA 1: Solo se puede agregar/modificar feedback cuando estado es RECHAZADO
         if 'feedback' in data and nuevo_feedback is not None:

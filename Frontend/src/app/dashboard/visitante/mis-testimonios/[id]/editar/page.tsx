@@ -46,6 +46,7 @@ const formSchema = z.object({
 
 export default function EditarTestimonioPage() {
     const [loading, setLoading] = useState(false)
+    const [loadingDraft, setLoadingDraft] = useState(false)
     const [loadingData, setLoadingData] = useState(true)
     const [categories, setCategories] = useState<Categoria[]>([])
     const [testimonial, setTestimonial] = useState<Testimonio | null>(null)
@@ -111,6 +112,24 @@ export default function EditarTestimonioPage() {
             toast.error(errorMessage)
         } finally {
             setLoading(false)
+        }
+    }
+
+    async function saveAsDraft() {
+        setLoadingDraft(true)
+        try {
+            // Usar el endpoint correcto: /app/testimonios-cambiar-estado/{id}/
+            await testimonialService.updateTestimonialStatus(id, 'B')
+            toast.success("¡Testimonio guardado como Borrador!")
+            router.push('/dashboard/visitante/mis-testimonios')
+        } catch (error: any) {
+            console.error('Error saving as draft:', error)
+            const errorMessage = error.response?.data?.detail ||
+                error.response?.data?.estado?.[0] ||
+                "Error al guardar como borrador"
+            toast.error(errorMessage)
+        } finally {
+            setLoadingDraft(false)
         }
     }
 
@@ -258,11 +277,19 @@ export default function EditarTestimonioPage() {
                                     type="button"
                                     variant="outline"
                                     onClick={() => router.back()}
-                                    disabled={loading}
+                                    disabled={loading || loadingDraft}
                                 >
                                     Cancelar
                                 </Button>
-                                <Button type="submit" disabled={loading}>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={saveAsDraft}
+                                    disabled={loading || loadingDraft}
+                                >
+                                    {loadingDraft ? "Guardando..." : "Guardar como Borrador"}
+                                </Button>
+                                <Button type="submit" disabled={loading || loadingDraft}>
                                     {loading ? "Guardando..." : "Guardar cambios"}
                                 </Button>
                             </div>

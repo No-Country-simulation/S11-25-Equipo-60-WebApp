@@ -319,21 +319,21 @@ export default function CrearTestimonioPage() {
                                                 )}
                                                 
                                                 {hasFiles && (
-                                                    <div className="grid grid-cols-2 gap-4">
+                                                    <div className="grid grid-cols-2 gap-3">
                                                         {previews.map((preview, index) => (
                                                             <div 
                                                                 key={index}
-                                                                className="relative group rounded-lg border p-2 bg-muted/50"
+                                                                className="relative group rounded-lg border overflow-hidden bg-muted/30"
                                                             >
                                                                 {preview !== 'video-placeholder' && preview !== 'error-preview' ? (
                                                                     <img 
                                                                         src={preview} 
                                                                         alt={`Preview ${index + 1}`}
-                                                                        className="w-full h-24 object-cover rounded"
+                                                                        className="w-full h-32 object-cover"
                                                                     />
                                                                 ) : (
-                                                                    <div className="w-full h-24 flex items-center justify-center bg-muted rounded">
-                                                                        <span className="text-xs text-muted-foreground">
+                                                                    <div className="w-full h-32 flex items-center justify-center bg-muted">
+                                                                        <span className="text-xs text-muted-foreground text-center p-2">
                                                                             {files[index].name}
                                                                         </span>
                                                                     </div>
@@ -342,14 +342,19 @@ export default function CrearTestimonioPage() {
                                                                     type="button"
                                                                     variant="destructive"
                                                                     size="icon"
-                                                                    className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                    className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                                                                     onClick={() => removeFile(index)}
                                                                 >
-                                                                    <X className="h-3 w-3" />
+                                                                    <X className="h-4 w-4" />
                                                                 </Button>
-                                                                <p className="text-xs text-muted-foreground mt-1 truncate">
-                                                                    {files[index].name}
-                                                                </p>
+                                                                <div className="p-2 bg-background/80 backdrop-blur-sm">
+                                                                    <p className="text-xs text-muted-foreground truncate">
+                                                                        {files[index].name}
+                                                                    </p>
+                                                                    <p className="text-xs text-muted-foreground">
+                                                                        {(files[index].size / 1024).toFixed(1)} KB
+                                                                    </p>
+                                                                </div>
                                                             </div>
                                                         ))}
                                                     </div>

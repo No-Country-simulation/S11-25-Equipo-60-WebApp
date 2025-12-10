@@ -31,6 +31,7 @@ export interface Testimonio {
   fecha_comentario?: string;
   ranking: string; // Decimal como string, ej: "5.0"
   estado?: EstadoTestimonio; // Estado del testimonio
+  feedback?: string | null; // Retroalimentación del editor/admin (readOnly, max 512 chars)
 }
 
 /**

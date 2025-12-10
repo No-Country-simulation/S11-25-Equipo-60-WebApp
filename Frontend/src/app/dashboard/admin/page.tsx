@@ -27,7 +27,77 @@ export default function AdminDashboardPage() {
 
     const loadData = async () => {
         try {
-            // ✅ Admin puede obtener TODAS las estadísticas y testimonios
+            // ✅ Cargar datos con manejo individual de errores
+            const loadVisitantes = async () => {
+                try {
+                    return await userService.getVisitantes()
+                } catch (error) {
+                    console.error('Error loading visitantes:', error)
+                    toast.error("Error al cargar visitantes")
+                    return []
+                }
+            }
+
+            const loadEditores = async () => {
+                try {
+                    return await userService.getEditores()
+                } catch (error) {
+                    console.error('Error loading editores:', error)
+                    toast.error("Error al cargar editores")
+                    return []
+                }
+            }
+
+            const loadAdmins = async () => {
+                try {
+                    return await userService.getAdministradores()
+                } catch (error) {
+                    console.error('Error loading administradores:', error)
+                    toast.error("Error al cargar administradores")
+                    return []
+                }
+            }
+
+            const loadOrganizations = async () => {
+                try {
+                    return await organizationService.getOrganizations()
+                } catch (error) {
+                    console.error('Error loading organizations:', error)
+                    toast.error("Error al cargar organizaciones")
+                    return []
+                }
+            }
+
+            const loadCategories = async () => {
+                try {
+                    return await categoryService.getCategories()
+                } catch (error) {
+                    console.error('Error loading categories:', error)
+                    toast.error("Error al cargar categorías. Servicio no disponible.")
+                    return []
+                }
+            }
+
+            const loadTestimonials = async () => {
+                try {
+                    return await testimonialService.getAllTestimonials()
+                } catch (error) {
+                    console.error('Error loading testimonials:', error)
+                    toast.error("Error al cargar testimonios")
+                    return []
+                }
+            }
+
+            const loadStatistics = async () => {
+                try {
+                    return await testimonialService.getStatistics()
+                } catch (error) {
+                    console.error('Error loading statistics:', error)
+                    toast.error("Error al cargar estadísticas")
+                    return []
+                }
+            }
+
             const [
                 visitantesData,
                 editoresData,
@@ -37,13 +107,13 @@ export default function AdminDashboardPage() {
                 testimonialsData,
                 statsData
             ] = await Promise.all([
-                userService.getVisitantes(),
-                userService.getEditores(),
-                userService.getAdministradores(),
-                organizationService.getOrganizations(), // GET /app/organizacion/
-                categoryService.getCategories(),
-                testimonialService.getAllTestimonials(), // GET /app/testimonios-totales/ - Admin ve TODOS
-                testimonialService.getStatistics(), // GET /app/testimonios-totales/estadisticas/
+                loadVisitantes(),
+                loadEditores(),
+                loadAdmins(),
+                loadOrganizations(),
+                loadCategories(),
+                loadTestimonials(),
+                loadStatistics(),
             ])
 
             setVisitantes(visitantesData)
@@ -55,7 +125,7 @@ export default function AdminDashboardPage() {
             setStatistics(statsData)
         } catch (error) {
             console.error('Error loading admin data:', error)
-            toast.error("Error al cargar los datos del dashboard")
+            toast.error("Error crítico al cargar los datos del dashboard")
         } finally {
             setLoading(false)
         }
