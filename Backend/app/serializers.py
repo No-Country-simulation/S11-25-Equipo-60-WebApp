@@ -989,7 +989,7 @@ class CambiarEstadoTestimonioSerializer(serializers.ModelSerializer):
             # Si el autor envía feedback, forzar su anulación, ya que solo los editores/admin pueden asignarlo.
             if 'feedback' in data:
                  raise serializers.ValidationError({
-                    "feedback": "Usted no tiene permisos para asignar o modificar el feedback."
+                    "feedback": "Usted no tiene permisos para asignar o modificar el feedback ni cambiar el estado de un testimonio rechazado."
                 })
         
         # --- REGLAS para Editores/Admin (solo se aplican si NO es el autor) ---
