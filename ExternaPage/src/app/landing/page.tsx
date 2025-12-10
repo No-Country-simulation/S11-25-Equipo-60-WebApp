@@ -1,7 +1,6 @@
-export default function landing() {
+import { LandingContainer } from "@/components";
+export default function Landing() {
   return (
-    <div>
-      Landing...
-    </div>
+    <LandingContainer />
   )
 }

@@ -1,8 +1,8 @@
-import { PageConstruction } from "@/components";
+import { PageInConstruction } from "@/components";
 
 export default function UnderConstruction() {
   return (
-    <PageConstruction />
+    <PageInConstruction />
   );
 
 }

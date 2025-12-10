@@ -1,118 +1,135 @@
 {
-    "common": {
-        "welcome": "Welcome",
-        "logout": "Logout",
-        "settings": "Settings",
-        "profile": "Profile",
-        "save": "Save",
-        "cancel": "Cancel",
-        "edit": "Edit",
-        "delete": "Delete",
-        "add": "Add",
-        "search": "Search",
-        "filter": "Filter",
-        "back": "Back"
+  "common": {
+    "welcome": "Welcome",
+    "logout": "Logout",
+    "settings": "Settings",
+    "profile": "Profile",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "back": "Back",
+    "user": "User",
+    "guest": "Guest",
+    "userMenu": "User menu"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "myTestimonials": "My Testimonials",
+    "createTestimonial": "Create Testimonial",
+    "pendingTestimonials": "Pending Testimonials",
+    "myOrganization": "My Organization",
+    "users": "Users",
+    "organizations": "Organizations",
+    "categories": "Categories",
+    "statistics": "Statistics"
+  },
+  "roles": {
+    "visitante": "Visitor",
+    "editor": "Editor",
+    "admin": "Administrator"
+  },
+  "dashboard": {
+    "overview": "Overview",
+    "welcomeMessage": "Welcome back!",
+    "stats": {
+      "totalTestimonials": "Total Testimonials",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "testimonials": {
+    "title": "Testimonials",
+    "create": "Create Testimonial",
+    "edit": "Edit Testimonial",
+    "delete": "Delete Testimonial",
+    "approve": "Approve",
+    "reject": "Reject",
+    "status": {
+      "pending": "Pending Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "published": "Published"
     },
-    "nav": {
-        "dashboard": "Dashboard",
-        "myTestimonials": "My Testimonials",
-        "createTestimonial": "Create Testimonial",
-        "pendingTestimonials": "Pending Testimonials",
-        "myOrganization": "My Organization",
-        "users": "Users",
-        "organizations": "Organizations",
-        "categories": "Categories",
-        "statistics": "Statistics"
+    "empty": {
+      "title": "No testimonials yet",
+      "description": "Start by creating your first testimonial"
+    }
+  },
+  "underConstruction": {
+    "title": "Page Under Construction",
+    "description": "We're working hard to bring you this feature. Come back soon!"
+  },
+  "function": {
+    "title": "Function Under Construction",
+    "description": "This functionality is being developed. It will be available soon."
+  },
+  "buttons": {
+    "back": "Back"
+  },
+  "statusCards": {
+    "dev": {
+      "title": "In Development",
+      "desc": "Building new features"
     },
-    "roles": {
-        "visitante": "Visitor",
-        "editor": "Editor",
-        "admin": "Administrator"
+    "soon": {
+      "title": "Coming Soon",
+      "desc": "Launching very soon"
     },
-    "dashboard": {
-        "overview": "Overview",
-        "welcomeMessage": "Welcome back!",
-        "stats": {
-            "totalTestimonials": "Total Testimonials",
-            "pending": "Pending",
-            "approved": "Approved",
-            "rejected": "Rejected"
-        }
+    "improve": {
+      "title": "Improving",
+      "desc": "Optimizing your experience"
+    }
+  },
+  "contact": {
+    "prompt": "Have suggestions? Contact us at",
+    "email": "support@testimonial-cms.com"
+  },
+  "table": {
+    "title": "Table Viewer",
+    "add": "Add",
+    "headers": {
+      "name": "Card",
+      "fee": "Fee (%)",
+      "days": "Reception Period (days)",
+      "actions": "Actions"
     },
-    "testimonials": {
-        "title": "Testimonials",
-        "create": "Create Testimonial",
-        "edit": "Edit Testimonial",
-        "delete": "Delete Testimonial",
-        "approve": "Approve",
-        "reject": "Reject",
-        "status": {
-            "pending": "Pending Review",
-            "approved": "Approved",
-            "rejected": "Rejected",
-            "published": "Published"
-        },
-        "empty": {
-            "title": "No testimonials yet",
-            "description": "Start by creating your first testimonial"
-        }
-    },
-    "underConstruction": {
-        "title": "Page Under Construction",
-        "description": "We're working hard to bring you this feature. Come back soon!"
-    },
-    "function": {
-        "title": "Function Under Construction",
-        "description": "This functionality is being developed. It will be available soon."
+    "placeholders": {
+      "name": "Card name",
+      "fee": "Fee",
+      "days": "Days"
     },
     "buttons": {
-        "back": "Back"
-    },
-    "statusCards": {
-        "dev": {
-            "title": "In Development",
-            "desc": "Building new features"
-        },
-        "soon": {
-            "title": "Coming Soon",
-            "desc": "Launching very soon"
-        },
-        "improve": {
-            "title": "Improving",
-            "desc": "Optimizing your experience"
-        }
-    },
-    "contact": {
-        "prompt": "Have suggestions? Contact us at",
-        "email": "support@testimonial-cms.com"
-    },
-    "table": {
-        "title": "Table Viewer",
-        "add": "Add",
-        "headers": {
-            "name": "Card",
-            "fee": "Fee (%)",
-            "days": "Reception Period (days)",
-            "actions": "Actions"
-        },
-        "placeholders": {
-            "name": "Card name",
-            "fee": "Fee",
-            "days": "Days"
-        },
-        "buttons": {
-            "save": "Save",
-            "cancel": "Cancel",
-            "add": "Add",
-            "edit": "Edit",
-            "delete": "Delete"
-        }
-    },
-    "notFound": {
-        "code": "404",
-        "title": "Page Not Found",
-        "description": "Sorry, the page you are looking for does not exist.",
-        "backHome": "Back to Home",
-        "goDashboard": "Go to Dashboard"
+      "save": "Save",
+      "cancel": "Cancel",
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete"
     }
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Page Not Found",
+    "description": "Sorry, the page you are looking for does not exist.",
+    "backHome": "Back to Home",
+    "goDashboard": "Go to Dashboard"
+  },
+  "logoType": {
+    "altText": "External CMS Logo",
+    "title": "External CMS"
+  },
+  "landing":{
+    "auth": {
+      "login": "Login",
+      "register": "Register"
+    },
+    "hero": {
+      "title": "External CMS - Easily manage your testimonials",
+      "description": "External CMS is a platform that allows you to create, manage, and display customer testimonials easily and efficiently."
+    }
+  }
 }

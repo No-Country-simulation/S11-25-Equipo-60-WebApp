@@ -1,3 +1,52 @@
-export * from './Interceptors/api.interceptor.request';
-export * from './Interceptors/api.interceptor.response';
-export * from './url/api.url';
+export * from './interceptors/api.interceptor.request';
+export * from './interceptors/api.interceptor.response';
+
+// Auth endpoints
+export * from './paths/auth/login.path';
+export * from './paths/auth/logout.path';
+export * from './paths/auth/refresh.path';
+export * from './paths/auth/register.path';
+
+// Category endpoints
+export * from './paths/category/create.path';
+export * from './paths/category/delete.path';
+export * from './paths/category/get.path';
+export * from './paths/category/getById.path';
+export * from './paths/category/update.path';
+
+// Organization endpoints
+export * from './paths/organization/addEditors.path';
+export * from './paths/organization/addVisitors.path';
+export * from './paths/organization/create.path';
+export * from './paths/organization/delete.path';
+export * from './paths/organization/get.path';
+export * from './paths/organization/getApprovedTestimonials.path';
+export * from './paths/organization/getById.path';
+export * from './paths/organization/update.path';
+
+// Testimonial endpoints
+export * from './paths/testimonial/approve.path';
+export * from './paths/testimonial/create.path';
+export * from './paths/testimonial/delete.path';
+export * from './paths/testimonial/get.path';
+export * from './paths/testimonial/getById.path';
+export * from './paths/testimonial/reject.path';
+export * from './paths/testimonial/update.path';
+
+// User endpoints
+export * from './paths/user/administrador/create.path';
+export * from './paths/user/administrador/delete.path';
+export * from './paths/user/administrador/get.path';
+export * from './paths/user/administrador/getById.path';
+export * from './paths/user/administrador/update.path';
+export * from './paths/user/editor/delete.path';
+export * from './paths/user/editor/get.path';
+export * from './paths/user/editor/getById.path';
+export * from './paths/user/editor/update.path';
+export * from './paths/user/visitante/create.path';
+export * from './paths/user/visitante/delete.path';
+export * from './paths/user/visitante/get.path';
+export * from './paths/user/visitante/getById.path';
+export * from './paths/user/visitante/update.path';
+
+export * from './root/api.root';

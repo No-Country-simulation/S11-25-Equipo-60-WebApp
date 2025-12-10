@@ -11,7 +11,10 @@
     "add": "Agregar",
     "search": "Buscar",
     "filter": "Filtrar",
-    "back": "Volver"
+    "back": "Volver",
+    "user": "Usuario",
+    "guest": "Invitado",
+    "userMenu": "Menú de usuario"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -116,5 +119,19 @@
     "description": "Lo sentimos, la página que estás buscando no existe.",
     "backHome": "Volver al Inicio",
     "goDashboard": "Ir al Dashboard"
+  },
+  "logoType": {
+    "altText": "Logo del External CMS",
+    "title": "External CMS"
+  },
+  "landing":{
+    "auth": {
+      "login": "Ingresar",
+      "register": "Registrarse"
+    },
+    "hero": {
+      "title": "External CMS - Gestiona tus testimonios fácilmente",
+      "description": "External CMS es una plataforma que te permite crear, gestionar y mostrar testimonios de clientes de manera sencilla y eficiente."
+    }
   }
 }

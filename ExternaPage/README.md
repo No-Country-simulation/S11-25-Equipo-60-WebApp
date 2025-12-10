@@ -1,4 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ExternaPage - S11-25-Equipo-60
+
+Aplicación web externa construida con Next.js 15, TypeScript, Zustand y Tailwind CSS.
+
+## 📚 Documentación Reciente
+
+### 🎯 Refactorización Auth Store (Diciembre 2024)
+Se realizó una refactorización completa del sistema de autenticación siguiendo las mejores prácticas de Zustand v5:
+
+- **[QUICK-GUIDE.md](./QUICK-GUIDE.md)** - Guía visual rápida de uso de Zustand con `useShallow`
+- **[REFACTORING-SUMMARY.md](./REFACTORING-SUMMARY.md)** - Resumen ejecutivo de cambios
+- **[PERFORMANCE-COMPARISON.md](./PERFORMANCE-COMPARISON.md)** - Comparativa de performance antes/después
+- **[store/auth/README.md](./src/store/auth/README.md)** - Documentación completa del auth store
+
+**Resultado:** 70-80% menos re-renders innecesarios! 🚀
+
+### 📖 Guías de Ejemplo
+- **[HeaderExample.tsx](./src/components/examples/HeaderExample.tsx)** - Header con login condicional
+- **[AuthExamples.tsx](./src/components/examples/AuthExamples.tsx)** - 5 patrones de uso
+- **[ShallowComparison.tsx](./src/components/examples/ShallowComparison.tsx)** - Demo interactivo
+
+---
 
 ## Getting Started
 
