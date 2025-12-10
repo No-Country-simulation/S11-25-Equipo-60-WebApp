@@ -62,7 +62,7 @@ export default function VerTestimonioPage() {
             'A': { label: 'Aprobado', variant: 'default' },
             'R': { label: 'Rechazado', variant: 'destructive' },
             'P': { label: 'Publicado', variant: 'default' },
-            'B': { label: 'Bloqueado', variant: 'destructive' },
+            'B': { label: 'Borrador', variant: 'outline' },
             'O': { label: 'Oculto', variant: 'outline' },
         }
         const status = statusMap[estado] || { label: estado, variant: 'outline' as const }
@@ -239,6 +239,26 @@ export default function VerTestimonioPage() {
                                     })}
                                 </p>
                             </div>
+                        </div>
+                    )}
+
+                    {/* Feedback del Editor (si está rechazado) */}
+                    {testimonial.estado === 'R' && testimonial.feedback && (
+                        <div className="col-span-full">
+                            <Card className="border-destructive">
+                                <CardHeader>
+                                    <CardTitle className="text-destructive flex items-center gap-2">
+                                        <AlertCircle className="h-5 w-5" />
+                                        Feedback del Editor
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Tu testimonio fue rechazado. Revisa el feedback y realiza los cambios necesarios.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm">{testimonial.feedback}</p>
+                                </CardContent>
+                            </Card>
                         </div>
                     )}
 
