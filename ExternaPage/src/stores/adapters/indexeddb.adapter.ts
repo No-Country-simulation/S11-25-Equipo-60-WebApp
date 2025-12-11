@@ -35,14 +35,21 @@ interface StoredData {
 }
 
 class IndexedDBManager {
-  private readonly dbPromise: Promise<IDBDatabase> | null = null;
+  private dbPromise: Promise<IDBDatabase> | null = null;
 
-  constructor() {
-    // Solo inicializar en el navegador
-    if (globalThis.window !== undefined && typeof indexedDB !== 'undefined') {
-      // @ts-expect-error - Se asigna en constructor por necesidad de inicialización
-      this.dbPromise = this.initDB();
+  /**
+   * Obtiene la promesa de la base de datos, inicializándola si es necesario
+   */
+  private getDB(): Promise<IDBDatabase> | null {
+    // Verificar si estamos en el navegador
+    if (globalThis.window === undefined || typeof indexedDB === 'undefined') {
+      return null;
     }
+
+    // Inicializar solo una vez (lazy initialization)
+    this.dbPromise ??= this.initDB();
+
+    return this.dbPromise;
   }
 
   private initDB(): Promise<IDBDatabase> {
@@ -86,13 +93,14 @@ class IndexedDBManager {
   }
 
   async setItem(key: string, value: any): Promise<void> {
-    if (!this.dbPromise) {
+    const dbPromise = this.getDB();
+    if (!dbPromise) {
       console.warn('[IndexedDB] No disponible en el servidor');
       return;
     }
 
     const storeName = this.getStoreName(key);
-    const db = await this.dbPromise;
+    const db = await dbPromise;
 
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(storeName, 'readwrite');
@@ -105,13 +113,14 @@ class IndexedDBManager {
   }
 
   async getItem(key: string): Promise<StoredData | null> {
-    if (!this.dbPromise) {
+    const dbPromise = this.getDB();
+    if (!dbPromise) {
       console.warn('[IndexedDB] No disponible en el servidor');
       return null;
     }
 
     const storeName = this.getStoreName(key);
-    const db = await this.dbPromise;
+    const db = await dbPromise;
 
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(storeName, 'readonly');
@@ -124,13 +133,14 @@ class IndexedDBManager {
   }
 
   async removeItem(key: string): Promise<void> {
-    if (!this.dbPromise) {
+    const dbPromise = this.getDB();
+    if (!dbPromise) {
       console.warn('[IndexedDB] No disponible en el servidor');
       return;
     }
 
     const storeName = this.getStoreName(key);
-    const db = await this.dbPromise;
+    const db = await dbPromise;
 
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(storeName, 'readwrite');
