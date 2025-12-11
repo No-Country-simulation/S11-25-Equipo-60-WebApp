@@ -1,4 +1,5 @@
-export type UserRole = 'visitante' | 'editor' | 'admin' | 'sin_grupo';
+export type UserRole = 'visitante' | 'editor' | 'admin'
+  | 'sin_grupo';
 
 export interface RoleConfig {
     role: UserRole;
