@@ -1,5 +1,5 @@
 import type { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { logger } from "@/core/logging";
+import { logger } from "@/core";
 import { api } from "@/api";
 import type { HttpMethod } from "@/types";
 

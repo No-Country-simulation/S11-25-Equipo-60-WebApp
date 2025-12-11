@@ -1,5 +1,5 @@
 import type { InternalAxiosRequestConfig } from "axios";
-import { logger } from "@/core/logging";
+import { logger } from "@/core";
 import { api } from "@/api";
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
