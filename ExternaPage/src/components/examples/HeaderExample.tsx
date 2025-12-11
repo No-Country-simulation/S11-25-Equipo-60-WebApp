@@ -8,7 +8,7 @@
 'use client';
 import Link from 'next/link';
 import { useShallow } from 'zustand/react/shallow';
-import { useAuthStore, selectIsLoggedIn, selectUserData } from '@/store/auth/auth.store';
+import { useAuthStore, selectIsLoggedIn, selectUserData } from '@/stores/auth/auth.store';
 
 export default function Header() {
   // ✅ MEJOR PRÁCTICA: Usar selector para verificar login

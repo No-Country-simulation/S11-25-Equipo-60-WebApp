@@ -1,20 +1,21 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { indexedDBStorage } from "@/store/adapters";
+import { indexedDBStorage } from "@/stores";
 import { 
   getTestimonials, 
   getTestimonialById, 
   createTestimonial, 
   updateTestimonial, 
   deleteTestimonial,
-  approveTestimonial,
-  rejectTestimonial
+  changeTestimonialState,
+  getOwnTestimonials
 } from "@/api";
 import { validateApiResponse } from "@/core";
 import type { Testimonio } from "@/interfaces";
 
 interface TestimonialStateData {
   testimonials: Testimonio[];
+  ownTestimonials: Testimonio[];
   currentTestimonial: Testimonio | null;
   isLoading: boolean;
   error: string | null;
@@ -23,11 +24,11 @@ interface TestimonialStateData {
 interface TestimonialActions {
   fetchTestimonials: () => Promise<void>;
   fetchTestimonial: (id: number) => Promise<void>;
+  fetchOwnTestimonials: () => Promise<void>;
   createTestimonial: (data: Partial<Testimonio>) => Promise<void>;
   updateTestimonial: (id: number, data: Partial<Testimonio>) => Promise<void>;
   deleteTestimonial: (id: number) => Promise<void>;
-  approveTestimonial: (id: number) => Promise<void>;
-  rejectTestimonial: (id: number) => Promise<void>;
+  changeState: (id: number, estado: string, feedback?: string) => Promise<void>;
   clearCurrent: () => void;
   clearError: () => void;
 }
@@ -39,11 +40,12 @@ export const useTestimonialStore = create<TestimonialState>()(
     (set, get) => ({
       // Estado inicial
       testimonials: [],
+      ownTestimonials: [],
       currentTestimonial: null,
       isLoading: false,
       error: null,
 
-      // Obtener todos los testimonios
+      // Obtener todos los testimonios públicos (aprobados)
       fetchTestimonials: async () => {
         set({ isLoading: true, error: null });
 
@@ -81,6 +83,27 @@ export const useTestimonialStore = create<TestimonialState>()(
           set({
             isLoading: false,
             error: error.message || `Error al obtener testimonio ${id}`
+          });
+        }
+      },
+
+      // Obtener testimonios propios según rol (editores: sus organizaciones, visitantes: propios)
+      fetchOwnTestimonials: async () => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const result = await getOwnTestimonials();
+          const ownTestimonials = validateApiResponse<Testimonio[]>(result, '[fetchOwnTestimonials]');
+
+          set({
+            ownTestimonials,
+            isLoading: false,
+            error: null
+          });
+        } catch (error: any) {
+          set({
+            isLoading: false,
+            error: error.message || 'Error al obtener testimonios propios'
           });
         }
       },
@@ -141,6 +164,7 @@ export const useTestimonialStore = create<TestimonialState>()(
 
           set({
             testimonials: get().testimonials.filter(testimonial => testimonial.id !== id),
+            ownTestimonials: get().ownTestimonials.filter(testimonial => testimonial.id !== id),
             currentTestimonial: get().currentTestimonial?.id === id ? null : get().currentTestimonial,
             isLoading: false,
             error: null
@@ -153,50 +177,29 @@ export const useTestimonialStore = create<TestimonialState>()(
         }
       },
 
-      // Aprobar testimonio (solo editores/admin)
-      approveTestimonial: async (id) => {
+      // Cambiar estado de testimonio (solo editores/admin)
+      changeState: async (id: number, estado: string, feedback?: string) => {
         set({ isLoading: true, error: null });
 
         try {
-          const result = await approveTestimonial(id);
-          const approvedTestimonial = validateApiResponse<Testimonio>(result, `[approveTestimonial ${id}]`);
+          const result = await changeTestimonialState(id, estado, feedback);
+          const updatedTestimonial = validateApiResponse<Testimonio>(result, `[changeState ${id}]`);
 
           set({
             testimonials: get().testimonials.map(testimonial => 
-              testimonial.id === id ? approvedTestimonial : testimonial
+              testimonial.id === id ? updatedTestimonial : testimonial
             ),
-            currentTestimonial: get().currentTestimonial?.id === id ? approvedTestimonial : get().currentTestimonial,
+            ownTestimonials: get().ownTestimonials.map(testimonial => 
+              testimonial.id === id ? updatedTestimonial : testimonial
+            ),
+            currentTestimonial: get().currentTestimonial?.id === id ? updatedTestimonial : get().currentTestimonial,
             isLoading: false,
             error: null
           });
         } catch (error: any) {
           set({
             isLoading: false,
-            error: error.message || `Error al aprobar testimonio ${id}`
-          });
-        }
-      },
-
-      // Rechazar testimonio (solo editores/admin)
-      rejectTestimonial: async (id) => {
-        set({ isLoading: true, error: null });
-
-        try {
-          const result = await rejectTestimonial(id);
-          const rejectedTestimonial = validateApiResponse<Testimonio>(result, `[rejectTestimonial ${id}]`);
-
-          set({
-            testimonials: get().testimonials.map(testimonial => 
-              testimonial.id === id ? rejectedTestimonial : testimonial
-            ),
-            currentTestimonial: get().currentTestimonial?.id === id ? rejectedTestimonial : get().currentTestimonial,
-            isLoading: false,
-            error: null
-          });
-        } catch (error: any) {
-          set({
-            isLoading: false,
-            error: error.message || `Error al rechazar testimonio ${id}`
+            error: error.message || `Error al cambiar estado de testimonio ${id}`
           });
         }
       },
@@ -215,7 +218,8 @@ export const useTestimonialStore = create<TestimonialState>()(
       name: 'testimonial-storage',
       storage: createJSONStorage(() => indexedDBStorage),
       partialize: (state) => ({
-        testimonials: state.testimonials.filter(t => t.estado === 'A' || t.estado === 'P')
+        testimonials: state.testimonials.filter(t => t.estado === 'A' || t.estado === 'P'),
+        ownTestimonials: state.ownTestimonials
       })
     }
   )

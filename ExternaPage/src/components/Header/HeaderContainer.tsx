@@ -1,6 +1,6 @@
 import { NabHeader } from "./components/NabHeader"
 
-export const HeaderConmtainer = () => {
+export const HeaderContainer = () => {
   return (
     <NabHeader />
   )

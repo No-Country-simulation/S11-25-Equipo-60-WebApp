@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { indexedDBStorage } from "@/store/adapters";
-import { 
-  getOrganizations, 
-  getOrganizationById, 
-  createOrganization, 
-  updateOrganization, 
+import { indexedDBStorage } from "@/stores";
+import {
+  getOrganizations,
+  getOrganizationById,
+  createOrganization,
+  updateOrganization,
   deleteOrganization,
   addEditors,
   addVisitors,
@@ -13,7 +13,6 @@ import {
 } from "@/api";
 import { validateApiResponse } from "@/core";
 import type { Organizacion, TestimonioAprobado } from "@/interfaces";
-
 interface OrganizationStateData {
   organizations: Organizacion[];
   currentOrganization: Organizacion | null;
@@ -21,7 +20,6 @@ interface OrganizationStateData {
   isLoading: boolean;
   error: string | null;
 }
-
 interface OrganizationActions {
   fetchOrganizations: () => Promise<void>;
   fetchOrganization: (id: number) => Promise<void>;
@@ -120,7 +118,7 @@ export const useOrganizationStore = create<OrganizationState>()(
       const updatedOrganization = validateApiResponse<Organizacion>(result, `[updateOrganization ${id}]`);
 
       set({
-        organizations: get().organizations.map(org => 
+        organizations: get().organizations.map(org =>
           org.id === id ? updatedOrganization : org
         ),
         currentOrganization: get().currentOrganization?.id === id ? updatedOrganization : get().currentOrganization,
@@ -224,7 +222,7 @@ export const useOrganizationStore = create<OrganizationState>()(
 
   // Limpiar organización actual
   clearCurrent: () => {
-    set({ 
+    set({
       currentOrganization: null,
       approvedTestimonials: []
     });

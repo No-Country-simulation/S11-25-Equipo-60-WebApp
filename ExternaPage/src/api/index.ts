@@ -25,12 +25,13 @@ export * from './paths/organization/getById.path';
 export * from './paths/organization/update.path';
 
 // Testimonial endpoints
-export * from './paths/testimonial/approve.path';
+export * from './paths/testimonial/changeState.path';
 export * from './paths/testimonial/create.path';
 export * from './paths/testimonial/delete.path';
 export * from './paths/testimonial/get.path';
 export * from './paths/testimonial/getById.path';
-export * from './paths/testimonial/reject.path';
+export * from './paths/testimonial/getOwn.path';
+export * from './paths/testimonial/getStatistics.path';
 export * from './paths/testimonial/update.path';
 
 // User endpoints

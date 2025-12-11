@@ -1,6 +1,5 @@
-import { api } from "@/api/interceptors";
-import { handleApiError, handleSuccessResponse } from "@/core";
-import type { ApiError } from "@/interfaces";
+import { api } from "@/api";
+import { ApiError, handleApiError, handleSuccessResponse } from "@/core";
 
 /**
  * Elimina una categoría (solo admin)

@@ -13,7 +13,7 @@ import {
   useAuthStore,
   selectIsLoggedIn,
   selectUserData
-} from '@/store';
+} from '@/stores';
 
 // ============================================
 // Ejemplo 1: Redirigir según estado de login

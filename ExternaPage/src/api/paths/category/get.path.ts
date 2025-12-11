@@ -1,6 +1,6 @@
-import { api } from "@/api/interceptors";
-import { handleApiError, handleSuccessResponse } from "@/core";
-import type { Categoria, ApiError } from "@/interfaces";
+import { api } from "@/api";
+import { ApiError, handleApiError, handleSuccessResponse } from "@/core";
+import type { Categoria } from "@/interfaces";
 
 /**
  * Obtiene todas las categorías

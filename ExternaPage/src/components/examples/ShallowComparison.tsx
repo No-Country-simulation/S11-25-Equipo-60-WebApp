@@ -5,7 +5,7 @@
 
 'use client';
 import { useShallow } from 'zustand/react/shallow';
-import { useAuthStore, selectUserData, selectTokens } from '@/store/auth/auth.store';
+import { useAuthStore, selectUserData, selectTokens } from '@/stores/auth/auth.store';
 
 // ============================================
 // ❌ MAL: Sin useShallow - Re-renders innecesarios

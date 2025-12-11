@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { login, register, logout as logoutApi, refreshToken as refreshTokenApi } from "@/api";
-import { indexedDBStorage } from "@/store/adapters";
+import { indexedDBStorage } from "@/stores";
 import type { UserCredentials, Usuario, LoginResponse, RegisterResponse } from "@/interfaces";
 
 /**

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/providers"
-import { selectIsLoggedIn, useAuthStore } from "@/store"
+import { selectIsLoggedIn, useAuthStore } from "@/stores"
 import { UserMenu } from "./UserMenu"
 
 /**

@@ -15,7 +15,7 @@ type DeleteTestimonialResult = DeleteTestimonialResponse | ApiError;
  */
 export const deleteTestimonial = async (id: number): Promise<DeleteTestimonialResult> => {
   try {
-    const response = await api.delete(`/app/testimonio/${id}/`);
+    const response = await api.delete(`/app/testimonios/${id}/`);
     return handleSuccessResponse<DeleteTestimonialResponse>(response, 204);
   } catch (error: any) {
     return handleApiError(error, `Error al eliminar testimonio ${id}`);

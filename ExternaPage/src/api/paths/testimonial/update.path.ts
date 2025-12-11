@@ -12,7 +12,7 @@ type UpdateTestimonialResult = Testimonio | ApiError;
  */
 export const updateTestimonial = async (id: number, data: Partial<Testimonio>): Promise<UpdateTestimonialResult> => {
   try {
-    const response = await api.patch(`/app/testimonio/${id}/`, data);
+    const response = await api.patch(`/app/testimonios/${id}/`, data);
     return handleSuccessResponse<Testimonio>(response, 200);
   } catch (error: any) {
     return handleApiError(error, `Error al actualizar testimonio ${id}`);

@@ -11,7 +11,7 @@ type GetTestimonialByIdResult = Testimonio | ApiError;
  */
 export const getTestimonialById = async (id: number): Promise<GetTestimonialByIdResult> => {
   try {
-    const response = await api.get(`/app/testimonio/${id}/`);
+    const response = await api.get(`/app/testimonios/${id}/`);
     return handleSuccessResponse<Testimonio>(response, 200);
   } catch (error: any) {
     return handleApiError(error, `Error al obtener testimonio ${id}`);

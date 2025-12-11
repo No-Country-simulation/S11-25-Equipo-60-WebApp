@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { indexedDBStorage } from "@/store/adapters";
-import { executeAsyncAction } from "@/store/helpers/async-action.helper";
+import { indexedDBStorage , executeAsyncAction } from "@/stores";
 import { 
   getVisitante, 
   getEditor, 

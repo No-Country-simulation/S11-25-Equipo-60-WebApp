@@ -18,12 +18,12 @@ export interface Testimonio {
   id?: number;
   organizacion: number;
   organizacion_nombre?: string;
-  usuario_registrado?: string | UsuarioTestimonio; // Puede ser string (username) o objeto completo
+  usuario_registrado?: string; // Devuelve string (username), no objeto
   usuario_anonimo_email?: string;
   usuario_anonimo_username?: string;
   api_key?: string;
   categoria: number;
-  categoria_nombre?: string;
+  categoria_nombre?: string; // Devuelve string directo, no objeto
   comentario: string;
   enlace?: string; // URL externa relacionada
   archivos?: string[]; // Array de archivos (máx 4) - writeOnly para POST
@@ -31,6 +31,7 @@ export interface Testimonio {
   fecha_comentario?: string;
   ranking: string; // Decimal como string, ej: "5.0"
   estado?: EstadoTestimonio; // Estado del testimonio
+  feedback?: string; // Feedback del editor/admin (solo visible en estado 'R')
 }
 
 /**

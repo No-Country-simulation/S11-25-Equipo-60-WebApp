@@ -695,7 +695,10 @@ class TestimonioSerializer(serializers.ModelSerializer):
                 )
             
             total_size = 0
-            allowed_extensions = ['.jpg', '.jpeg', '.png', '.pdf', '.doc', '.docx', '.txt']
+            # Extensiones permitidas: imágenes (incluyendo GIF) y videos
+            allowed_image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg']
+            allowed_video_extensions = ['.mp4', '.webm', '.mov', '.avi', '.mkv', '.flv']
+            allowed_extensions = allowed_image_extensions + allowed_video_extensions
             
             for archivo in archivos:
                 # Validar tamaño individual
@@ -708,7 +711,7 @@ class TestimonioSerializer(serializers.ModelSerializer):
                 ext = os.path.splitext(archivo.name)[1].lower()
                 if ext not in allowed_extensions:
                     raise serializers.ValidationError(
-                        f"Tipo de archivo no permitido: {archivo.name}. Extensiones permitidas: {', '.join(allowed_extensions)}"
+                        f"Tipo de archivo no permitido: {archivo.name}. Solo se permiten imágenes (JPG, PNG, GIF, WebP) y videos (MP4, WebM, MOV)."
                     )
                 
                 total_size += archivo.size
