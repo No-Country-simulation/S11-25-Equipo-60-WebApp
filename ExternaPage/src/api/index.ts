@@ -1,5 +1,5 @@
-export * from './interceptors/api.interceptor.request';
-export * from './interceptors/api.interceptor.response';
+export * from './interceptores/api.interceptor.request';
+export * from './interceptores/api.interceptor.response';
 export * from './paths/auth/login.path';
 export * from './paths/auth/logout.path';
 export * from './paths/auth/refresh.path';
