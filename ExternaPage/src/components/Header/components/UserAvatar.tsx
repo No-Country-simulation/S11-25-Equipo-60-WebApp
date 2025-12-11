@@ -7,14 +7,14 @@ import { MENU_CONFIG } from "../constants/menu.constants"
  * Props interface for better type safety
  */
 interface UserAvatarProps {
-  initials: string
-  className?: string
+  readonly initials: string
+  readonly className?: string
 }
 
 export function UserAvatar({ initials, className }: UserAvatarProps) {
   return (
     <Avatar className={`${MENU_CONFIG.AVATAR.SIZE} ${className || ""}`}>
-      <AvatarFallback 
+      <AvatarFallback
         className={`${MENU_CONFIG.AVATAR.GRADIENT} ${MENU_CONFIG.AVATAR.TEXT_COLOR}`}
       >
         {initials}

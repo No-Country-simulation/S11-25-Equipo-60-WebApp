@@ -1,6 +1,6 @@
 "use client"
 
-import { LogoSvg } from "@/components"
+import { LogoSvg } from "../svg/LogoSvg"
 import { useTranslation } from "@/providers"
 
 interface ILogoTypeProps {
@@ -18,7 +18,7 @@ export const LogoType = ({ sizeLogo = 24, alt, className, currentColor = "#fffff
       <LogoSvg size={sizeLogo} alt={t("logoType.alt")} currentColor={currentColor} className={className} />
       <span className={`${className}`} >
         {t("logoType.title")}
-      </span>    
+      </span>
     </div>
   )
 }

@@ -1,7 +1,8 @@
 'use client'
 
 import { Construction, ArrowLeft, Clock, Wrench } from "lucide-react"
-import { Button, Card } from "@/components"
+import { Button } from "../ui/button";
+import { Card } from "../ui/card"
 import { useTranslation } from "@/providers"
 
 interface UnderConstructionProps {
@@ -46,7 +47,7 @@ export function PageInConstruction({
               {t("statusCards.dev.desc")}
             </p>
           </div>
-          
+
           <div className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted/50">
             <Clock className="h-8 w-8 text-blue-500" />
             <p className="text-sm font-medium">

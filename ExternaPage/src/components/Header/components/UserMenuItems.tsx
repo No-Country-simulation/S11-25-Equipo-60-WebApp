@@ -6,15 +6,15 @@ import type { UserMenuOption } from "../types/user.types"
  * Single Responsibility: Render individual menu item
  */
 interface UserMenuItemProps {
-  option: UserMenuOption
+  readonly option: UserMenuOption
 }
 
 export function UserMenuItem({ option }: UserMenuItemProps) {
   const Icon = option.icon
   const isDestructive = option.variant === "destructive"
-  
+
   return (
-    <DropdownMenuItem 
+    <DropdownMenuItem
       onClick={option.onClick}
       className={isDestructive ? "text-red-600 dark:text-red-400" : ""}
     >
@@ -36,7 +36,7 @@ export function UserMenuItems({ options }: UserMenuItemsProps) {
   // Separate logout from other options for better UX
   const regularOptions = options.filter(opt => opt.variant !== "destructive")
   const destructiveOptions = options.filter(opt => opt.variant === "destructive")
-  
+
   return (
     <>
       {regularOptions.map((option) => (

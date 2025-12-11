@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "../../ui/button"
 import { useTranslation } from "@/providers"
 import { selectIsLoggedIn, useAuthStore } from "@/stores"
 import { UserMenu } from "./UserMenu"

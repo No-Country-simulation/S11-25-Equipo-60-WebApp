@@ -2,12 +2,14 @@
 
 import Link from "next/link"
 import { FileQuestion } from "lucide-react"
-import { Button, LogoSvg, LogoType } from "@/components"
+import { Button } from "../ui/button";
+import { LogoSvg } from "../svg/LogoSvg";
+import { LogoType } from "../logoType/LogoType"
 import { useTranslation } from "@/providers"
 
 export function NotFoundContent() {
     const { t } = useTranslation()
-  
+
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center space-y-6 max-w-md">

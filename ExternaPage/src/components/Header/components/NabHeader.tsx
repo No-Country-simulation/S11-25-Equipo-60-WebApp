@@ -1,4 +1,5 @@
-import { AuthHeader, LogoType } from "@/components"
+import { AuthHeader } from "./AuthHeader";
+import { LogoType } from "../../logoType/LogoType"
 
 export const NabHeader = () => {
   return (

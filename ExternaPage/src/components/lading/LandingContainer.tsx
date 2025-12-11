@@ -1,11 +1,11 @@
-import { HeaderContainer } from "@/components";
-import { 
-  HeroSection, 
-  FeatureSection, 
-  TestimonialCarousel, 
-  ContactTestimonialTabs, 
-  Footer 
-} from "@/components/lading";
+import {
+  HeaderContainer,
+  FeatureSection,
+  TestimonialCarousel,
+  ContactTestimonialTabs,
+  Footer,
+  HeroSection
+} from "@/components";
 
 export const LandingContainer = () => {
   // Features data
@@ -56,7 +56,7 @@ export const LandingContainer = () => {
       <HeaderContainer />
       <main>
         <HeroSection />
-        
+
         {/* Feature Sections */}
         {features.map((feature, index) => (
           <FeatureSection
@@ -76,7 +76,7 @@ export const LandingContainer = () => {
         {/* Contact & Testimonial Forms */}
         <ContactTestimonialTabs />
       </main>
-      
+
       <Footer />
     </>
   );
