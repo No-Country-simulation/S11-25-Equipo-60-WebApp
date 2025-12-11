@@ -1,10 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { FileQuestion } from "lucide-react"
-import { Button } from "../ui/button";
-import { LogoSvg } from "../svg/LogoSvg";
-import { LogoType } from "../logoType/LogoType"
+import { Button, LogoType } from "@/components"
 import { useTranslation } from "@/providers"
 
 export function NotFoundContent() {

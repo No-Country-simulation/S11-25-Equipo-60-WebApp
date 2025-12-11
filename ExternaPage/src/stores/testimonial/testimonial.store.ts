@@ -8,7 +8,8 @@ import {
   updateTestimonial, 
   deleteTestimonial,
   changeTestimonialState,
-  getOwnTestimonials
+  getOwnTestimonials,
+  addFeedbackToTestimonial
 } from "@/api";
 import { validateApiResponse } from "@/core";
 import type { Testimonio } from "@/interfaces";
@@ -25,10 +26,11 @@ interface TestimonialActions {
   fetchTestimonials: () => Promise<void>;
   fetchTestimonial: (id: number) => Promise<void>;
   fetchOwnTestimonials: () => Promise<void>;
-  createTestimonial: (data: Partial<Testimonio>) => Promise<void>;
+  createTestimonial: (data: Partial<Testimonio> | FormData) => Promise<void>;
   updateTestimonial: (id: number, data: Partial<Testimonio>) => Promise<void>;
   deleteTestimonial: (id: number) => Promise<void>;
   changeState: (id: number, estado: string, feedback?: string) => Promise<void>;
+  addFeedback: (id: number, feedback: string) => Promise<void>;
   clearCurrent: () => void;
   clearError: () => void;
 }
@@ -118,6 +120,7 @@ export const useTestimonialStore = create<TestimonialState>()(
 
           set({
             testimonials: [...get().testimonials, newTestimonial],
+            ownTestimonials: [...get().ownTestimonials, newTestimonial],
             currentTestimonial: newTestimonial,
             isLoading: false,
             error: null
@@ -127,6 +130,7 @@ export const useTestimonialStore = create<TestimonialState>()(
             isLoading: false,
             error: error.message || 'Error al crear testimonio'
           });
+          throw error; // Re-lanzar para que el componente pueda manejarlo
         }
       },
 
@@ -142,6 +146,9 @@ export const useTestimonialStore = create<TestimonialState>()(
             testimonials: get().testimonials.map(testimonial => 
               testimonial.id === id ? updatedTestimonial : testimonial
             ),
+            ownTestimonials: get().ownTestimonials.map(testimonial => 
+              testimonial.id === id ? updatedTestimonial : testimonial
+            ),
             currentTestimonial: get().currentTestimonial?.id === id ? updatedTestimonial : get().currentTestimonial,
             isLoading: false,
             error: null
@@ -151,6 +158,7 @@ export const useTestimonialStore = create<TestimonialState>()(
             isLoading: false,
             error: error.message || `Error al actualizar testimonio ${id}`
           });
+          throw error; // Re-lanzar para que el componente pueda manejarlo
         }
       },
 
@@ -201,6 +209,35 @@ export const useTestimonialStore = create<TestimonialState>()(
             isLoading: false,
             error: error.message || `Error al cambiar estado de testimonio ${id}`
           });
+          throw error; // Re-lanzar para que el componente pueda manejarlo
+        }
+      },
+
+      // Agregar feedback a testimonio (cambia automáticamente a RECHAZADO)
+      addFeedback: async (id: number, feedback: string) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const result = await addFeedbackToTestimonial(id, feedback);
+          const updatedTestimonial = validateApiResponse<Testimonio>(result, `[addFeedback ${id}]`);
+
+          set({
+            testimonials: get().testimonials.map(testimonial => 
+              testimonial.id === id ? updatedTestimonial : testimonial
+            ),
+            ownTestimonials: get().ownTestimonials.map(testimonial => 
+              testimonial.id === id ? updatedTestimonial : testimonial
+            ),
+            currentTestimonial: get().currentTestimonial?.id === id ? updatedTestimonial : get().currentTestimonial,
+            isLoading: false,
+            error: null
+          });
+        } catch (error: any) {
+          set({
+            isLoading: false,
+            error: error.message || `Error al agregar feedback a testimonio ${id}`
+          });
+          throw error; // Re-lanzar para que el componente pueda manejarlo
         }
       },
 

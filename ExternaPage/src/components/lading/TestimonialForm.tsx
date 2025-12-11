@@ -1,15 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Star, Loader2, Upload, X } from "lucide-react";
-import { createTestimonial } from "@/api/paths/testimonial/create.path";
 import { toast } from "sonner";
-import { CONFIG } from "@/config/env.config";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, Button, Input, Textarea, Label } from "@/components";
+import { CONFIG } from "@/config";
+import { useTestimonialStore } from "@/stores";
 
 // Constantes de validación
 const MAX_FILES = 4;
@@ -159,6 +155,9 @@ const FilePreview = ({ file, previewUrl, onRemove }: FilePreviewProps) => {
 };
 
 export const TestimonialForm = () => {
+  // ✅ Usar el store de Zustand
+  const { createTestimonial, fetchTestimonials } = useTestimonialStore();
+  
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -227,14 +226,13 @@ export const TestimonialForm = () => {
         formData.append('archivos', file);
       });
 
-      const result = await createTestimonial(formData);
-
-      if ('success' in result && !result.success) {
-        toast.error(result.message || "Error al enviar el testimonio");
-        return;
-      }
+      // ✅ USAR EL STORE en vez de la API directa
+      await createTestimonial(formData);
 
       toast.success("¡Testimonio enviado con éxito! Será revisado por nuestro equipo.");
+      
+      // ✅ Refrescar lista de testimonios públicos
+      await fetchTestimonials();
       
       // Limpiar formulario
       formElement.reset();
@@ -243,9 +241,9 @@ export const TestimonialForm = () => {
       setFilePreviews([]);
       setVideoLink("");
       
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al enviar testimonio:", error);
-      toast.error("Error inesperado al enviar el testimonio");
+      toast.error(error.message || "Error inesperado al enviar el testimonio");
     } finally {
       setIsSubmitting(false);
     }

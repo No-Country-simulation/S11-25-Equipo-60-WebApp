@@ -17,6 +17,7 @@ export * from './paths/organization/get.path';
 export * from './paths/organization/getApprovedTestimonials.path';
 export * from './paths/organization/getById.path';
 export * from './paths/organization/update.path';
+export * from './paths/testimonial/addFeedback.path';
 export * from './paths/testimonial/changeState.path';
 export * from './paths/testimonial/create.path';
 export * from './paths/testimonial/delete.path';

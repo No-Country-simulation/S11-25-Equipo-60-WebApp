@@ -1,17 +1,18 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useRef } from "react";
+import Autoplay from "embla-carousel-autoplay";
+import { Star, Loader2 } from "lucide-react";
 import {
+  Card,
+  CardContent,
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import Autoplay from "embla-carousel-autoplay";
-import { Star, Loader2 } from "lucide-react";
+} from "@/components";
 import { useTestimonials } from "@/hooks";
-import { useEffect, useRef } from "react";
 
 export const TestimonialCarousel = () => {
   const plugin = useRef(

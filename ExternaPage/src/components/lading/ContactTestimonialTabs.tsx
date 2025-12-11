@@ -1,6 +1,6 @@
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components";
 import { Mail, MessageSquare } from "lucide-react";
 import { ContactForm } from "./ContactForm";
 import { TestimonialForm } from "./TestimonialForm";
