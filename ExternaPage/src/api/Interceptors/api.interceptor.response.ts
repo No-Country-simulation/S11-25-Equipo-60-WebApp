@@ -4,7 +4,6 @@ import { api } from "@/api";
 import type { HttpMethod } from "@/types";
 
 interface ApiResponse<T = any> extends AxiosResponse<T> {}
-
 interface ApiError extends AxiosError {
   config: InternalAxiosRequestConfig;
   response?: AxiosResponse;
@@ -24,7 +23,7 @@ api.interceptors.response.use(
     if (error.response) {
       const status = error.response.status;
       const message = `API Error: ${status} - ${error.config.method?.toUpperCase()} ${error.config.url}`;
-      
+
       if (status >= 500) {
         logger.error(`❌ ${message}`, error.response.data);
       } else if (status >= 400) {
