@@ -11,7 +11,7 @@ export const ContactForm = () => {
   };
 
   return (
-    <Card>
+    <Card className="bg-gray-700 text-2xl font-bold text-blue-600">
       <CardHeader>
         <CardTitle>Formulario de Contacto</CardTitle>
         <CardDescription>

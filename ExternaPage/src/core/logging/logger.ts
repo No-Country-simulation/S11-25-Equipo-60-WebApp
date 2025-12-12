@@ -4,7 +4,8 @@
  * Los logs solo se muestran en modo desarrollo
  */
 
-import { CONFIG } from "@/config";
+
+import { IS_DEVELOPMENT } from "@/config";
 import type { HttpMethod } from "@/types";
 
 type LogLevel = 'log' | 'warn' | 'error' | 'info' | 'debug';
@@ -18,7 +19,7 @@ class Logger {
   private readonly config: LogConfig;
 
   constructor(config: LogConfig = {
-    enabled: CONFIG.IS_DEVELOPMENT,
+    enabled: IS_DEVELOPMENT,
     ignoreRoleValidation403: true
   }) {
     this.config = config;

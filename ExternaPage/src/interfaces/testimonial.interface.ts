@@ -26,8 +26,8 @@ export interface Testimonio {
   categoria_nombre?: string; // Devuelve string directo, no objeto
   comentario: string;
   enlace?: string; // URL externa relacionada
-  archivos?: string[]; // Array de archivos (máx 4) - writeOnly para POST
-  archivos_urls?: string[]; // URLs de archivos subidos - readOnly
+  archivos?: string[]; // Array de archivos (máx 4) - para POST y también URLs desde GET
+  archivos_urls?: string[]; // DEPRECATED: usar 'archivos' - URLs de archivos
   fecha_comentario?: string;
   ranking: string; // Decimal como string, ej: "5.0"
   estado?: EstadoTestimonio; // Estado del testimonio
@@ -46,7 +46,12 @@ export interface TestimonioAprobado {
   api_key: string;
   categoria: number;
   categoria_nombre: string;
+  organizacion_nombre?: string;
   comentario?: string;
+  enlace?: string;
+  archivos?: string[]; // URLs de los archivos desde el backend
+  archivos_urls?: string[]; // DEPRECATED: usar 'archivos'
   fecha_comentario: string;
   ranking?: string; // Decimal como string
+  estado?: EstadoTestimonio;
 }

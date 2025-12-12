@@ -1,6 +1,4 @@
-"use client";
-
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import { ArrowRight } from "lucide-react";
 
 export const HeroSection = () => {
@@ -50,13 +48,15 @@ export const HeroSection = () => {
             <p className="text-4xl font-bold text-blue-600">10K+</p>
             <p className="text-gray-600 mt-2">Testimonios Recolectados</p>
           </div>
+
           <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
             <p className="text-4xl font-bold text-purple-600">500+</p>
-            <p className="text-gray-600 mt-2">Empresas Confían en Nosotros</p>
+            <p className="text-gray-600 mt-2">Empresas Satisfechas</p>
           </div>
+
           <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
-            <p className="text-4xl font-bold text-pink-600">98%</p>
-            <p className="text-gray-600 mt-2">Satisfacción del Cliente</p>
+            <p className="text-4xl font-bold text-blue-600">98%</p>
+            <p className="text-gray-600 mt-2">Tasa de Satisfacción</p>
           </div>
         </div>
       </div>
