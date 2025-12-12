@@ -27,9 +27,9 @@ export const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
           )}
         </div>
 
-        <TestimonialRating 
-          rating={testimonial.ranking || "5.0"} 
-          testimonialId={testimonial.id} 
+        <TestimonialRating
+          rating={testimonial.ranking || "5.0"}
+          testimonialId={testimonial.id}
         />
 
         {/* Layout: comentario arriba, imágenes abajo */}
@@ -46,9 +46,9 @@ export const TestimonialCard = ({ testimonial }: TestimonialCardProps) => {
           {/* Imágenes - En una línea abajo */}
           {archivos && archivos.length > 0 && (
             <div className="w-full flex items-center justify-center">
-              <TestimonialAttachments 
-                archivos={archivos} 
-                testimonialId={testimonial.id} 
+              <TestimonialAttachments
+                archivos={archivos}
+                testimonialId={testimonial.id}
               />
             </div>
           )}
