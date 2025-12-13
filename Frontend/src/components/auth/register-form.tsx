@@ -178,6 +178,13 @@ export function RegisterForm() {
             >
                 Iniciar sesión
             </Link>
+
+            <Link
+                href="/password/forgot"
+                className="mt-2 block w-full rounded-lg border border-transparent bg-transparent py-2 text-center text-sm text-gray-300 hover:underline"
+            >
+                ¿Olvidaste tu contraseña?
+            </Link>
         </div>
     )
 }

@@ -65,4 +65,17 @@ export const authService = {
         validateUserRole(userRole);
         return userRole;
     }
+,
+
+    // Enviar email para reset de contraseña
+    requestPasswordReset: async ( email: { email: string } ): Promise<any> => {
+        const response = await api.post('/app/auth/reset/password/', email);
+        return response.data;
+    },
+
+    // Confirmar y establecer nueva contraseña
+    confirmPasswordReset: async ( payload: { uid: string; token: string; new_password: string } ): Promise<any> => {
+        const response = await api.post('/app/auth/reset/password/confirm/', payload);
+        return response.data;
+    }
 };

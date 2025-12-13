@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import Link from "next/link"
+import { useState as useStateReact } from "react"
 
 const formSchema = z.object({
     email: z.string().email({
@@ -161,6 +162,12 @@ export function LoginForm() {
                 className="block w-full rounded-lg border border-white/10 bg-white/5 py-3 text-center text-sm font-medium text-white transition-all hover:bg-white/10 hover:border-white/20"
             >
                 Crear una cuenta nueva
+            </Link>
+            <Link
+                href="/password/forgot"
+                className="mt-2 block w-full rounded-lg border border-transparent bg-transparent py-2 text-center text-sm text-gray-300 hover:underline"
+            >
+                ¿Olvidaste tu contraseña?
             </Link>
         </div>
     )
