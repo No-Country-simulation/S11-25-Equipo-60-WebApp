@@ -343,7 +343,7 @@ SPECTACULAR_SETTINGS = {
     'CONTACT': {
         'name': 'Testimonial',
         'email': 'support@testimonial-cms.com',
-        'url': 'https://testimonial-cms.vercel.app/prueba',
+        'url': 'https://testimonial-cms.vercel.app/',
     },
     #Orden de los tags en Swagger
     'TAGS': [
