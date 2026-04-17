@@ -3,7 +3,7 @@ from .models import *
 from django.contrib.auth.models import Group as DefaultGroup
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, ReadOnlyPasswordHashField
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 from django_otp.plugins.otp_totp.models import TOTPDevice
@@ -161,11 +161,19 @@ class CustomUserCreationForm(UserCreationForm):
         
         return user
 
-class UserAdminForm(forms.ModelForm):
+class UserAdminForm(UserChangeForm):
     """
     Formulario personalizado para manejar la selección única de grupos
-    Y el manejo adecuado de fotos de perfil
+    y el manejo adecuado de fotos de perfil.
     """
+    password = ReadOnlyPasswordHashField(
+        label="Contraseña",
+        help_text=(
+            "La contraseña se almacena de forma segura. "
+            "Usa el enlace de cambio de contraseña en el admin para actualizarla."
+        )
+    )
+
     group_choice = forms.ModelChoiceField(
         queryset=Group.objects.all(),
         widget=forms.RadioSelect,
@@ -275,6 +283,10 @@ class UserAdminForm(forms.ModelForm):
             user.groups.set([default_group])
         
         return user
+
+    def clean_password(self):
+        # Mantener siempre el hash actual cuando se edita desde el admin.
+        return self.initial.get('password')
 
 class UserAdmin(BaseUserAdmin, UnfoldModelAdmin):
     list_display = ('username', 'email', 'is_staff', 'is_active', 'get_user_groups', 'display_profile_picture')
